@@ -125,6 +125,18 @@ export function sync(sheet, token) {
   return syncing;
 }
 
+// 等目前的同步結束（清空資料前呼叫，避免同步中途又把紀錄寫回去）
+export function whenIdle() {
+  return (syncing ?? Promise.resolve()).catch(() => {});
+}
+
+// 清空所有紀錄與待送佇列（保留試算表的綁定）
+export function clearRecords() {
+  records = [];
+  outbox = [];
+  persist();
+}
+
 // 換帳號或登出時清除本機資料
 export function clearLocal() {
   records = [];

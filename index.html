@@ -132,6 +132,11 @@
         <p><a id="source-link" href="https://github.com/Bear1110/headack" target="_blank" rel="noopener" data-i18n="settings.source"></a></p>
         <p class="muted small" data-i18n="settings.languageHelp"></p>
       </div>
+      <div class="card danger-zone">
+        <h2 data-i18n="danger.title"></h2>
+        <p class="muted small" data-i18n="danger.clearDesc"></p>
+        <button type="button" id="btn-clear" class="btn danger ghost" data-i18n="danger.clear"></button>
+      </div>
     </section>
 
     <footer class="site-footer">
@@ -206,6 +211,27 @@
         <button type="button" id="btn-import-close" class="btn ghost" data-i18n="import.close"></button>
         <span class="spacer"></span>
         <button type="submit" id="btn-import-confirm" class="btn" disabled></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 清空所有紀錄：需輸入確認文字 -->
+  <dialog id="clear-dialog" class="confirm-dialog">
+    <form id="clear-form" method="dialog">
+      <div class="dialog-body">
+        <h2 data-i18n="clear.title"></h2>
+        <p id="clear-body"></p>
+        <p id="clear-restore" class="warning small"></p>
+        <label class="field">
+          <span id="clear-hint"></span>
+          <input type="text" id="clear-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </label>
+        <p id="clear-error" class="error" hidden></p>
+      </div>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="button" id="btn-clear-cancel" class="btn ghost" data-i18n="form.cancel"></button>
+        <button type="submit" id="btn-clear-confirm" class="btn danger-solid" disabled data-i18n="clear.confirm"></button>
       </div>
     </form>
   </dialog>

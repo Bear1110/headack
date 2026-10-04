@@ -307,6 +307,57 @@ function deleteEditing() {
   trySync();
 }
 
+// ---------- 清空所有紀錄 ----------
+
+function openClearDialog() {
+  const n = store.getRecords().length;
+  const linked = !!auth.getEmail();
+  $('#clear-body').textContent = t(linked ? 'clear.body' : 'clear.bodyLocal', { n });
+  $('#clear-restore').textContent = t(linked ? 'clear.restore' : 'clear.restoreLocal');
+  $('#clear-hint').textContent = t('clear.typeHint', { word: t('clear.word') });
+  $('#clear-input').value = '';
+  $('#btn-clear-confirm').disabled = true;
+  $('#clear-error').hidden = true;
+  $('#clear-dialog').showModal();
+}
+
+function onClearInput() {
+  $('#btn-clear-confirm').disabled = $('#clear-input').value.trim().toLowerCase() !== t('clear.word').toLowerCase();
+}
+
+// 先清試算表、成功後才清本機；失敗時什麼都不刪。
+// 有綁定帳號但權杖過期時，必須在這個點擊事件中同步開啟登入彈窗。
+function confirmClear(e) {
+  e.preventDefault();
+  if ($('#btn-clear-confirm').disabled) return;
+  const linked = !!auth.getEmail();
+  const tokenPromise = !linked ? Promise.resolve(null)
+    : auth.hasValidToken() ? Promise.resolve(auth.getToken())
+    : auth.requestToken();
+  $('#btn-clear-confirm').disabled = true;
+  tokenPromise
+    .then(async (token) => {
+      await store.whenIdle();
+      if (token) {
+        if (!sheet) {
+          sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.title') });
+          store.setCachedSheetId(sheet.id);
+        }
+        await sheet.clearAll(token);
+      }
+      store.clearRecords();
+      calSelected = null;
+      $('#clear-dialog').close();
+      toast(t('clear.done'));
+    })
+    .catch((err) => {
+      console.error(err);
+      $('#clear-error').textContent = t('clear.failed');
+      $('#clear-error').hidden = false;
+      onClearInput();
+    });
+}
+
 // ---------- 匯入 ----------
 
 let importer = null; // 用到才載入
@@ -548,6 +599,7 @@ function renderSettings() {
   const email = auth.getEmail();
   $('#account-email').textContent = email || t('auth.localOnly');
   $('#btn-signout').hidden = !email;
+  $('#btn-clear').disabled = !store.getRecords().length;
   const link = $('#sheet-link');
   link.hidden = !sheet;
   if (sheet) link.href = sheet.url;
@@ -620,6 +672,11 @@ function bindEvents() {
   $('#btn-weather-off').addEventListener('click', disableWeather);
   $('#weather-toggle').addEventListener('change', (e) => (e.target.checked ? enableWeather() : disableWeather()));
   $('#aura-options').addEventListener('change', updateAuraWarning);
+
+  $('#btn-clear').addEventListener('click', openClearDialog);
+  $('#clear-input').addEventListener('input', onClearInput);
+  $('#clear-form').addEventListener('submit', confirmClear);
+  $('#btn-clear-cancel').addEventListener('click', () => $('#clear-dialog').close());
 
   $('#btn-import').addEventListener('click', openImport);
   $('#btn-copy-prompt').addEventListener('click', copyPrompt);

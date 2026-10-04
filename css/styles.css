@@ -343,6 +343,19 @@ dialog form { display: flex; flex-direction: column; height: 100%; }
 .switch-row { display: flex; align-items: center; gap: .75rem; cursor: pointer; min-height: var(--tap); }
 .switch-row input { width: 1.4rem; height: 1.4rem; min-height: 0; flex: none; accent-color: var(--primary); }
 
+/* 危險區域、確認對話框 */
+.danger-zone { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+.danger-zone h2 { color: var(--danger); }
+.btn.danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn.danger-solid:disabled { opacity: .4; }
+/* 確認對話框內容少，手機上也不必全螢幕 */
+dialog.confirm-dialog {
+  width: min(480px, calc(100vw - 32px)); height: fit-content; max-height: calc(100dvh - 32px);
+  margin: auto; border-radius: var(--radius);
+}
+dialog.confirm-dialog form { height: auto; }
+dialog.confirm-dialog .dialog-body { padding-top: 1.25rem; }
+
 /* 匯入 */
 .step { font-weight: 600; margin: 1.25rem 0 .5rem; }
 .ai-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }

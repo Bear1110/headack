@@ -161,6 +161,13 @@ export class Spreadsheet {
     });
   }
 
+  // 清空所有紀錄：只清除標題列以下的內容，保留試算表檔案與標題列。
+  // 之後 append 會從第 2 列重新開始寫。
+  async clearAll(token) {
+    const range = `${this.recordsRange}!A2:ZZ`;
+    await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}:clear`, { method: 'POST', body: {} });
+  }
+
   // 找不到該 ID 視為已刪除
   async remove(token, id) {
     const rowIndex = await this.#findRow(token, id);
