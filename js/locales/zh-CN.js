@@ -32,6 +32,7 @@ export default {
   'sync.syncing': '同步中…',
   'sync.failed': '同步失败，记录已保存在本机，稍后会重试。',
   'sync.offline': '离线中，记录已保存在本机。',
+  'sync.conflicts': '有 {n} 条在其他设备有较新的修改或已被删除，已以云端版本为准。',
   'sync.now': '立即同步',
   'log.start': '头痛开始了',
   'log.startHint': '先记下开始时间，细节之后再补',

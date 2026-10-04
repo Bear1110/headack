@@ -135,9 +135,18 @@ export class Spreadsheet {
     });
   }
 
-  async #findRow(token, id) {
-    const { rowIndexById } = await this.readAll(token);
-    return rowIndexById.get(id) ?? null;
+  // 找出紀錄所在的列與雲端版本
+  async #locate(token, id) {
+    const { records, rowIndexById } = await this.readAll(token);
+    const rowIndex = rowIndexById.get(id) ?? null;
+    return { rowIndex, remote: rowIndex == null ? null : records.find((r) => r.id === id) };
+  }
+
+  // 寫入或刪除前再讀一次該列的 ID：另一台裝置可能剛好增刪了前面的列，造成列號位移
+  async #idAt(token, rowIndex) {
+    const range = `${this.recordsRange}!${colLetter(this.headers.indexOf('id'))}${rowIndex + 1}`;
+    const data = await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}?valueRenderOption=UNFORMATTED_VALUE`);
+    return String(data.values?.[0]?.[0] ?? '');
   }
 
   // 一次新增一或多筆
@@ -150,15 +159,24 @@ export class Spreadsheet {
     });
   }
 
-  // 找不到該 ID（例如使用者在試算表裡刪掉了）就改為新增
+  // 更新一筆。回傳：
+  // - 'ok'
+  // - 'deleted'：雲端已找不到（在別的裝置或試算表裡被刪除）→ 刪除為準，不重新新增
+  // - 'stale'：雲端版本的修改時間比較新 → 以最後編輯為準，不覆蓋
   async update(token, record) {
-    const rowIndex = await this.#findRow(token, record.id);
-    if (rowIndex == null) return this.append(token, record);
-    const range = `${this.recordsRange}!A${rowIndex + 1}`;
-    await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
-      method: 'PUT',
-      body: { values: [recordToRow(record, this.headers)] },
-    });
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { rowIndex, remote } = await this.#locate(token, record.id);
+      if (rowIndex == null) return 'deleted';
+      if (remote?.updated_at && record.updated_at && String(remote.updated_at) > String(record.updated_at)) return 'stale';
+      if (await this.#idAt(token, rowIndex) !== record.id) continue; // 列號位移，重新找
+      const range = `${this.recordsRange}!A${rowIndex + 1}`;
+      await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
+        method: 'PUT',
+        body: { values: [recordToRow(record, this.headers)] },
+      });
+      return 'ok';
+    }
+    throw new Error('row_moved');
   }
 
   // 清空所有紀錄：只清除標題列以下的內容，保留試算表檔案與標題列。
@@ -168,21 +186,21 @@ export class Spreadsheet {
     await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}:clear`, { method: 'POST', body: {} });
   }
 
-  // 找不到該 ID 視為已刪除
+  // 找不到該 ID 視為已刪除；刪除前同樣確認列號沒有位移
   async remove(token, id) {
-    const rowIndex = await this.#findRow(token, id);
-    if (rowIndex == null) return;
-    await api(token, `${SHEETS}/${this.id}:batchUpdate`, {
-      method: 'POST',
-      body: {
-        requests: [{
-          deleteDimension: {
-            range: { sheetId: RECORDS_SHEET_ID, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
-          },
-        }],
-      },
-    });
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { rowIndex } = await this.#locate(token, id);
+      if (rowIndex == null) return 'ok';
+      if (await this.#idAt(token, rowIndex) !== id) continue; // 列號位移，重新找
+      await api(token, `${SHEETS}/${this.id}:batchUpdate`, {
+        method: 'POST',
+        body: { requests: [{ deleteDimension: { range: { sheetId: RECORDS_SHEET_ID, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 } } }] },
+      });
+      return 'ok';
+    }
+    throw new Error('row_moved');
   }
+
 }
 
 function colLetter(index) {

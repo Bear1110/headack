@@ -94,8 +94,9 @@ async function trySync() {
       sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.sheetTitle') });
       store.setCachedSheetId(sheet.id);
     }
-    await store.sync(sheet, token);
+    const { conflicts } = await store.sync(sheet, token);
     syncState = 'idle';
+    if (conflicts) toast(t('sync.conflicts', { n: conflicts }), 6000);
   } catch (e) {
     console.error(e);
     if (e instanceof ApiError && e.status === 401) {

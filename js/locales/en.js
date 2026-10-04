@@ -32,6 +32,7 @@ export default {
   'sync.syncing': 'Syncing…',
   'sync.failed': 'Sync failed. Entries are kept on this device and will be retried.',
   'sync.offline': 'Offline. Entries are kept on this device.',
+  'sync.conflicts': { one: '{n} entry was changed more recently or deleted on another device; the cloud version was kept.', other: '{n} entries were changed more recently or deleted on another device; the cloud versions were kept.' },
   'sync.now': 'Sync now',
   'log.start': 'Headache started',
   'log.startHint': 'Record the start time now, add details later',

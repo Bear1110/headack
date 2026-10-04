@@ -114,9 +114,11 @@ const inFlight = new Set(); // 正在送出的項目，不可再被合併或移�
 const APPEND_BATCH = 500;
 
 // 依序送出待送佇列，再從試算表讀回最新資料。任何一步失敗就停下，佇列保留到下次。
+// 回傳 { conflicts }：有幾筆因為雲端有較新修改或已被刪除，而改採雲端版本
 export function sync(sheet, token) {
   if (syncing) return syncing;
   syncing = (async () => {
+    let conflicts = 0;
     try {
       while (outbox.length) {
         // 連續的新增合併成一次 append，避免大量匯入時撞到每分鐘請求上限
@@ -130,7 +132,7 @@ export function sync(sheet, token) {
         const [op] = ops;
         if (batch.length) await sheet.append(token, batch.map((o) => o.record));
         else if (op.type === 'delete') await sheet.remove(token, op.id);
-        else await sheet.update(token, op.record);
+        else if (await sheet.update(token, op.record) !== 'ok') conflicts += 1;
         outbox = outbox.filter((o) => !inFlight.has(o));
         inFlight.clear();
         persist();
@@ -143,6 +145,7 @@ export function sync(sheet, token) {
         else applyUpsert(records, op.record);
       }
       persist();
+      return { conflicts };
     } finally {
       inFlight.clear();
       syncing = null;
