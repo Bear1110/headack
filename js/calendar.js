@@ -1,4 +1,4 @@
-// 日曆：最近 N 個月（依時間順序，本月在最後），每天依最痛程度上色，有用藥加記號。
+// 日曆：畫出指定的月份，每天依最痛程度上色，有用藥加記號。
 // 只產生 HTML，互動由 app.js 處理。
 
 import { daysCovered, localDate, monthStats } from './stats.js';
@@ -43,7 +43,8 @@ function dayLabel(t, dayFmt, date, e) {
   return `${d}: ${parts.join(', ')}`;
 }
 
-export function renderCalendar({ records, months, lang, t, selected }) {
+// months：要畫的月份清單（'YYYY-MM'，依顯示順序）；linkMonths：月份標題可點（年檢視用來進入該月）
+export function renderCalendar({ records, months, lang, t, selected, linkMonths = false }) {
   const dayMap = buildDayMap(records);
   const today = localDate(new Date());
   const firstDay = firstDayOfWeek(lang);
@@ -54,12 +55,9 @@ export function renderCalendar({ records, months, lang, t, selected }) {
   // 週幾的標題（以 2023-01-01 週日為基準）
   const weekdays = Array.from({ length: 7 }, (_, i) => weekdayFmt.format(new Date(2023, 0, 1 + ((firstDay + i) % 7))));
 
-  const now = new Date();
   const blocks = [];
-  // 依時間順序排列：舊的在前（左 / 上），本月在最後（右 / 下）
-  for (let m = months - 1; m >= 0; m--) {
-    const first = new Date(now.getFullYear(), now.getMonth() - m, 1);
-    const ym = localDate(first).slice(0, 7);
+  for (const ym of months) {
+    const first = new Date(`${ym}-01T00:00`);
     const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
     const lead = (first.getDay() - firstDay + 7) % 7;
     const s = monthStats(records, ym);
@@ -85,7 +83,7 @@ export function renderCalendar({ records, months, lang, t, selected }) {
     blocks.push(`
       <section class="cal-month">
         <header class="cal-head">
-          <h3>${esc(monthFmt.format(first))}</h3>
+          <h3>${linkMonths ? `<button type="button" class="cal-month-link" data-open-month="${ym}">${esc(monthFmt.format(first))}</button>` : esc(monthFmt.format(first))}</h3>
           <span class="muted small">${esc(t('cal.summary', { h: s.headacheDays, m: s.medDays }))}${s.mohWarnings.length ? ' <span class="cal-warn" title="' + esc(t('cal.mohHint')) + '">⚠</span>' : ''}</span>
         </header>
         <div class="cal-grid">

@@ -131,21 +131,27 @@
     <!-- 日曆：最近 3 / 6 個月 -->
     <section id="view-calendar" class="view">
       <div class="cal-toolbar">
-        <div class="seg cal-range" role="radiogroup" data-i18n-attr="aria-label:cal.range">
-          <button type="button" role="radio" data-months="3" data-i18n="cal.range3"></button>
-          <button type="button" role="radio" data-months="6" data-i18n="cal.range6"></button>
-          <button type="button" role="radio" data-months="12" data-i18n="cal.range12"></button>
+        <div class="seg cal-mode" role="radiogroup" data-i18n-attr="aria-label:cal.view">
+          <button type="button" role="radio" data-cal-mode="month" data-i18n="cal.modeMonth"></button>
+          <button type="button" role="radio" data-cal-mode="year" data-i18n="cal.modeYear"></button>
         </div>
-        <div class="cal-legend" aria-hidden="true">
-          <span><i class="sw i2"></i><span data-i18n="cal.legendMild"></span></span>
-          <span><i class="sw i5"></i><i class="sw i7"></i><i class="sw i9"></i><span data-i18n="cal.legendSevere"></span></span>
-          <span><i class="sw no-intensity"></i><span data-i18n="cal.legendUnknown"></span></span>
-          <span><i class="dot"></i><span data-i18n="cal.meds"></span></span>
+        <div class="cal-nav">
+          <button type="button" id="cal-prev" class="pager-btn" data-i18n-attr="aria-label:cal.prev,title:cal.prev">‹</button>
+          <div id="cal-label" class="cal-label"></div>
+          <button type="button" id="cal-next" class="pager-btn" data-i18n-attr="aria-label:cal.next,title:cal.next">›</button>
+          <button type="button" id="cal-today" class="btn ghost small" data-i18n="cal.today"></button>
         </div>
       </div>
-      <div id="cal-pager" class="cal-pager"></div>
-      <div id="calendar-months" class="cal-months"></div>
-      <div id="cal-year-detail"></div>
+      <div class="cal-legend" aria-hidden="true">
+        <span><i class="sw i2"></i><span data-i18n="cal.legendMild"></span></span>
+        <span><i class="sw i5"></i><i class="sw i7"></i><i class="sw i9"></i><span data-i18n="cal.legendSevere"></span></span>
+        <span><i class="sw no-intensity"></i><span data-i18n="cal.legendUnknown"></span></span>
+        <span><i class="dot"></i><span data-i18n="cal.meds"></span></span>
+      </div>
+      <div class="cal-layout">
+        <div id="calendar-months" class="cal-months"></div>
+        <div id="cal-detail" class="card cal-detail"></div>
+      </div>
     </section>
 
     <!-- 統計 -->

@@ -254,25 +254,29 @@ body[data-view="settings"] #view-settings { display: flex; }
 
 /* 日曆 */
 .cal-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
-.seg.cal-range { flex: 0 1 260px; min-width: 200px; }
 .cal-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .8rem; color: var(--muted); }
 .cal-legend > span { display: inline-flex; align-items: center; gap: .25rem; }
 .cal-legend .sw { width: .85rem; height: .85rem; border-radius: 3px; display: inline-block; background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%); }
 .cal-legend .sw.no-intensity { background: var(--muted); }
 .cal-legend .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text); display: inline-block; }
-.cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-/* 手機：月份左右滑動（scroll-snap），一次一個月；舊→新，本月在最右邊，與桌機一致 */
-@media (max-width: 599px) {
-  #view-calendar:not(.year) .cal-months {
-    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
-    scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter);
-    align-items: flex-start;
-  }
-  #view-calendar:not(.year) .cal-months::-webkit-scrollbar { display: none; }
-  #view-calendar:not(.year) .cal-month { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+.cal-mode.seg { flex: 0 0 auto; }
+.cal-mode.seg button { min-width: 3.4rem; padding-inline: .9rem; }
+.cal-nav { display: flex; align-items: center; gap: .4rem; }
+.cal-label { min-width: 9.5rem; text-align: center; font-weight: 700; }
+.cal-label input[type="month"] { width: 100%; min-height: var(--tap); text-align: center; font-weight: 700; cursor: pointer; }
+.cal-label-text { font-size: 1.15rem; }
+.cal-nav .btn[hidden] { display: none; }
+.pager-btn {
+  appearance: none; width: var(--tap); height: var(--tap); border-radius: 50%; cursor: pointer; flex: none;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.4rem; line-height: 1;
 }
-.cal-pager { display: none; }
-/* 年度總覽：縮小月曆，只看顏色與用藥點 */
+.pager-btn:disabled { opacity: .3; cursor: default; }
+[dir="rtl"] .pager-btn { transform: scaleX(-1); }
+
+/* 月檢視：一個月 + 明細（手機上下排，桌機左右排）；年檢視：12 個月縮圖，不顯示明細 */
+.cal-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+.cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; touch-action: pan-y; }
+#view-calendar.year .cal-layout { grid-template-columns: 1fr; }
 #view-calendar.year .cal-months { grid-template-columns: repeat(2, 1fr); gap: .6rem; }
 #view-calendar.year .cal-months .cal-month { padding: .5rem; }
 #view-calendar.year .cal-months .cal-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: .3rem; }
@@ -283,26 +287,14 @@ body[data-view="settings"] #view-settings { display: flex; }
 #view-calendar.year .cal-months .cal-day { min-height: 0; border-radius: 3px; font-size: 0; }
 #view-calendar.year .cal-months .cal-med { width: 3px; height: 3px; bottom: 1px; }
 #view-calendar.year .cal-months .cal-day.today { border-width: 1px; }
-#view-calendar.year .cal-months .cal-day.selected { outline-width: 2px; outline-offset: 0; }
-#cal-year-detail:empty { display: none; }
-#cal-year-detail .cal-detail { margin-top: 0; }
 @media (min-width: 600px) { #view-calendar.year .cal-months { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 900px) { #view-calendar.year .cal-months { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 599px) {
-  #view-calendar:not(.year) .cal-pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: -.25rem; }
+@media (min-width: 900px) {
+  #view-calendar.year .cal-months { grid-template-columns: repeat(4, 1fr); }
+  #view-calendar:not(.year) .cal-layout { grid-template-columns: minmax(340px, 460px) 1fr; }
 }
-.pager-btn {
-  appearance: none; width: var(--tap); height: var(--tap); border-radius: 50%; cursor: pointer;
-  border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.4rem; line-height: 1;
-}
-.pager-btn:disabled { opacity: .3; cursor: default; }
-.pager-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.pager-dot {
-  appearance: none; width: 10px; height: 10px; padding: 0; border-radius: 50%; cursor: pointer;
-  border: 0; background: var(--border);
-}
-.pager-dot[aria-current="true"] { background: var(--primary); width: 22px; border-radius: 5px; }
-[dir="rtl"] .pager-btn { transform: scaleX(-1); }
+.cal-month-link { appearance: none; border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.cal-month-link:hover { color: var(--primary); }
+.link-btn { appearance: none; border: 0; background: none; padding: .25rem 0; font: inherit; font-size: .85rem; color: var(--primary); cursor: pointer; text-decoration: underline; }
 .cal-month { scroll-margin-top: calc(var(--topbar-h) + 12px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
 .cal-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .cal-head h3 { margin: 0; font-size: 1rem; }
@@ -330,7 +322,9 @@ body[data-view="settings"] #view-settings { display: flex; }
 .intensity-pick button.i2[aria-pressed="true"], .intensity-pick button.i3[aria-pressed="true"], .intensity-pick button.i4[aria-pressed="true"],
 .intensity-pick button.i5[aria-pressed="true"], .intensity-pick button.i6[aria-pressed="true"] { color: #1f2330; }
 .cal-day.i2 .cal-med, .cal-day.i3 .cal-med, .cal-day.i4 .cal-med, .cal-day.i5 .cal-med, .cal-day.i6 .cal-med { background: #1f2330; }
-.cal-detail { margin-top: .75rem; display: flex; flex-direction: column; gap: .5rem; }
+.cal-detail { display: flex; flex-direction: column; gap: .5rem; scroll-margin-top: calc(var(--topbar-h) + 12px); }
+.cal-detail[hidden] { display: none; }
+.cal-detail-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
 .cal-detail h4 { margin: 0; font-size: .95rem; }
 .cal-detail .record-list { gap: .4rem; }
 
@@ -738,7 +732,6 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   /* 桌機：子分頁不必拉滿整列，AI 分析靠右 */
   .stats-tabs-row { justify-content: space-between; }
   .stats-tabs-row .stats-tabs { flex: 0 1 420px; }
-  .cal-months { grid-template-columns: repeat(2, 1fr); align-items: start; }
   .intensity-pick { grid-template-columns: repeat(10, 1fr); }
 
   dialog {
@@ -778,7 +771,6 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   body[data-view="log"] .site-footer { grid-column: 1 / -1; }
   .view-title { display: block; margin: 0; }
 
-  .cal-months { grid-template-columns: repeat(3, 1fr); }
   body[data-view="settings"] main { max-width: 760px; }
   body[data-view="stats"] main { max-width: 1120px; }
   .stat-grid { grid-template-columns: 1fr 1fr; align-items: start; }

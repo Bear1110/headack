@@ -662,56 +662,81 @@ function hasMultipleTypes(records) {
 }
 
 // ---------- 日曆 ----------
+//
+// 兩種檢視（手機、電腦相同）：
+// - 月：一次一個月，‹ › 或左右滑動切換，可一直往前；月份標籤是年月選擇器（直接跳）；旁邊的明細面板
+//       沒選日期時列出整個月的紀錄，選了日期就列出當天的紀錄
+// - 年：某一年 1–12 月的縮圖；點日期或月份標題會「往下鑽」到該月的月檢視（結果一定看得到）
 
-const CAL_KEY = 'hl.calMonths';
-let calMonths = 3;
-try {
-  const saved = Number(localStorage.getItem(CAL_KEY));
-  if ([3, 6, 12].includes(saved)) calMonths = saved;
-} catch { /* ignore */ }
-// 12 個月 = 年度總覽：縮小的月曆一次全部顯示（手機也不左右滑）
-const isYearView = () => calMonths === 12;
+const CAL_KEY = 'hl.calMode';
+const thisMonth = () => localDate(new Date()).slice(0, 7);
+let calMode = 'month';
+try { if (localStorage.getItem(CAL_KEY) === 'year') calMode = 'year'; } catch { /* ignore */ }
+let calMonth = thisMonth(); // 月檢視：'YYYY-MM'
+let calYear = new Date().getFullYear(); // 年檢視
 let calSelected = null; // 'YYYY-MM-DD'
-// 手機：月份左右滑動（舊→新，本月在最右）。記住目前停在第幾個月，重繪後回到同一個月
-let calPage = null; // null = 本月（最後一個）
-const isNarrow = () => matchMedia('(max-width: 599px)').matches;
+
+const shiftMonth = (ym, n) => localDate(new Date(Number(ym.slice(0, 4)), Number(ym.slice(5, 7)) - 1 + n, 1)).slice(0, 7);
+
+function setCalMode(mode) {
+  calMode = mode;
+  try { localStorage.setItem(CAL_KEY, mode); } catch { /* ignore */ }
+}
 
 function renderCalendarView() {
-  document.querySelectorAll('.cal-range [data-months]').forEach((b) => {
-    b.setAttribute('aria-checked', String(Number(b.dataset.months) === calMonths));
-  });
-  // 版面在這裡決定一次：年度總覽是格狀，其他（手機）是左右滑；CSS 依 #view-calendar.year 切換
-  $('#view-calendar').classList.toggle('year', isYearView());
-  const box = $('#calendar-months');
-  box.innerHTML = calendarHtml({ records: store.getRecords(), months: calMonths, lang: getLang(), t, selected: calSelected });
-  renderCalPager();
-  showCalPage(calPage ?? calMonths - 1, false);
+  const year = calMode === 'year';
+  $('#view-calendar').classList.toggle('year', year);
+  document.querySelectorAll('.cal-mode [data-cal-mode]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.calMode === calMode)));
+
+  // 導覽列：‹ 標籤 ›；月檢視的標籤是原生年月選擇器
+  const atEnd = year ? calYear >= new Date().getFullYear() : calMonth >= thisMonth();
+  const atNow = year ? calYear === new Date().getFullYear() : calMonth === thisMonth();
+  $('#cal-label').innerHTML = year
+    ? `<span class="cal-label-text">${calYear}</span>`
+    : `<input type="month" id="cal-month-input" value="${calMonth}" max="${thisMonth()}" aria-label="${escapeHtml(t('cal.pickMonth'))}">`;
+  $('#cal-next').disabled = atEnd;
+  $('#cal-today').hidden = atNow;
+
+  const months = year ? Array.from({ length: 12 }, (_, i) => `${calYear}-${String(i + 1).padStart(2, '0')}`) : [calMonth];
+  $('#calendar-months').innerHTML = calendarHtml({ records: store.getRecords(), months, lang: getLang(), t, selected: calSelected, linkMonths: year });
   renderDayDetail();
 }
 
-// 選取的日期：一般模式顯示在該月下方；年度總覽的月份很小，顯示在整個年曆下方
+// 月檢視旁的明細：選了日期 → 當天紀錄；沒選 → 整個月的紀錄（年檢視不顯示，點日期會進入月檢視）
 function renderDayDetail() {
-  $('#cal-year-detail').innerHTML = '';
-  document.querySelector('#calendar-months .cal-detail')?.remove();
-  const btn = calSelected && $('#calendar-months').querySelector(`[data-day="${calSelected}"]`);
-  if (!btn) return;
-  const dayRecords = store.getRecords()
-    .filter((r) => daysCovered(r).includes(calSelected))
+  const panel = $('#cal-detail');
+  panel.hidden = calMode === 'year';
+  if (calMode === 'year') return;
+  const all = store.getRecords();
+  const showType = hasMultipleTypes(all);
+  const items = (calSelected
+    ? all.filter((r) => daysCovered(r).includes(calSelected))
+    : all.filter((r) => r.start?.startsWith(calMonth)))
     .sort((a, b) => a.start.localeCompare(b.start));
-  const title = new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
-  const target = isYearView() ? $('#cal-year-detail') : btn.closest('.cal-month');
-  target.insertAdjacentHTML('beforeend', `
-    <div class="cal-detail">
+  const title = calSelected
+    ? new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { month: 'long', day: 'numeric', weekday: 'short' })
+    : t('cal.monthEntries', { n: items.length });
+  const addDay = calSelected ?? (calMonth === thisMonth() ? localDate(new Date()) : `${calMonth}-01`);
+  panel.innerHTML = `
+    <div class="cal-detail-head">
       <h4>${escapeHtml(title)}</h4>
-      ${dayRecords.length
-        ? `<ul class="record-list">${dayRecords.map((r) => recordItemHtml(r, { showType: hasMultipleTypes(store.getRecords()) })).join('')}</ul>`
-        : `<p class="muted small">${escapeHtml(t('cal.noEntries'))}</p>`}
-      <button type="button" class="btn ghost small" data-add-day="${calSelected}">＋ ${escapeHtml(t('cal.addForDay'))}</button>
-    </div>`);
+      ${calSelected ? `<button type="button" class="link-btn" data-clear-day>${escapeHtml(t('cal.showMonth'))}</button>` : ''}
+    </div>
+    ${items.length
+      ? `<ul class="record-list">${items.map((r) => recordItemHtml(r, { showType })).join('')}</ul>`
+      : `<p class="muted small">${escapeHtml(t(calSelected ? 'cal.noEntries' : 'cal.noEntriesMonth'))}</p>`}
+    ${calSelected ? `<button type="button" class="btn ghost small" data-add-day="${addDay}">＋ ${escapeHtml(t('cal.addForDay'))}</button>` : ''}`;
 }
 
-// 點日期：只移動選取狀態並更新明細，不重繪整個日曆（年度總覽有 12 個月）
+// 點日期：月檢視只更新選取與明細；年檢視往下鑽到該月
 function selectDay(day) {
+  if (calMode === 'year') {
+    setCalMode('month');
+    calMonth = day.slice(0, 7);
+    calSelected = day;
+    renderCalendarView();
+    return;
+  }
   calSelected = calSelected === day ? null : day;
   document.querySelectorAll('#calendar-months .cal-day.selected').forEach((b) => {
     b.classList.remove('selected');
@@ -721,64 +746,51 @@ function selectDay(day) {
   btn?.classList.add('selected');
   btn?.setAttribute('aria-pressed', 'true');
   renderDayDetail();
+  // 手機上明細在月曆下方：不在畫面內就捲過去
+  const panel = $('#cal-detail');
+  const rect = panel.getBoundingClientRect();
+  if (calSelected && rect.top > window.innerHeight - 120) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// 手機的分頁控制：‹ › 箭頭與小圓點
-function renderCalPager() {
-  const n = calMonths;
-  $('#cal-pager').innerHTML = `
-    <button type="button" class="pager-btn" data-page-step="-1" aria-label="${escapeHtml(t('cal.prev'))}">‹</button>
-    <span class="pager-dots">${Array.from({ length: n }, (_, i) => `<button type="button" class="pager-dot" data-page="${i}" aria-label="${i + 1} / ${n}"></button>`).join('')}</span>
-    <button type="button" class="pager-btn" data-page-step="1" aria-label="${escapeHtml(t('cal.next'))}">›</button>`;
-}
-
-function updateCalPager() {
-  const i = calPage ?? calMonths - 1;
-  document.querySelectorAll('#cal-pager .pager-dot').forEach((d, k) => d.setAttribute('aria-current', String(k === i)));
-  const [prev, next] = document.querySelectorAll('#cal-pager .pager-btn');
-  if (prev) prev.disabled = i <= 0;
-  if (next) next.disabled = i >= calMonths - 1;
-}
-
-function showCalPage(i, smooth = true) {
-  calPage = Math.max(0, Math.min(calMonths - 1, i));
-  updateCalPager();
-  if (!isNarrow() || isYearView()) return;
-  const box = $('#calendar-months');
-  const month = box.children[calPage];
-  // 以第一個月為基準算位移（容器有左右內距與月份間距）
-  if (month) box.scrollTo({ left: month.offsetLeft - box.firstElementChild.offsetLeft, behavior: smooth ? 'smooth' : 'instant' });
-}
-
-// 使用者自己滑動時，更新目前月份
-let calScrollTimer;
-function onCalendarScroll() {
-  clearTimeout(calScrollTimer);
-  calScrollTimer = setTimeout(() => {
-    const box = $('#calendar-months');
-    const months = [...box.children];
-    if (!months.length) return;
-    const base = months[0].offsetLeft;
-    const pos = Math.abs(box.scrollLeft);
-    calPage = months.reduce((best, m, i) => (Math.abs(m.offsetLeft - base - pos) < Math.abs(months[best].offsetLeft - base - pos) ? i : best), 0);
-    updateCalPager();
-  }, 80);
+function stepCalendar(n) {
+  if (calMode === 'year') calYear = Math.min(new Date().getFullYear(), calYear + n);
+  else {
+    const next = shiftMonth(calMonth, n);
+    calMonth = next > thisMonth() ? thisMonth() : next;
+  }
+  calSelected = null;
+  renderCalendarView();
 }
 
 function onCalendarClick(e) {
-  const step = e.target.closest('[data-page-step]');
-  if (step) return showCalPage((calPage ?? calMonths - 1) + Number(step.dataset.pageStep));
-  const dot = e.target.closest('[data-page]');
-  if (dot) return showCalPage(Number(dot.dataset.page));
-  const range = e.target.closest('[data-months]');
-  if (range) {
-    calPage = null; // 換範圍：回到本月
-    calMonths = Number(range.dataset.months);
-    try { localStorage.setItem(CAL_KEY, String(calMonths)); } catch { /* ignore */ }
+  const mode = e.target.closest('[data-cal-mode]');
+  if (mode) {
+    setCalMode(mode.dataset.calMode);
+    calYear = Number(calMonth.slice(0, 4)); // 切換檢視時停在同一個時間點
+    calSelected = null;
+    return renderCalendarView();
+  }
+  if (e.target.closest('#cal-prev')) return stepCalendar(-1);
+  if (e.target.closest('#cal-next')) return stepCalendar(1);
+  if (e.target.closest('#cal-today')) {
+    calMonth = thisMonth();
+    calYear = new Date().getFullYear();
+    calSelected = null;
+    return renderCalendarView();
+  }
+  const open = e.target.closest('[data-open-month]');
+  if (open) {
+    setCalMode('month');
+    calMonth = open.dataset.openMonth;
+    calSelected = null;
     return renderCalendarView();
   }
   const day = e.target.closest('[data-day]');
   if (day) return selectDay(day.dataset.day);
+  if (e.target.closest('[data-clear-day]')) {
+    calSelected = null;
+    return renderCalendarView();
+  }
   const item = e.target.closest('li[data-id]');
   if (item) return openForm(store.getRecords().find((r) => r.id === item.dataset.id));
   const add = e.target.closest('[data-add-day]');
@@ -787,6 +799,23 @@ function onCalendarClick(e) {
     const now = nowLocal();
     openForm(null, { start: `${add.dataset.addDay}T${now.slice(11)}` });
   }
+}
+
+// 月檢視可以左右滑動切換月份（往右滑 = 上個月）
+function bindCalendarSwipe() {
+  const box = $('#calendar-months');
+  let x0 = null;
+  let y0 = null;
+  box.addEventListener('touchstart', (e) => { [x0, y0] = [e.touches[0].clientX, e.touches[0].clientY]; }, { passive: true });
+  box.addEventListener('touchend', (e) => {
+    if (x0 == null || calMode !== 'month') return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = document.documentElement.dir === 'rtl';
+    stepCalendar((dx > 0) !== rtl ? -1 : 1);
+  }, { passive: true });
 }
 
 // 統計頁由 statsview.js 負責（篩選、我的趨勢、看診摘要）
@@ -961,12 +990,7 @@ function showView(name) {
   renderSync(); // 首頁與其他分頁的提醒方式不同
   window.scrollTo(0, 0);
   if (name === 'stats') statsView?.render(); // 隱藏時量不到圖表寬度，切過來再畫一次
-  // 手機上月份是單欄、本月在最下面：切到日曆時直接捲到本月
-  // 進入日曆：回到本月（手機上月份是左右滑動，本月在最右邊）
-  if (name === 'calendar') {
-    calPage = null;
-    renderCalendarView();
-  }
+  if (name === 'calendar') renderCalendarView();
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
 }
 
@@ -1045,7 +1069,13 @@ function bindEvents() {
     },
   });
   $('#view-calendar').addEventListener('click', onCalendarClick);
-  $('#calendar-months').addEventListener('scroll', onCalendarScroll, { passive: true });
+  $('#view-calendar').addEventListener('change', (e) => {
+    if (e.target.id !== 'cal-month-input' || !e.target.value) return;
+    calMonth = e.target.value > thisMonth() ? thisMonth() : e.target.value;
+    calSelected = null;
+    renderCalendarView();
+  });
+  bindCalendarSwipe();
 
   $('#btn-weather-on').addEventListener('click', enableWeather);
   $('#btn-weather-off').addEventListener('click', disableWeather);
