@@ -206,7 +206,7 @@ export default {
   'about.title': 'Why "Headack"?',
   'about.p1': 'Headack = headache + ack (acknowledge). A headache that isn’t acked — noticed and written down — is hard to understand, and hard to treat well together with your doctor.',
   'about.p2': 'So we hope you’ll log your headaches and medication: when it started, how long it lasted, what you took and whether it helped. Over time these records show you and your doctor your pattern, help identify what’s going on, and guide treatment.',
-  'about.tagline': 'A headache has to be acked before it can be handled. Start by logging this one.',
+  'about.tagline': 'A headache has to be acked (acknowledged: noticed and written down) before it can be handled. Start by logging this one.',
   'demo.title': 'Demo mode',
   'demo.desc': 'Explore the calendar, stats and doctor summary with about seven months of sample data. Nothing is synced and your real entries are not touched; the sample data is removed when you leave.',
   'demo.enter': 'Try demo mode',
