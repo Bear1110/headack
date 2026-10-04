@@ -1,4 +1,4 @@
-<p align="center"><img src="icons/logo.svg" width="120" alt=""></p>
+<p align="center"><img src="icons/logo-512.png" width="120" alt=""></p>
 
 <h1 align="center">Headack</h1>
 

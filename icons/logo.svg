@@ -1,14 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Headack：幾何熊頭 + 劈進額頭的閃電（透明背景，用於標題列） -->
-  <circle cx="142" cy="138" r="78" fill="#b8733f"/>
-  <circle cx="370" cy="138" r="78" fill="#b8733f"/>
-  <circle cx="256" cy="292" r="184" fill="#c8814a"/>
-  <!-- 閃電：從頭頂劈進額頭 -->
-  <path d="M286 92 L222 214 L268 214 L232 312 L338 178 L290 178 L330 92 Z" fill="#ffc53d"/>
-  <!-- 瞇眼 > < -->
-  <path d="M150 262 L196 290 L150 318" fill="none" stroke="#2b1a10" stroke-width="22" stroke-linejoin="miter" stroke-linecap="butt"/>
-  <path d="M362 262 L316 290 L362 318" fill="none" stroke="#2b1a10" stroke-width="22" stroke-linejoin="miter" stroke-linecap="butt"/>
-  <!-- 嘴部與鼻子 -->
-  <circle cx="256" cy="372" r="74" fill="#f2d2aa"/>
-  <rect x="226" y="336" width="60" height="36" rx="18" fill="#2b1a10"/>
+  <!-- Headack：頭痛熊熊（依原始插畫重繪的向量版；顏色取自原圖） -->
+  <defs>
+    <clipPath id="card"><rect width="512" height="512" rx="104"/></clipPath>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ef7a5c" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ef7a5c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="512" height="512" fill="#fbeedd"/>
+    <!-- 身體與左耳、右耳 -->
+    <ellipse cx="150" cy="530" rx="175" ry="78" fill="#b8744d"/>
+    <circle cx="140" cy="150" r="74" fill="#b8744d"/>
+    <circle cx="150" cy="160" r="40" fill="#8f5536"/>
+    <circle cx="424" cy="214" r="70" fill="#b8744d"/>
+    <circle cx="432" cy="222" r="35" fill="#8f5536"/>
+    <!-- 頭 -->
+    <ellipse cx="236" cy="336" rx="212" ry="186" fill="#c68054"/>
+    <!-- 頭痛處的紅暈 -->
+    <circle cx="392" cy="250" r="62" fill="url(#glow)"/>
+    <!-- 腮紅 -->
+    <ellipse cx="118" cy="330" rx="31" ry="21" fill="#ec8b6c" opacity=".85"/>
+    <ellipse cx="368" cy="382" rx="29" ry="19" fill="#ec8b6c" opacity=".85"/>
+    <!-- 嘴部、鼻子 -->
+    <ellipse cx="238" cy="372" rx="80" ry="64" fill="#f6d9b9"/>
+    <ellipse cx="240" cy="352" rx="25" ry="18" fill="#4b2b1e"/>
+    <!-- 眉毛與眼睛（左眼張開、右眼痛到瞇起） -->
+    <g fill="none" stroke="#4b2b1e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M150 266 q24 -16 52 -2"/>
+      <path d="M318 294 q24 -12 46 6"/>
+      <path d="M354 322 L320 338 L354 352"/>
+    </g>
+    <ellipse cx="180" cy="308" rx="13" ry="18" fill="#3c2418"/>
+    <!-- 托著臉的手 -->
+    <ellipse cx="392" cy="452" rx="58" ry="80" transform="rotate(-14 392 452)" fill="#b8744d"/>
+    <ellipse cx="388" cy="446" rx="50" ry="72" transform="rotate(-14 388 446)" fill="#c27b50"/>
+    <!-- 閃電與痛痛線 -->
+    <path d="M427 216 L405 254 L423 254 L407 292 L446 244 L427 244 L441 216 Z" fill="#ef7a5c" stroke="#fbeedd" stroke-width="4" stroke-linejoin="round"/>
+    <g stroke="#ef7a5c" stroke-width="8" stroke-linecap="round">
+      <path d="M383 236 l4 22"/>
+      <path d="M455 300 l20 -9"/>
+      <path d="M460 326 l20 4"/>
+    </g>
+  </g>
 </svg>

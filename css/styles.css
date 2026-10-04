@@ -77,7 +77,7 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .topbar h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* 品牌：熊熊 logo + 小寫文字標誌 */
 .brand { display: flex; align-items: center; gap: .45rem; flex: none; }
-.brand img { width: 34px; height: 34px; flex: none; }
+.brand img { width: 34px; height: 34px; flex: none; border-radius: 8px; }
 .brand span { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
 .brand-link { display: inline-flex; align-items: center; gap: .4rem; font-weight: 800; font-size: 1.1rem; color: var(--text); text-decoration: none; }
 .top-actions { display: flex; align-items: center; gap: .5rem; min-width: 0; }
