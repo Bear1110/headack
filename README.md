@@ -7,6 +7,8 @@
 Headack 是免費的頭痛日記。頭痛發作時點一下就能記錄，看診時可以給醫師看每月統計。
 紀錄存在**你自己的 Google 雲端硬碟**，網站作者看不到任何人的資料。
 
+> **為什麼叫 Headack？** Headack 是 headache（頭痛）加上 ack（acknowledge，確認收到）。頭痛如果沒有被好好「ack」——被注意到、被記下來——就很難看清楚原因，也很難和醫師一起找到有效的處理方式。所以我們希望大家多記錄自己的頭痛和用藥，讓紀錄幫你和醫師看出頭痛模式、進一步辨識狀況。
+
 [English below](#english)
 
 ## 可以記錄什麼
@@ -50,6 +52,8 @@ Headack 是免費的頭痛日記。頭痛發作時點一下就能記錄，看診
 <a id="english"></a>
 
 ## English
+
+> **Why "Headack"?** Headack = headache + ack (acknowledge). A headache that isn't acked — noticed and written down — is hard to understand and hard to treat well with your doctor. So we hope you'll log your headaches and medication, and let those records help you and your doctor see your pattern and identify what's going on.
 
 Headack is a free headache diary. Log a headache with one tap when it starts, and show your doctor monthly stats at your appointment. Your entries are stored in **your own Google Drive** — the site's author never sees anyone's data.
 

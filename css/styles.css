@@ -150,6 +150,10 @@ body[data-view="settings"] #view-settings { display: flex; }
 .btn.huge small { font-size: .9rem; font-weight: 400; opacity: .85; }
 .btn.huge:active { transform: scale(.98); }
 
+/* 理念 */
+.tagline { margin: 0; text-align: center; color: var(--muted); font-size: .95rem; line-height: 1.6; text-wrap: balance; }
+.about p { line-height: 1.7; margin: .5rem 0; }
+
 /* 進行中的頭痛 */
 .ongoing-list { display: flex; flex-direction: column; gap: .75rem; }
 .ongoing-list:empty { display: none; }

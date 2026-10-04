@@ -612,6 +612,11 @@ function renderStats() {
 }
 
 // 尚未決定是否記錄天氣、且已有紀錄時，在記錄頁詢問一次
+// 新使用者（還沒有任何紀錄）在首頁看到一句理念，有紀錄後就收起來
+function renderTagline() {
+  $('#tagline').hidden = store.getRecords().length > 0;
+}
+
 function renderWeatherPrompt() {
   $('#weather-prompt').hidden = weather.getPref() != null || !store.getRecords().length;
 }
@@ -631,6 +636,7 @@ function renderSettings() {
 function render() {
   renderSync();
   renderOngoing();
+  renderTagline();
   renderWeatherPrompt();
   renderList();
   renderCalendarView();
