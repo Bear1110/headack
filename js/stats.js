@@ -6,7 +6,7 @@ import { MED_BY_CODE, MOH_THRESHOLDS } from './schema.js';
 const dayOf = (iso) => (iso ? iso.slice(0, 10) : null);
 
 // 一筆紀錄涵蓋的所有日期（跨夜頭痛算兩天）
-function daysCovered(r) {
+export function daysCovered(r) {
   const start = dayOf(r.start);
   if (!start) return [];
   const end = dayOf(r.end) || start;

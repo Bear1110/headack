@@ -33,6 +33,7 @@
     <nav class="nav">
       <button data-view="log" class="active" data-i18n="nav.log">Log</button>
       <button data-view="list" data-i18n="nav.list">History</button>
+      <button data-view="calendar" data-i18n="nav.calendar">Calendar</button>
       <button data-view="stats" data-i18n="nav.stats">Stats</button>
       <button data-view="settings" data-i18n="nav.settings">Settings</button>
     </nav>
@@ -75,6 +76,23 @@
     <section id="view-list" class="view">
       <h2 class="view-title" data-i18n="nav.list"></h2>
       <ul id="record-list" class="record-list"></ul>
+    </section>
+
+    <!-- 日曆：最近 3 / 6 個月 -->
+    <section id="view-calendar" class="view">
+      <div class="cal-toolbar">
+        <div class="seg cal-range" role="radiogroup" data-i18n-attr="aria-label:cal.range">
+          <button type="button" role="radio" data-months="3" data-i18n="cal.range3"></button>
+          <button type="button" role="radio" data-months="6" data-i18n="cal.range6"></button>
+        </div>
+        <div class="cal-legend" aria-hidden="true">
+          <span><i class="sw i2"></i><span data-i18n="cal.legendMild"></span></span>
+          <span><i class="sw i5"></i><i class="sw i7"></i><i class="sw i9"></i><span data-i18n="cal.legendSevere"></span></span>
+          <span><i class="sw no-intensity"></i><span data-i18n="cal.legendUnknown"></span></span>
+          <span><i class="dot"></i><span data-i18n="cal.meds"></span></span>
+        </div>
+      </div>
+      <div id="calendar-months" class="cal-months"></div>
     </section>
 
     <!-- 統計 -->

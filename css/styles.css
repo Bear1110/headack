@@ -101,6 +101,7 @@ main { max-width: 640px; margin: 0 auto; padding: var(--gutter); }
 .view { display: none; flex-direction: column; gap: 1rem; }
 body[data-view="log"] #view-log,
 body[data-view="list"] #view-list,
+body[data-view="calendar"] #view-calendar,
 body[data-view="stats"] #view-stats,
 body[data-view="settings"] #view-settings { display: flex; }
 
@@ -171,6 +172,46 @@ body[data-view="settings"] #view-settings { display: flex; }
 }
 .i0 { --lvl: 0 } .i1 { --lvl: 1 } .i2 { --lvl: 2 } .i3 { --lvl: 3 } .i4 { --lvl: 4 } .i5 { --lvl: 5 }
 .i6 { --lvl: 6 } .i7 { --lvl: 7 } .i8 { --lvl: 8 } .i9 { --lvl: 9 } .i10 { --lvl: 10 }
+
+/* 日曆 */
+.cal-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
+.seg.cal-range { flex: 0 1 260px; min-width: 200px; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .8rem; color: var(--muted); }
+.cal-legend > span { display: inline-flex; align-items: center; gap: .25rem; }
+.cal-legend .sw { width: .85rem; height: .85rem; border-radius: 3px; display: inline-block; background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%); }
+.cal-legend .sw.no-intensity { background: var(--muted); }
+.cal-legend .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text); display: inline-block; }
+.cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.cal-month { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
+.cal-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.cal-head h3 { margin: 0; font-size: 1rem; }
+.cal-warn { color: var(--danger); font-weight: 700; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-wd { text-align: center; font-size: .75rem; color: var(--muted); padding-bottom: .2rem; }
+.cal-day {
+  position: relative; aspect-ratio: 1; min-height: 36px; padding: 0; cursor: pointer;
+  display: grid; place-items: center; font: inherit; font-size: .85rem;
+  border: 1px solid transparent; border-radius: 8px; background: var(--bg); color: var(--text);
+}
+.cal-day:disabled { opacity: .35; cursor: default; }
+.cal-day.has-headache { background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%); color: #fff; font-weight: 700; }
+.cal-day.no-intensity { background: var(--muted); }
+.cal-day.today { border-color: var(--primary); border-width: 2px; }
+.cal-day.selected { outline: 3px solid var(--text); outline-offset: 1px; }
+.cal-med {
+  position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--text);
+}
+.cal-day.has-headache .cal-med { background: #fff; }
+/* 黃綠色區段（程度 2–6）白字對比不足，改用深色字 */
+.cal-day.i2, .cal-day.i3, .cal-day.i4, .cal-day.i5, .cal-day.i6,
+.intensity.i2, .intensity.i3, .intensity.i4, .intensity.i5, .intensity.i6,
+.intensity-pick button.i2[aria-pressed="true"], .intensity-pick button.i3[aria-pressed="true"], .intensity-pick button.i4[aria-pressed="true"],
+.intensity-pick button.i5[aria-pressed="true"], .intensity-pick button.i6[aria-pressed="true"] { color: #1f2330; }
+.cal-day.i2 .cal-med, .cal-day.i3 .cal-med, .cal-day.i4 .cal-med, .cal-day.i5 .cal-med, .cal-day.i6 .cal-med { background: #1f2330; }
+.cal-detail { margin-top: .75rem; display: flex; flex-direction: column; gap: .5rem; }
+.cal-detail h4 { margin: 0; font-size: .95rem; }
+.cal-detail .record-list { gap: .4rem; }
 
 /* 統計 */
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
@@ -348,6 +389,7 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 @media (min-width: 600px) {
   .row { grid-template-columns: 1fr 1fr; }
   .tiles { grid-template-columns: repeat(4, 1fr); }
+  .cal-months { grid-template-columns: repeat(2, 1fr); align-items: start; }
   .intensity-pick { grid-template-columns: repeat(10, 1fr); }
 
   dialog {
@@ -385,6 +427,7 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   body[data-view="log"] .site-footer { grid-column: 1 / -1; }
   .view-title { display: block; margin: 0; }
 
+  .cal-months { grid-template-columns: repeat(3, 1fr); }
   body[data-view="stats"] main,
   body[data-view="settings"] main { max-width: 760px; }
 

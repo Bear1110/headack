@@ -4,7 +4,8 @@ import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS } from './i18n.js';
-import { monthStats, localDate } from './stats.js';
+import { monthStats, localDate, daysCovered } from './stats.js';
+import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -238,9 +239,10 @@ function frequentMeds() {
   return [...new Set([...used, ...defaults])];
 }
 
-function openForm(record) {
+// preset：新增時預先帶入的欄位（例如從日曆補登某一天）
+function openForm(record, preset = {}) {
   editing = record;
-  const r = record ?? { ...emptyRecord(), intensity: 5 };
+  const r = record ?? { ...emptyRecord(), intensity: 5, ...preset };
   const form = $('#record-form');
   $('#form-title').textContent = t(record ? 'form.titleEdit' : 'form.titleNew');
   form.elements.start.value = r.start || '';
@@ -446,17 +448,73 @@ function renderList() {
     $('#record-list').innerHTML = `<li class="muted">${t('list.empty')}</li>`;
     return;
   }
-  $('#record-list').innerHTML = list.map((r) => {
-    const meta = recordSummary(r);
-    return `
-      <li class="record" data-id="${escapeHtml(r.id)}">
-        <div class="record-main">
-          <div>${escapeHtml(formatDateTime(r.start))}</div>
-          <div class="muted small">${escapeHtml(meta)}</div>
-        </div>
-        ${Number.isFinite(r.intensity) ? `<span class="intensity i${Math.min(10, Math.max(0, r.intensity))}">${r.intensity}</span>` : ''}
-      </li>`;
-  }).join('');
+  $('#record-list').innerHTML = list.map(recordItemHtml).join('');
+}
+
+// 列表與日曆共用的一列
+function recordItemHtml(r) {
+  return `
+    <li class="record" data-id="${escapeHtml(r.id)}">
+      <div class="record-main">
+        <div>${escapeHtml(formatDateTime(r.start))}</div>
+        <div class="muted small">${escapeHtml(recordSummary(r))}</div>
+      </div>
+      ${Number.isFinite(r.intensity) ? `<span class="intensity i${Math.min(10, Math.max(0, r.intensity))}">${r.intensity}</span>` : ''}
+    </li>`;
+}
+
+// ---------- 日曆 ----------
+
+const CAL_KEY = 'hl.calMonths';
+let calMonths = 3;
+try { calMonths = Number(localStorage.getItem(CAL_KEY)) === 6 ? 6 : 3; } catch { /* ignore */ }
+let calSelected = null; // 'YYYY-MM-DD'
+
+function renderCalendarView() {
+  document.querySelectorAll('.cal-range [data-months]').forEach((b) => {
+    b.setAttribute('aria-checked', String(Number(b.dataset.months) === calMonths));
+  });
+  const records = store.getRecords();
+  const box = $('#calendar-months');
+  box.innerHTML = calendarHtml({ records, months: calMonths, lang: getLang(), t, selected: calSelected });
+
+  // 選取的日期：在該月下方顯示當天紀錄
+  const btn = calSelected && box.querySelector(`[data-day="${calSelected}"]`);
+  if (!btn) return;
+  const dayRecords = records
+    .filter((r) => daysCovered(r).includes(calSelected))
+    .sort((a, b) => a.start.localeCompare(b.start));
+  const title = new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+  btn.closest('.cal-month').insertAdjacentHTML('beforeend', `
+    <div class="cal-detail">
+      <h4>${escapeHtml(title)}</h4>
+      ${dayRecords.length
+        ? `<ul class="record-list">${dayRecords.map(recordItemHtml).join('')}</ul>`
+        : `<p class="muted small">${escapeHtml(t('cal.noEntries'))}</p>`}
+      <button type="button" class="btn ghost small" data-add-day="${calSelected}">＋ ${escapeHtml(t('cal.addForDay'))}</button>
+    </div>`);
+}
+
+function onCalendarClick(e) {
+  const range = e.target.closest('[data-months]');
+  if (range) {
+    calMonths = Number(range.dataset.months);
+    try { localStorage.setItem(CAL_KEY, String(calMonths)); } catch { /* ignore */ }
+    return renderCalendarView();
+  }
+  const day = e.target.closest('[data-day]');
+  if (day) {
+    calSelected = calSelected === day.dataset.day ? null : day.dataset.day;
+    return renderCalendarView();
+  }
+  const item = e.target.closest('li[data-id]');
+  if (item) return openForm(store.getRecords().find((r) => r.id === item.dataset.id));
+  const add = e.target.closest('[data-add-day]');
+  if (add) {
+    // 補登：日期用選取的那天，時間先帶目前時間
+    const now = nowLocal();
+    openForm(null, { start: `${add.dataset.addDay}T${now.slice(11)}` });
+  }
 }
 
 function renderStats() {
@@ -500,6 +558,7 @@ function render() {
   renderOngoing();
   renderWeatherPrompt();
   renderList();
+  renderCalendarView();
   renderStats();
   renderSettings();
 }
@@ -551,6 +610,7 @@ function bindEvents() {
   $('#btn-delete').addEventListener('click', deleteEditing);
 
   $('#stats-month').addEventListener('change', renderStats);
+  $('#view-calendar').addEventListener('click', onCalendarClick);
 
   $('#btn-weather-on').addEventListener('click', enableWeather);
   $('#btn-weather-off').addEventListener('click', disableWeather);
