@@ -15,8 +15,40 @@
     form-action 'self';
   ">
   <meta name="referrer" content="no-referrer">
-  <title>Headack</title>
-  <meta name="description" content="Headack — log headaches, medication and monthly stats. Your data stays in your own Google Sheet.">
+  <title>Headack — Free headache diary｜免費頭痛日記</title>
+  <meta name="description" content="Free headache diary: log attacks, pain, medication and triggers in a few taps, see monthly trends and print a summary for your doctor. Your data stays in your own Google Drive. 免費頭痛日記：幾下點選就能記錄頭痛、疼痛程度、用藥與誘因，查看每月趨勢並列印看診摘要。資料只存在你自己的 Google 雲端硬碟。">
+  <link rel="canonical" href="https://bear1110.github.io/headack/">
+  <!-- 分享預覽（LINE、Facebook、X 等） -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Headack">
+  <meta property="og:title" content="Headack — Free headache diary｜免費頭痛日記">
+  <meta property="og:description" content="Free headache diary: log attacks, pain, medication and triggers in a few taps, see monthly trends and print a summary for your doctor. Your data stays in your own Google Drive.">
+  <meta property="og:url" content="https://bear1110.github.io/headack/">
+  <meta property="og:image" content="https://bear1110.github.io/headack/icons/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Headack bear logo">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- 結構化資料（只是資料區塊，不會被執行，不受 CSP script-src 限制） -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Headack",
+    "url": "https://bear1110.github.io/headack/",
+    "description": "Free headache diary: log attacks, pain, medication and triggers in a few taps, see monthly trends and print a summary for your doctor. Your data stays in your own Google Drive.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any (web browser)",
+    "inLanguage": ["zh-TW", "zh-CN", "en", "ja"],
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "image": "https://bear1110.github.io/headack/icons/og-image.png"
+  }
+  </script>
   <meta name="theme-color" content="#3b5bdb">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -54,6 +86,7 @@
   <p id="banner" class="banner" hidden></p>
 
   <main>
+    <noscript><p class="card">Headack is a free headache diary that stores your entries in your own Google Drive. Please enable JavaScript to use it.<br>Headack 是免費的頭痛日記，紀錄存在你自己的 Google 雲端硬碟。請啟用 JavaScript 以使用本網站。</p></noscript>
     <!-- 記錄：手機的首頁；桌機時與列表並排 -->
     <section id="view-log" class="view">
       <button id="btn-quick-start" class="btn huge">
