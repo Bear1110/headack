@@ -11,6 +11,7 @@ export default {
   'cal.range': '表示期間',
   'cal.range3': '3 か月',
   'cal.range6': '6 か月',
+  'cal.range12': '1 年',
   'cal.headache': '頭痛',
   'cal.meds': '服薬あり',
   'cal.summary': '頭痛 {h} 日 · 服薬 {m} 日',

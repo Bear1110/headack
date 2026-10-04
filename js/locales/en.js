@@ -11,6 +11,7 @@ export default {
   'cal.range': 'Range',
   'cal.range3': '3 months',
   'cal.range6': '6 months',
+  'cal.range12': '1 year',
   'cal.headache': 'Headache',
   'cal.meds': 'Medication',
   'cal.summary': '{h} headache days · {m} medication days',

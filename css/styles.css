@@ -99,17 +99,17 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .install-steps { margin: .5rem 0 0; padding-inline-start: 1.4rem; display: flex; flex-direction: column; gap: .6rem; line-height: 1.6; }
 .install-steps .icon { vertical-align: -0.25em; color: var(--primary); }
 
-.lang-picker { position: relative; display: inline-flex; align-items: center; flex: none; }
-.lang-picker svg {
-  position: absolute; inset-inline-start: .55rem; width: 18px; height: 18px; pointer-events: none;
-  fill: none; stroke: var(--primary); stroke-width: 1.8;
+/* 語言：只顯示地球 icon（與「加到主畫面」同樣式），原生下拉選單透明疊在上面，點下去開系統清單 */
+.lang-picker {
+  position: relative; display: inline-grid; place-items: center; flex: none; cursor: pointer;
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--primary); color: var(--primary);
 }
+.lang-picker svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; pointer-events: none; }
 .lang-picker select {
-  appearance: none; -webkit-appearance: none; width: auto; cursor: pointer;
-  min-height: 36px; padding: .3rem .7rem .3rem 2rem; padding-inline: 2rem .7rem;
-  font-size: .85rem; font-weight: 600; color: var(--primary);
-  background: transparent; border: 1px solid var(--primary); border-radius: 999px;
+  position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; padding: 0; margin: 0;
+  opacity: 0; cursor: pointer; font-size: 16px; border: 0;
 }
+.lang-picker:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .banner {
   margin: 0; padding: .6rem var(--gutter); font-size: .9rem;
@@ -244,7 +244,24 @@ body[data-view="settings"] #view-settings { display: flex; }
   .cal-month { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
 }
 .cal-pager { display: none; }
+/* 年度總覽：縮小月曆，只看顏色與用藥點 */
+.cal-months.year { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; overflow: visible; margin-inline: 0; padding-inline: 0; }
+.cal-months.year .cal-month { padding: .5rem; scroll-snap-align: none; }
+.cal-months.year .cal-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: .3rem; }
+.cal-months.year .cal-head h3 { font-size: .85rem; }
+.cal-months.year .cal-head .muted { font-size: .7rem; }
+.cal-months.year .cal-grid { gap: 2px; }
+.cal-months.year .cal-wd { font-size: .6rem; padding-bottom: 0; }
+.cal-months.year .cal-day { min-height: 0; border-radius: 3px; font-size: 0; }
+.cal-months.year .cal-med { width: 3px; height: 3px; bottom: 1px; }
+.cal-months.year .cal-day.today { border-width: 1px; }
+.cal-months.year .cal-day.selected { outline-width: 2px; outline-offset: 0; }
+#cal-year-detail:empty { display: none; }
+#cal-year-detail .cal-detail { margin-top: 0; }
+@media (min-width: 600px) { .cal-months.year { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .cal-months.year { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 599px) {
+  .cal-pager[hidden] { display: none; }
   .cal-pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: -.25rem; }
 }
 .pager-btn {
@@ -406,6 +423,10 @@ th[title] { cursor: help; text-decoration: underline dotted; text-underline-offs
 }
 .site-footer p, .site-footer nav { margin: 0; }
 .site-footer a { color: var(--muted); }
+.site-footer nav { display: inline-flex; align-items: center; gap: .3rem; flex-wrap: wrap; justify-content: center; }
+.footer-gh { display: inline-flex; align-items: center; color: var(--muted); }
+.footer-gh:hover { color: var(--text); }
+.footer-gh .icon { width: 18px; height: 18px; }
 .footer-version { font-size: .75rem; opacity: .7; font-variant-numeric: tabular-nums; }
 
 /* 隱私權政策、服務條款等文件頁：沒有底部分頁列 */

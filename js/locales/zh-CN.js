@@ -11,6 +11,7 @@ export default {
   'cal.range': '显示范围',
   'cal.range3': '3 个月',
   'cal.range6': '6 个月',
+  'cal.range12': '1 年',
   'cal.headache': '头痛',
   'cal.meds': '有用药',
   'cal.summary': '头痛 {h} 天 · 用药 {m} 天',

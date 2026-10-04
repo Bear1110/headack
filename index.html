@@ -73,7 +73,7 @@
       <!-- 語言選單放在標題列，第一次來的人不必進設定就能切換 -->
       <!-- 加到主畫面／安裝：已安裝（從主畫面開啟）時隱藏 -->
       <button type="button" id="btn-install" class="icon-btn-top" hidden data-i18n-attr="aria-label:install.button,title:install.button"><span data-icon="install"></span></button>
-      <label class="lang-picker">
+      <label class="lang-picker" data-i18n-attr="title:settings.language">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
         <select id="lang-select" data-i18n-attr="aria-label:settings.language,title:settings.language"></select>
       </label>
@@ -132,6 +132,7 @@
         <div class="seg cal-range" role="radiogroup" data-i18n-attr="aria-label:cal.range">
           <button type="button" role="radio" data-months="3" data-i18n="cal.range3"></button>
           <button type="button" role="radio" data-months="6" data-i18n="cal.range6"></button>
+          <button type="button" role="radio" data-months="12" data-i18n="cal.range12"></button>
         </div>
         <div class="cal-legend" aria-hidden="true">
           <span><i class="sw i2"></i><span data-i18n="cal.legendMild"></span></span>
@@ -142,6 +143,7 @@
       </div>
       <div id="cal-pager" class="cal-pager"></div>
       <div id="calendar-months" class="cal-months"></div>
+      <div id="cal-year-detail"></div>
     </section>
 
     <!-- 統計 -->
@@ -208,7 +210,7 @@
 
     <footer class="site-footer">
       <p class="disclaimer" data-i18n="disclaimer"></p>
-      <nav><a href="privacy.html" data-i18n="settings.privacy"></a> · <a href="terms.html" data-i18n="footer.terms"></a> · <a href="faq.html" data-i18n="footer.faq"></a></nav>
+      <nav><a href="privacy.html" data-i18n="settings.privacy"></a> · <a href="terms.html" data-i18n="footer.terms"></a> · <a href="faq.html" data-i18n="footer.faq"></a> · <a href="https://github.com/Bear1110/headack" class="footer-gh" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><span data-icon="github"></span></a></nav>
       <p id="copyright"></p>
       <p id="footer-version" class="footer-version"></p>
     </footer>

@@ -2,7 +2,7 @@
 // Google 的 API 與登入請求一律不經快取。
 // 採「網路優先」，一般部署會自動拿到新版；SHELL 清單有增減時請把 VERSION 加一。
 
-const VERSION = 'v17'; // 網站版本見 js/version.js
+const VERSION = 'v18'; // 網站版本見 js/version.js
 const CACHE = `headache-log-${VERSION}`;
 const SHELL = [
   './',
