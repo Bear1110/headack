@@ -1,31 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Headack：頭痛的熊熊 + 止痛藥膠囊（透明背景，用於標題列） -->
-  <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- 痛痛閃線 -->
-    <path d="M58 176 l34 22 l-22 8 l36 20" fill="none" stroke="#ffc53d" stroke-width="16"/>
-    <!-- 耳朵 -->
-    <circle cx="146" cy="140" r="64" fill="#a8703f"/>
-    <circle cx="366" cy="140" r="64" fill="#a8703f"/>
-    <circle cx="146" cy="140" r="34" fill="#e7b88c"/>
-    <circle cx="366" cy="140" r="34" fill="#e7b88c"/>
-    <!-- 頭 -->
-    <ellipse cx="256" cy="292" rx="182" ry="160" fill="#b97f4b"/>
-    <!-- 瞇眼 > < -->
-    <path d="M160 262 l36 20 l-36 20" fill="none" stroke="#3d2414" stroke-width="13"/>
-    <path d="M352 262 l-36 20 l36 20" fill="none" stroke="#3d2414" stroke-width="13"/>
-    <!-- 腮紅 -->
-    <ellipse cx="160" cy="340" rx="26" ry="15" fill="#f08c8c" opacity=".75"/>
-    <ellipse cx="352" cy="340" rx="26" ry="15" fill="#f08c8c" opacity=".75"/>
-    <!-- 嘴鼻 -->
-    <ellipse cx="256" cy="352" rx="82" ry="62" fill="#f2d4ae"/>
-    <ellipse cx="256" cy="324" rx="24" ry="16" fill="#3d2414"/>
-    <path d="M226 382 q30 -20 60 0" fill="none" stroke="#3d2414" stroke-width="10"/>
-    <!-- 止痛藥膠囊 -->
-    <g transform="rotate(-38 392 122)">
-      <rect x="322" y="94" width="140" height="56" rx="28" fill="#ffffff"/>
-      <path d="M392 94 H434 a28 28 0 0 1 0 56 H392 Z" fill="#ff6b6b"/>
-      <rect x="402" y="105" width="36" height="9" rx="4.5" fill="#ffffff" opacity=".45"/>
-      <rect x="322" y="94" width="140" height="56" rx="28" fill="none" stroke="#3d2414" stroke-opacity=".18" stroke-width="4"/>
-    </g>
-  </g>
+  <!-- Headack：幾何熊頭 + 劈進額頭的閃電（透明背景，用於標題列） -->
+  <circle cx="142" cy="138" r="78" fill="#b8733f"/>
+  <circle cx="370" cy="138" r="78" fill="#b8733f"/>
+  <circle cx="256" cy="292" r="184" fill="#c8814a"/>
+  <!-- 閃電：從頭頂劈進額頭 -->
+  <path d="M286 92 L222 214 L268 214 L232 312 L338 178 L290 178 L330 92 Z" fill="#ffc53d"/>
+  <!-- 瞇眼 > < -->
+  <path d="M150 262 L196 290 L150 318" fill="none" stroke="#2b1a10" stroke-width="22" stroke-linejoin="miter" stroke-linecap="butt"/>
+  <path d="M362 262 L316 290 L362 318" fill="none" stroke="#2b1a10" stroke-width="22" stroke-linejoin="miter" stroke-linecap="butt"/>
+  <!-- 嘴部與鼻子 -->
+  <circle cx="256" cy="372" r="74" fill="#f2d2aa"/>
+  <rect x="226" y="336" width="60" height="36" rx="18" fill="#2b1a10"/>
 </svg>
