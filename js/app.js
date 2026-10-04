@@ -48,7 +48,7 @@ let toastTimer;
 // action：{ label, run }，例如「復原」；有按鈕時停留久一點
 function toast(msg, ms = 3000, action = null) {
   const el = $('#toast');
-  el.innerHTML = `<span>${escapeHtml(msg)}</span>${action ? `<button type="button" class="toast-action">${icon('undo')}${escapeHtml(action.label)}</button>` : ''}`;
+  el.innerHTML = `<span>${escapeHtml(msg)}</span>${action ? `<button type="button" class="toast-action">${icon(action.icon ?? 'undo')}${escapeHtml(action.label)}</button>` : ''}`;
   el.hidden = false;
   if (action) {
     el.querySelector('.toast-action').addEventListener('click', () => {
@@ -529,7 +529,7 @@ function renderSync() {
   $('#btn-sync').hidden = !hasToken || !pending || syncState === 'syncing';
 
   let msg = '';
-  if (!email) msg = t('auth.localOnly');
+  if (!email && !(document.body.dataset.view === 'log' && needsBackup())) msg = t('auth.localOnly');
   else if (syncState === 'error') msg = t('sync.failed');
   else if (syncState === 'offline') msg = t('sync.offline');
   banner.textContent = msg;
@@ -730,6 +730,15 @@ function renderHomeSummary() {
   el.classList.toggle('alert', m.mohWarnings.length > 0);
 }
 
+// 有紀錄但還沒登入：首頁顯示「尚未備份」卡片（比頂部橫幅更具體：幾筆、會怎麼遺失）
+const needsBackup = () => !store.isDemo() && !auth.getEmail() && store.getRecords().length > 0;
+function renderBackupCard() {
+  const show = needsBackup();
+  $('#backup-card').hidden = !show;
+  if (show) $('#backup-body').textContent = t('backup.body', { n: store.getRecords().length });
+  $('#btn-backup').disabled = !authReady;
+}
+
 // 新使用者（還沒有任何紀錄）在首頁看到一句理念，有紀錄後就收起來
 function renderTagline() {
   const fresh = !store.getRecords().length && !store.isDemo();
@@ -801,6 +810,7 @@ function render() {
   renderInstall();
   renderOngoing();
   renderHomeSummary();
+  renderBackupCard();
   renderTagline();
   renderWeatherPrompt();
   renderList();
@@ -819,6 +829,7 @@ function refreshLanguage() {
 // 版面（手機 / 桌機）由 CSS 依 body[data-view] 決定
 function showView(name) {
   document.body.dataset.view = name;
+  renderSync(); // 首頁與其他分頁的提醒方式不同
   window.scrollTo(0, 0);
   if (name === 'stats') statsView?.render(); // 隱藏時量不到圖表寬度，切過來再畫一次
   // 手機上月份是單欄、本月在最下面：切到日曆時直接捲到本月
@@ -882,7 +893,9 @@ function bindEvents() {
     getRecord: (id) => store.getRecords().find((r) => r.id === id),
     saveRecord: (r) => save(r, false, { quiet: true }),
     frequentMeds,
-    notify: (msg) => toast(msg, 5000),
+    notify: (msg) => (needsBackup()
+      ? toast(msg, 8000, { label: t('backup.short'), icon: 'cloudUp', run: signIn })
+      : toast(msg, 5000)),
     discard: (id) => {
       const r = store.getRecords().find((x) => x.id === id);
       if (r) deleteWithUndo(r);
@@ -897,6 +910,7 @@ function bindEvents() {
   $('#aura-options').addEventListener('change', updateAuraWarning);
 
   $('#btn-clear').addEventListener('click', openClearDialog);
+  $('#btn-backup').addEventListener('click', signIn);
   $('#btn-install').addEventListener('click', install);
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();

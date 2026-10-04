@@ -99,10 +99,16 @@
         <span data-i18n="log.start">Headache started</span>
         <small data-i18n="log.startHint"></small>
       </button>
+      <div id="ongoing" class="ongoing-list"></div>
       <p id="home-summary" class="home-summary" hidden></p>
+      <!-- 有紀錄但還沒登入：明確說明後果，並提供登入備份 -->
+      <div id="backup-card" class="card backup-card" hidden>
+        <h2 class="card-title"><span data-icon="cloudOff"></span><span data-i18n="backup.title"></span></h2>
+        <p id="backup-body"></p>
+        <button type="button" id="btn-backup" class="btn" data-i18n="backup.button"></button>
+      </div>
       <p id="tagline" class="tagline" hidden data-i18n="about.tagline"></p>
       <button type="button" id="btn-try-demo" class="btn ghost wide" hidden data-i18n="demo.try"></button>
-      <div id="ongoing" class="ongoing-list"></div>
       <div id="weather-prompt" class="card weather-prompt" hidden>
         <h2 data-i18n="weather.promptTitle"></h2>
         <p class="muted small" data-i18n="weather.promptBody"></p>
