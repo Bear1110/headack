@@ -685,6 +685,35 @@ function renderTagline() {
   $('#btn-try-demo').hidden = !fresh;
 }
 
+// ---------- 加到主畫面 ----------
+
+// Chrome / Edge / Android 會先發出 beforeinstallprompt，留著等使用者按按鈕時再顯示
+let installPrompt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function renderInstall() {
+  $('#btn-install').hidden = isStandalone();
+}
+
+async function install() {
+  if (installPrompt) {
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    installPrompt = null;
+    if (outcome === 'accepted') toast(t('install.done'));
+    return;
+  }
+  // 不支援直接安裝：依裝置顯示步驟
+  const steps = isIOS()
+    ? [`${icon('share')} ${escapeHtml(t('install.ios1'))}`, `${icon('addBox')} ${escapeHtml(t('install.ios2'))}`]
+    : /Android/i.test(navigator.userAgent)
+      ? [escapeHtml(t('install.android'))]
+      : [escapeHtml(t('install.desktop', { key: /Mac/i.test(navigator.platform) ? '⌘ + D' : 'Ctrl + D' }))];
+  $('#install-steps').innerHTML = steps.map((s) => `<li>${s}</li>`).join('');
+  $('#install-dialog').showModal();
+}
+
 // ---------- 示範模式 ----------
 
 async function enterDemo() {
@@ -717,6 +746,7 @@ function renderSettings() {
 
 function render() {
   renderSync();
+  renderInstall();
   renderOngoing();
   renderHomeSummary();
   renderTagline();
@@ -812,6 +842,15 @@ function bindEvents() {
   $('#aura-options').addEventListener('change', updateAuraWarning);
 
   $('#btn-clear').addEventListener('click', openClearDialog);
+  $('#btn-install').addEventListener('click', install);
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installPrompt = e;
+  });
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    renderInstall();
+  });
   $('#btn-try-demo').addEventListener('click', enterDemo);
   $('#btn-demo-exit').addEventListener('click', exitDemo);
   $('#btn-demo').addEventListener('click', () => (store.isDemo() ? exitDemo() : enterDemo()));

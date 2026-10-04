@@ -90,6 +90,15 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .sync-count { font-weight: 700; font-variant-numeric: tabular-nums; }
 .sync-text { display: none; }
 
+.icon-btn-top {
+  appearance: none; flex: none; display: inline-grid; place-items: center; cursor: pointer;
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--primary); background: transparent; color: var(--primary);
+}
+.icon-btn-top[hidden] { display: none; }
+.icon-btn-top .icon { width: 19px; height: 19px; }
+.install-steps { margin: .5rem 0 0; padding-inline-start: 1.4rem; display: flex; flex-direction: column; gap: .6rem; line-height: 1.6; }
+.install-steps .icon { vertical-align: -0.25em; color: var(--primary); }
+
 .lang-picker { position: relative; display: inline-flex; align-items: center; flex: none; }
 .lang-picker svg {
   position: absolute; inset-inline-start: .55rem; width: 18px; height: 18px; pointer-events: none;
