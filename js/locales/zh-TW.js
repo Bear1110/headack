@@ -242,7 +242,6 @@ export default {
   'backup.short': '登入備份',
   'ai.title': 'AI 分析',
   'ai.desc': '把最近的紀錄交給 AI（ChatGPT、Claude 等），整理趨勢、用藥狀況，或準備看診要問醫師的問題。回覆語言會跟你的介面語言相同。',
-  'ai.start': '用 AI 分析',
   'ai.privacy': '這會把你最近 {n} 筆紀錄交給你選擇的 AI 服務分析。本網站不會傳送任何資料，是你的瀏覽器開啟該服務並帶入內容；該服務如何處理資料，由它自己的條款規範。',
   'ai.question': '想問什麼',
   'ai.p_overview': '整體趨勢與可能誘因',

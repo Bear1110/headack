@@ -619,7 +619,14 @@ dialog.quick-dialog::backdrop { background: #000; }
 /* AI 分析 */
 .ai-preview { white-space: pre-wrap; word-break: break-word; font-size: .75rem; max-height: 240px; overflow: auto; margin: .5rem 0 0; padding: .6rem; border-radius: 8px; background: var(--bg); color: var(--muted); }
 #ai-dialog .ai-buttons .btn { flex: 1 1 140px; }
-.ai-card .btn { margin-top: .25rem; }
+.stats-tabs-row { display: flex; align-items: stretch; gap: .5rem; }
+.stats-tabs-row .stats-tabs { flex: 1; min-width: 0; }
+.ai-chip {
+  appearance: none; flex: none; display: inline-flex; align-items: center; gap: .35rem; cursor: pointer;
+  padding: 0 .9rem; min-height: var(--tap); border-radius: 10px; font: inherit; font-size: .9rem; font-weight: 600;
+  border: 1px solid var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--surface)); color: var(--primary);
+}
+.ai-chip .icon { width: 18px; height: 18px; }
 
 /* 匯入 */
 .file-pick { display: flex; flex-direction: column; gap: .35rem; margin-top: .75rem; font-size: .85rem; color: var(--muted); }

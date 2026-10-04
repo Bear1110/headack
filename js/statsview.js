@@ -6,6 +6,7 @@ import { OPTIONS, MOH_THRESHOLDS, MED_BY_CODE } from './schema.js';
 import { RANGE_PRESETS, resolveRange, previousRange, filterRecords, analyze } from './analysis.js';
 import { columnChart, tableView, proportionList, attachTooltips, applyProportions } from './charts.js';
 import { medLabel } from './widgets.js';
+import { icon } from './icons.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const STATE_KEY = 'hl.statsState';
@@ -76,8 +77,11 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
           </label>
         </div>
       </div>
-      <div class="seg stats-tabs" role="tablist">
-        ${['self', 'doctor'].map((tab) => `<button type="button" role="tab" data-tab="${tab}" aria-selected="${state.tab === tab}" aria-checked="${state.tab === tab}">${esc(t(`st.tab_${tab}`))}</button>`).join('')}
+      <div class="stats-tabs-row">
+        <div class="seg stats-tabs" role="tablist">
+          ${['self', 'doctor'].map((tab) => `<button type="button" role="tab" data-tab="${tab}" aria-selected="${state.tab === tab}" aria-checked="${state.tab === tab}">${esc(t(`st.tab_${tab}`))}</button>`).join('')}
+        </div>
+        <button type="button" class="ai-chip no-print" data-ai title="${esc(t('ai.desc'))}">${icon('sparkle')}<span>${esc(t('ai.title'))}</span></button>
       </div>`;
   }
 
@@ -194,8 +198,7 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
       <div class="stat-grid">
         ${card(t('st.triggersTitle'), trig.length ? proportionList(trig, a.attacks, nOf) : notEnough(t('st.triggersHint')))}
         ${card(t('st.weatherTitle'), weatherHtml)}
-      </div>
-      ${card(t('ai.title'), `<p class="muted small">${esc(t('ai.desc'))}</p><button type="button" class="btn" data-ai>${esc(t('ai.start'))}</button>`, 'ai-card')}`;
+      </div>`;
   }
 
   // 藥物類別說明：只列出表格中出現的類別，並標出使用者在這段期間用過哪些藥

@@ -242,7 +242,6 @@ export default {
   'backup.short': 'Back up',
   'ai.title': 'AI analysis',
   'ai.desc': 'Let an AI (ChatGPT, Claude, …) review your recent entries: trends, medication use, or questions to ask your doctor. It replies in your interface language.',
-  'ai.start': 'Analyze with AI',
   'ai.privacy': { one: 'This shares your {n} most recent entry with the AI service you choose. This site does not send anything — your browser opens that service with the text, and its own terms apply.', other: 'This shares your {n} most recent entries with the AI service you choose. This site does not send anything — your browser opens that service with the text, and its own terms apply.' },
   'ai.question': 'What to ask',
   'ai.p_overview': 'Overall trends and possible triggers',
