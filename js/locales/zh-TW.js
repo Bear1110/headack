@@ -56,6 +56,7 @@ export default {
   'form.endBeforeStart': '結束時間不能早於開始時間',
   'list.empty': '還沒有紀錄',
   'list.ongoing': '進行中',
+  'list.more': '顯示更多（還有 {n} 筆）',
   'list.noEnd': '未記錄結束時間',
   'list.duration': '{h} 小時 {m} 分',
   'list.separator': '、',

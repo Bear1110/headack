@@ -56,6 +56,7 @@ export default {
   'form.endBeforeStart': 'End time cannot be before start time',
   'list.empty': 'No entries yet',
   'list.ongoing': 'Ongoing',
+  'list.more': { one: 'Show more ({n} more entry)', other: 'Show more ({n} more entries)' },
   'list.noEnd': 'No end time',
   'list.duration': '{h} h {m} min',
   'list.separator': ', ',

@@ -29,7 +29,10 @@ function escapeHtml(s) {
 
 function formatDateTime(iso) {
   if (!iso) return '';
-  return new Date(iso).toLocaleString(getLang(), { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const d = new Date(iso);
+  // 不是今年的紀錄加上年份（匯入的舊資料可能跨好幾年）
+  const year = d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {};
+  return d.toLocaleString(getLang(), { ...year, month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 function formatDuration(start, end) {
@@ -493,13 +496,20 @@ function recordSummary(r) {
   ].filter(Boolean).join(' · ');
 }
 
+// 列表只先顯示最近幾筆，避免紀錄多時頁面超長、看不到頁尾
+const LIST_INITIAL = 20;
+const LIST_STEP = 50;
+let listLimit = LIST_INITIAL;
+
 function renderList() {
   const list = [...store.getRecords()].sort((a, b) => (b.start || '').localeCompare(a.start || ''));
   if (!list.length) {
     $('#record-list').innerHTML = `<li class="muted">${t('list.empty')}</li>`;
     return;
   }
-  $('#record-list').innerHTML = list.map(recordItemHtml).join('');
+  const rest = list.length - listLimit;
+  $('#record-list').innerHTML = list.slice(0, listLimit).map(recordItemHtml).join('')
+    + (rest > 0 ? `<li class="list-more"><button type="button" class="btn ghost wide" data-more>${escapeHtml(t('list.more', { n: rest }))}</button></li>` : '');
 }
 
 // 列表與日曆共用的一列
@@ -656,6 +666,10 @@ function bindEvents() {
   });
 
   $('#record-list').addEventListener('click', (e) => {
+    if (e.target.closest('[data-more]')) {
+      listLimit += LIST_STEP;
+      return renderList();
+    }
     const li = e.target.closest('li[data-id]');
     if (li) openForm(store.getRecords().find((r) => r.id === li.dataset.id));
   });

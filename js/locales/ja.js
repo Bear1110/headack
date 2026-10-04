@@ -56,6 +56,7 @@ export default {
   'form.endBeforeStart': '終了時刻は開始時刻より前にできません',
   'list.empty': 'まだ記録がありません',
   'list.ongoing': '継続中',
+  'list.more': 'さらに表示（残り {n} 件）',
   'list.noEnd': '終了時刻なし',
   'list.duration': '{h} 時間 {m} 分',
   'list.separator': '、',
