@@ -14,6 +14,7 @@
   --warning-text: #8a4b00;
   --series-1: #2a78d6;
   --series-2: #eb6834;
+  --aura: #4a3aa7;
   --grid: #e8eaf0;
   --good: #0a7d0a;
   --bad: #c0392b;
@@ -39,6 +40,7 @@
     --warning-text: #ffc078;
     --series-1: #3987e5;
     --series-2: #d95926;
+    --aura: #9085e9;
     --grid: #2a2e39;
     --good: #3fbf3f;
     --bad: #f06a6a;
@@ -177,6 +179,21 @@ body[data-view="settings"] #view-settings { display: flex; }
   box-shadow: 0 8px 24px rgb(59 91 219 / .25);
 }
 .btn.huge small { font-size: .9rem; font-weight: 400; opacity: .85; }
+.huge-icon .icon { width: 44px; height: 44px; stroke-width: 2.2; }
+.btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
+
+/* 有預兆的紀錄：紫色小膠囊（鋸齒線＝典型的視覺預兆） */
+.record-when { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.badge-aura {
+  display: inline-flex; align-items: center; gap: .2rem; padding: .05rem .5rem; border-radius: 999px;
+  font-size: .75rem; font-weight: 600; color: var(--text);
+  border: 1px solid var(--aura); background: color-mix(in srgb, var(--aura) 18%, transparent);
+}
+.badge-aura .icon { width: 14px; height: 14px; color: var(--aura); }
+.list-filters { margin-bottom: .25rem; }
+.list-filters[hidden] { display: none; }
+.list-filters .chip-toggle .icon { width: 14px; height: 14px; margin-inline-end: .2rem; vertical-align: -2px; color: var(--aura); }
+.list-filters .chip-toggle[aria-pressed="true"] .icon { color: inherit; }
 .btn.huge:active { transform: scale(.98); }
 
 /* 理念 */

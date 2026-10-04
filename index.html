@@ -96,6 +96,7 @@
     <!-- 記錄：手機的首頁；桌機時與列表並排 -->
     <section id="view-log" class="view">
       <button id="btn-quick-start" class="btn huge">
+        <span class="huge-icon" data-icon="bolt"></span>
         <span data-i18n="log.start">Headache started</span>
         <small data-i18n="log.startHint"></small>
       </button>
@@ -117,12 +118,13 @@
           <button type="button" id="btn-weather-off" class="btn ghost" data-i18n="weather.dismiss"></button>
         </div>
       </div>
-      <button id="btn-full" class="btn ghost wide" data-i18n="log.full">Add full entry</button>
+      <button id="btn-full" class="btn ghost wide btn-with-icon"><span data-icon="edit"></span><span data-i18n="log.full">Add full entry</span></button>
     </section>
 
     <!-- 列表 -->
     <section id="view-list" class="view">
       <h2 class="view-title" data-i18n="nav.list"></h2>
+      <div id="list-filters" class="chips list-filters"></div>
       <ul id="record-list" class="record-list"></ul>
     </section>
 

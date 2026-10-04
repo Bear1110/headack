@@ -576,10 +576,34 @@ const LIST_INITIAL = 20;
 const LIST_STEP = 50;
 let listLimit = LIST_INITIAL;
 
+// 列表篩選：頭痛類型（與表單、統計相同的清單，附筆數）＋「有預兆」
+const listFilter = { type: '', aura: false };
+
+function renderListFilters(all) {
+  const count = (pred) => all.filter(pred).length;
+  const chip = (attrs, pressed, label, n, disabled = false) => `
+    <button type="button" class="chip-toggle" ${attrs} aria-pressed="${pressed}" ${disabled ? 'disabled' : ''}>${label}<span class="chip-count">${n}</span></button>`;
+  $('#list-filters').innerHTML = [
+    chip('data-list-type=""', !listFilter.type, escapeHtml(t('st.allTypes')), all.length),
+    ...OPTIONS.type.map((c) => {
+      const n = count((r) => (r.type || 'unknown') === c);
+      return chip(`data-list-type="${c}"`, listFilter.type === c, escapeHtml(t(`opt.type.${c}`)), n, !n && listFilter.type !== c);
+    }),
+    chip('data-list-aura', listFilter.aura, `${icon('aura')}${escapeHtml(t('list.auraOnly'))}`, count((r) => r.aura?.length), !listFilter.aura && !count((r) => r.aura?.length)),
+  ].join('');
+  $('#list-filters').hidden = !all.length;
+}
+
 function renderList() {
-  const list = [...store.getRecords()].sort((a, b) => (b.start || '').localeCompare(a.start || ''));
-  if (!list.length) {
+  const all = [...store.getRecords()].sort((a, b) => (b.start || '').localeCompare(a.start || ''));
+  renderListFilters(all);
+  if (!all.length) {
     $('#record-list').innerHTML = `<li class="muted">${t('list.empty')}</li>`;
+    return;
+  }
+  const list = all.filter((r) => (!listFilter.type || (r.type || 'unknown') === listFilter.type) && (!listFilter.aura || r.aura?.length));
+  if (!list.length) {
+    $('#record-list').innerHTML = `<li class="muted">${t('list.noMatch')}</li>`;
     return;
   }
   const rest = list.length - listLimit;
@@ -592,7 +616,7 @@ function recordItemHtml(r) {
   return `
     <li class="record" data-id="${escapeHtml(r.id)}">
       <div class="record-main">
-        <div>${escapeHtml(formatDateTime(r.start))}</div>
+        <div class="record-when">${escapeHtml(formatDateTime(r.start))}${r.aura?.length ? `<span class="badge-aura">${icon('aura')}${escapeHtml(t('list.auraBadge'))}</span>` : ''}</div>
         <div class="muted small">${escapeHtml(recordSummary(r))}</div>
       </div>
       ${Number.isFinite(r.intensity) ? `<span class="intensity i${Math.min(10, Math.max(0, r.intensity))}">${r.intensity}</span>` : ''}
@@ -930,6 +954,14 @@ function bindEvents() {
     else openForm(store.getRecords().find((r) => r.id === id));
   });
 
+  $('#list-filters').addEventListener('click', (e) => {
+    const typeBtn = e.target.closest('[data-list-type]');
+    if (typeBtn) listFilter.type = typeBtn.dataset.listType;
+    else if (e.target.closest('[data-list-aura]')) listFilter.aura = !listFilter.aura;
+    else return;
+    listLimit = LIST_INITIAL;
+    renderList();
+  });
   $('#record-list').addEventListener('click', (e) => {
     if (e.target.closest('[data-more]')) {
       listLimit += LIST_STEP;
