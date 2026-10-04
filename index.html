@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- GitHub Pages 無法設定 HTTP header，以 meta CSP 限制腳本與連線來源 -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://accounts.google.com/gsi/client;
+    style-src 'self' https://accounts.google.com/gsi/style;
+    frame-src https://accounts.google.com/gsi/;
+    connect-src 'self' https://accounts.google.com/gsi/ https://sheets.googleapis.com https://www.googleapis.com https://api.open-meteo.com;
+    img-src 'self' data:;
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <meta name="referrer" content="no-referrer">
+  <title>Headache Log</title>
+  <meta name="description" content="Log headaches, medication and monthly stats. Your data stays in your own Google Sheet.">
+  <meta name="theme-color" content="#3b5bdb">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script id="gis" src="https://accounts.google.com/gsi/client" async></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<!-- data-view 控制目前顯示的分頁；版面差異（手機 / 桌機）全部由 CSS 處理 -->
+<body data-view="log">
+  <header class="topbar">
+    <h1 data-i18n="app.title">Headache Log</h1>
+    <!-- 手機：固定在畫面底部的分頁列；桌機：標題列中的分頁 -->
+    <nav class="nav">
+      <button data-view="log" class="active" data-i18n="nav.log">Log</button>
+      <button data-view="list" data-i18n="nav.list">History</button>
+      <button data-view="stats" data-i18n="nav.stats">Stats</button>
+      <button data-view="settings" data-i18n="nav.settings">Settings</button>
+    </nav>
+    <div class="top-actions">
+      <!-- 語言選單放在標題列，第一次來的人不必進設定就能切換 -->
+      <label class="lang-picker">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+        <select id="lang-select" data-i18n-attr="aria-label:settings.language,title:settings.language"></select>
+      </label>
+    <div class="sync">
+      <span id="sync-status" class="sync-status"></span>
+      <button id="btn-signin" class="btn small" hidden data-i18n="auth.signIn">Sign in with Google</button>
+      <button id="btn-sync" class="btn small ghost" hidden data-i18n="sync.now">Sync now</button>
+    </div>
+    </div>
+  </header>
+
+  <p id="banner" class="banner" hidden></p>
+
+  <main>
+    <!-- 記錄：手機的首頁；桌機時與列表並排 -->
+    <section id="view-log" class="view">
+      <button id="btn-quick-start" class="btn huge">
+        <span data-i18n="log.start">Headache started</span>
+        <small data-i18n="log.startHint"></small>
+      </button>
+      <div id="ongoing" class="ongoing-list"></div>
+      <div id="weather-prompt" class="card weather-prompt" hidden>
+        <h2 data-i18n="weather.promptTitle"></h2>
+        <p class="muted small" data-i18n="weather.promptBody"></p>
+        <div class="actions">
+          <button type="button" id="btn-weather-on" class="btn" data-i18n="weather.enable"></button>
+          <button type="button" id="btn-weather-off" class="btn ghost" data-i18n="weather.dismiss"></button>
+        </div>
+      </div>
+      <button id="btn-full" class="btn ghost wide" data-i18n="log.full">Add full entry</button>
+    </section>
+
+    <!-- 列表 -->
+    <section id="view-list" class="view">
+      <h2 class="view-title" data-i18n="nav.list"></h2>
+      <ul id="record-list" class="record-list"></ul>
+    </section>
+
+    <!-- 統計 -->
+    <section id="view-stats" class="view">
+      <label class="field inline">
+        <span data-i18n="stats.month"></span>
+        <input type="month" id="stats-month">
+      </label>
+      <div id="stats-body"></div>
+    </section>
+
+    <!-- 設定 -->
+    <section id="view-settings" class="view">
+      <div class="card">
+        <h2 data-i18n="settings.account"></h2>
+        <p id="account-email" class="muted"></p>
+        <p><a id="sheet-link" href="#" target="_blank" rel="noopener" hidden data-i18n="settings.openSheet"></a></p>
+        <button id="btn-signout" class="btn ghost small" hidden data-i18n="auth.signOut"></button>
+      </div>
+      <div class="card">
+        <h2 data-i18n="weather.title"></h2>
+        <label class="switch-row">
+          <input type="checkbox" id="weather-toggle">
+          <span data-i18n="weather.setting"></span>
+        </label>
+        <p class="muted small" data-i18n="weather.promptBody"></p>
+        <p class="muted small"><a href="https://open-meteo.com/" target="_blank" rel="noopener" data-i18n="weather.credit"></a></p>
+      </div>
+      <div class="card">
+        <h2 data-i18n="import.title"></h2>
+        <p class="muted small" data-i18n="import.desc"></p>
+        <button id="btn-import" class="btn ghost" data-i18n="import.title"></button>
+      </div>
+      <div class="card">
+        <p><a href="privacy.html" data-i18n="settings.privacy"></a></p>
+        <p><a id="source-link" href="https://github.com/Bear1110/headack" target="_blank" rel="noopener" data-i18n="settings.source"></a></p>
+        <p class="muted small" data-i18n="settings.languageHelp"></p>
+      </div>
+    </section>
+
+    <p class="disclaimer" data-i18n="disclaimer"></p>
+  </main>
+
+  <!-- 手機在列表、統計頁也能一鍵新增 -->
+  <button id="fab" class="fab" data-i18n-attr="aria-label:nav.add,title:nav.add">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+  </button>
+
+  <!-- 新增 / 編輯表單：手機為全螢幕，桌機為置中對話框 -->
+  <dialog id="record-dialog">
+    <form id="record-form" method="dialog">
+      <div class="dialog-body">
+        <h2 id="form-title"></h2>
+        <div class="row">
+          <label class="field"><span data-i18n="form.start"></span><input type="datetime-local" name="start" required></label>
+          <label class="field"><span data-i18n="form.end"></span><input type="datetime-local" name="end"></label>
+        </div>
+        <label class="field">
+          <span><span data-i18n="form.intensity"></span> <strong><output id="intensity-out">5</output>/10</strong></span>
+          <input type="range" name="intensity" min="0" max="10" step="1" value="5">
+        </label>
+        <label class="field"><span data-i18n="form.type"></span><select name="type"></select></label>
+        <fieldset class="field"><legend data-i18n="form.locations"></legend><div id="head-map"></div></fieldset>
+        <fieldset class="field">
+          <legend data-i18n="form.aura"></legend>
+          <p class="muted small hint" data-i18n="form.auraHint"></p>
+          <div id="aura-options" class="chips"></div>
+          <p id="aura-warning" class="warning small" role="alert" hidden data-i18n="form.auraWarning"></p>
+        </fieldset>
+        <fieldset class="field"><legend data-i18n="form.symptoms"></legend><div id="symptoms-options" class="chips"></div></fieldset>
+        <fieldset class="field"><legend data-i18n="form.meds"></legend><div id="med-editor" class="med-editor"></div></fieldset>
+        <label class="field"><span data-i18n="form.medEffect"></span><select name="med_effect"></select></label>
+        <fieldset class="field"><legend data-i18n="form.triggers"></legend><div id="triggers-options" class="chips"></div></fieldset>
+        <label class="field"><span data-i18n="form.notes"></span><textarea name="notes" rows="3"></textarea></label>
+        <p id="form-weather" class="muted small weather-line" hidden></p>
+        <p id="form-error" class="error" hidden></p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="btn-delete" class="btn danger ghost" data-i18n="form.delete"></button>
+        <span class="spacer"></span>
+        <button type="button" id="btn-cancel" class="btn ghost" data-i18n="form.cancel"></button>
+        <button type="submit" class="btn" data-i18n="form.save"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 匯入：AI 整理 → 貼上 → 預覽 → 匯入 -->
+  <dialog id="import-dialog">
+    <form id="import-form" method="dialog">
+      <div class="dialog-body">
+        <h2 data-i18n="import.title"></h2>
+        <p class="muted small" data-i18n="import.privacy"></p>
+
+        <p class="step" data-i18n="import.step1"></p>
+        <div class="ai-buttons">
+          <a id="ai-chatgpt" class="btn ghost" target="_blank" rel="noopener noreferrer" data-i18n="import.openChatgpt"></a>
+          <a id="ai-claude" class="btn ghost" target="_blank" rel="noopener noreferrer" data-i18n="import.openClaude"></a>
+          <button type="button" id="btn-copy-prompt" class="btn ghost" data-i18n="import.copyPrompt"></button>
+        </div>
+
+        <p class="step" data-i18n="import.step2"></p>
+        <textarea id="import-text" rows="6" data-i18n-attr="placeholder:import.placeholder"></textarea>
+        <div id="import-preview" class="import-preview"></div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="btn-import-close" class="btn ghost" data-i18n="import.close"></button>
+        <span class="spacer"></span>
+        <button type="submit" id="btn-import-confirm" class="btn" disabled></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
