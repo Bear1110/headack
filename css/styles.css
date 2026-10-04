@@ -397,6 +397,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 }
 .site-footer p, .site-footer nav { margin: 0; }
 .site-footer a { color: var(--muted); }
+.footer-version { font-size: .75rem; opacity: .7; font-variant-numeric: tabular-nums; }
 
 /* 隱私權政策、服務條款等文件頁：沒有底部分頁列 */
 body.doc-page { padding-bottom: 0; }
@@ -404,6 +405,17 @@ body.doc-page { padding-bottom: 0; }
 .doc h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
 .doc h2 { margin-top: 1.5rem; }
 .doc p, .doc li { line-height: 1.7; }
+/* FAQ：可展開的問答 */
+.faq details { border-bottom: 1px solid var(--border); }
+.faq details:last-of-type { border-bottom: 0; }
+.faq summary {
+  cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: .85rem 0; font-weight: 600; min-height: var(--tap);
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; color: var(--primary); font-size: 1.3rem; font-weight: 400; flex: none; }
+.faq details[open] summary::after { content: '−'; }
+.faq details p { margin: 0 0 1rem; color: var(--text); }
 
 /* 表單 */
 .field { display: flex; flex-direction: column; gap: .3rem; margin: 0 0 1rem; border: 0; padding: 0; min-width: 0; }

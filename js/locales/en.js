@@ -240,6 +240,8 @@ export default {
   'settings.privacy': 'Privacy policy',
   'settings.source': 'Source code',
   'footer.terms': 'Terms of Service',
+  'footer.faq': 'FAQ',
+  'settings.version': 'Version {v}',
   'footer.copyright': '© {year} Headack. All rights reserved.',
   'danger.title': 'Danger zone',
   'danger.clear': 'Delete all entries',

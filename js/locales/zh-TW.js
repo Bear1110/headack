@@ -240,6 +240,8 @@ export default {
   'settings.privacy': '隱私權政策',
   'settings.source': '原始碼',
   'footer.terms': '服務條款',
+  'footer.faq': '常見問題',
+  'settings.version': '版本 {v}',
   'footer.copyright': '© {year} Headack. 保留所有權利。',
   'danger.title': '危險區域',
   'danger.clear': '清空所有紀錄',

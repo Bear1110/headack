@@ -8,6 +8,7 @@ import { localDate, daysCovered, monthStats } from './stats.js';
 import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
 import { applyIcons, icon } from './icons.js';
+import { APP_VERSION } from './version.js';
 import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
@@ -822,6 +823,8 @@ function render() {
 // 語言切換後重建由 JS 產生的文字（靜態文字由 i18n.applyI18n 處理）
 function refreshLanguage() {
   $('#copyright').textContent = t('footer.copyright', { year: new Date().getFullYear() });
+  $('#footer-version').textContent = `v${APP_VERSION}`;
+  $('#app-version').textContent = t('settings.version', { v: APP_VERSION });
   buildFormOptions();
   render();
 }

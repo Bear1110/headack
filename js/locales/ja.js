@@ -240,6 +240,8 @@ export default {
   'settings.privacy': 'プライバシーポリシー',
   'settings.source': 'ソースコード',
   'footer.terms': '利用規約',
+  'footer.faq': 'よくある質問',
+  'settings.version': 'バージョン {v}',
   'footer.copyright': '© {year} Headack. All rights reserved.',
   'danger.title': '危険な操作',
   'danger.clear': 'すべての記録を削除',

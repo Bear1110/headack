@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://headack.goatcounter.com; base-uri 'self'">
+  <title>常見問題 FAQ｜Headack</title>
+  <meta name="description" content="Headack 常見問題：資料存在哪裡、一定要登入嗎、換手機怎麼辦、怎麼給醫師看、怎麼刪除資料。 Headack FAQ: where your data lives, signing in, switching phones, sharing with your doctor, deleting data.">
+  <link rel="canonical" href="https://bear1110.github.io/headack/faq.html">
+  <meta property="og:image" content="https://bear1110.github.io/headack/icons/og-image.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- 結構化資料：FAQPage（只是資料區塊，不會被執行） -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Headack 是什麼？", "acceptedAnswer": { "@type": "Answer", "text": "免費的頭痛日記網站。頭痛時點一下就能記錄，也能查看每月統計、列印看診摘要給醫師。紀錄存在你自己的 Google 雲端硬碟。" } },
+      { "@type": "Question", "name": "我的資料存在哪裡？網站作者看得到嗎？", "acceptedAnswer": { "@type": "Answer", "text": "登入後，紀錄存在你自己 Google 雲端硬碟裡的一份試算表；尚未同步的紀錄暫存在你的瀏覽器。本網站沒有後端伺服器，作者看不到任何人的資料。" } },
+      { "@type": "Question", "name": "一定要登入嗎？", "acceptedAnswer": { "@type": "Answer", "text": "不用登入也能記錄，但紀錄只會存在這台裝置的瀏覽器裡，清除瀏覽器資料、換手機或換瀏覽器就會遺失。建議用 Google 登入備份。" } },
+      { "@type": "Question", "name": "換手機或換電腦怎麼辦？", "acceptedAnswer": { "@type": "Answer", "text": "在新裝置打開網站，用同一個 Google 帳號登入，紀錄就會從你的試算表讀回來。" } },
+      { "@type": "Question", "name": "怎麼把紀錄給醫師看？", "acceptedAnswer": { "@type": "Answer", "text": "到「統計」→「看診摘要」，按「列印／存成 PDF」；也可以直接分享你的 Google 試算表。" } },
+      { "@type": "Question", "name": "怎麼刪除所有資料？", "acceptedAnswer": { "@type": "Answer", "text": "到「設定」→「危險區域」→「清空所有紀錄」。也可以直接刪除雲端硬碟中的試算表，並在 Google 帳戶撤銷本網站的存取權。" } }
+    ]
+  }
+  </script>
+</head>
+<body class="doc-page">
+  <main>
+    <p><a href="./" class="brand-link"><img src="icons/logo.svg" alt="" width="28" height="28">headack</a></p>
+
+    <article class="card doc faq">
+      <h1>常見問題</h1>
+
+      <details open>
+        <summary>Headack 是什麼？</summary>
+        <p>免費的頭痛日記網站。頭痛時點一下就能記錄開始時間，再用幾個大按鈕補上痛的程度、位置、症狀和用藥；平常可以看日曆、每月統計，看診時列印摘要給醫師。紀錄存在你自己的 Google 雲端硬碟。</p>
+      </details>
+      <details>
+        <summary>為什麼叫 Headack？</summary>
+        <p>Headack 是 headache（頭痛）加上 ack（acknowledge，確認收到）。頭痛如果沒有被好好「ack」——被正視、被記下來——就很難看清楚原因，也很難和醫師一起找到有效的處理方式。所以我們希望大家多記錄自己的頭痛和用藥。</p>
+      </details>
+      <details>
+        <summary>我的資料存在哪裡？網站作者看得到嗎？</summary>
+        <p>登入後，紀錄存在你自己 Google 雲端硬碟裡的一份試算表（「Headack 頭痛紀錄」）；尚未同步的紀錄暫存在你目前使用的瀏覽器。本網站沒有後端伺服器，<strong>作者看不到任何人的資料</strong>。詳見<a href="privacy.html">隱私權政策</a>。</p>
+      </details>
+      <details>
+        <summary>一定要登入嗎？</summary>
+        <p>不用登入也能記錄，方便頭痛當下馬上使用。但沒登入時，紀錄只存在這台裝置的瀏覽器裡：<strong>清除瀏覽器資料、換手機或換瀏覽器，紀錄就會不見</strong>。建議用 Google 登入，紀錄會備份到你自己的雲端硬碟。</p>
+      </details>
+      <details>
+        <summary>網站會看到我雲端硬碟裡的其他檔案嗎？</summary>
+        <p>不會。登入時授權的是 Google 的 <code>drive.file</code> 權限，只能存取本網站自己建立的那份試算表。</p>
+      </details>
+      <details>
+        <summary>換手機或換電腦怎麼辦？</summary>
+        <p>在新裝置打開網站，用同一個 Google 帳號登入，紀錄就會從你的試算表讀回來。</p>
+      </details>
+      <details>
+        <summary>沒有網路的時候可以記錄嗎？</summary>
+        <p>可以。紀錄會先存在瀏覽器裡，連上網路後自動同步到試算表。</p>
+      </details>
+      <details>
+        <summary>怎麼加到手機主畫面？</summary>
+        <p>按畫面上方的「↓」按鈕。Android 和電腦版 Chrome／Edge 會直接安裝；iPhone 請在 Safari 點「分享」→「加入主畫面」。</p>
+      </details>
+      <details>
+        <summary>怎麼把紀錄給醫師看？</summary>
+        <p>到「統計」→「看診摘要」，選好期間後按「列印／存成 PDF」。摘要包含每月頭痛天數、用藥天數、發作特徵與治療反應。也可以直接分享你的 Google 試算表。</p>
+      </details>
+      <details>
+        <summary>用藥過度的提醒是怎麼算的？</summary>
+        <p>依國際頭痛分類（ICHD-3）的參考門檻：一般止痛藥每月使用 15 天以上，翠普登類、複方止痛藥、麥角類或鴉片類每月 10 天以上。達到時會提醒你和醫師討論，因為止痛藥用太頻繁本身也可能造成頭痛。這只是提醒，不是診斷。</p>
+      </details>
+      <details>
+        <summary>怎麼匯入以前的紀錄？</summary>
+        <p>到「設定」→「匯入紀錄」。可以把你在筆記或其他 App 的紀錄交給 AI（ChatGPT、Claude 等）整理成格式後貼回來，或直接選擇本網站匯出的 JSON 檔。本網站不會把你的資料傳給 AI，資料是你自己貼過去的。</p>
+      </details>
+      <details>
+        <summary>天氣功能會追蹤我的位置嗎？</summary>
+        <p>天氣是選用功能，預設關閉。開啟後只會把大約位置（約 10 公里範圍）傳給 Open-Meteo 查詢氣壓、氣溫與濕度，不傳送任何健康資料，試算表裡也不存位置。</p>
+      </details>
+      <details>
+        <summary>怎麼刪除所有資料？</summary>
+        <p>到「設定」→「危險區域」→「清空所有紀錄」。也可以直接刪除雲端硬碟中的試算表，並在 <a href="https://myaccount.google.com/permissions" rel="noopener">Google 帳戶的第三方存取權</a>頁面撤銷本網站的授權。</p>
+      </details>
+      <details>
+        <summary>這是醫療器材嗎？</summary>
+        <p>不是。本網站只是記錄工具，統計與提醒不構成醫療診斷。如果出現突然的劇烈頭痛、單側無力、說話困難等症狀，請立即就醫。</p>
+      </details>
+      <details>
+        <summary>有問題或建議要找誰？</summary>
+        <p>歡迎到 <a href="https://github.com/Bear1110/headack/issues" rel="noopener">GitHub</a> 提出 issue，也可以在那裡協助翻譯。</p>
+      </details>
+    </article>
+
+    <article class="card doc faq" lang="en">
+      <h1>FAQ</h1>
+      <details>
+        <summary>What is Headack?</summary>
+        <p>A free headache diary. Log the start of a headache with one tap, add intensity, location, symptoms and medication with big buttons, see a calendar and monthly stats, and print a summary for your doctor. Your entries are stored in your own Google Drive.</p>
+      </details>
+      <details>
+        <summary>Why “Headack”?</summary>
+        <p>Headack = headache + ack (acknowledge). A headache that isn't acked — noticed and written down — is hard to understand and hard to treat well with your doctor. So we hope you'll log your headaches and medication.</p>
+      </details>
+      <details>
+        <summary>Where is my data? Can the author see it?</summary>
+        <p>Once you sign in, entries are stored in a spreadsheet in your own Google Drive; entries not yet synced are kept in your browser. There is no backend server — <strong>the author cannot see anyone's data</strong>. See the <a href="privacy.html">privacy policy</a>.</p>
+      </details>
+      <details>
+        <summary>Do I have to sign in?</summary>
+        <p>No — you can log right away. But without signing in, entries live only in this browser on this device: <strong>clearing browser data or switching phones or browsers will lose them</strong>. Sign in with Google to back them up to your own Drive.</p>
+      </details>
+      <details>
+        <summary>Can the site see other files in my Drive?</summary>
+        <p>No. It uses Google's <code>drive.file</code> permission, which only allows access to the spreadsheet the site created.</p>
+      </details>
+      <details>
+        <summary>What if I switch phones or computers?</summary>
+        <p>Open the site on the new device and sign in with the same Google account; your entries are read back from your spreadsheet.</p>
+      </details>
+      <details>
+        <summary>Can I log entries offline?</summary>
+        <p>Yes. Entries are saved in the browser first and synced to your spreadsheet when you're back online.</p>
+      </details>
+      <details>
+        <summary>How do I add it to my home screen?</summary>
+        <p>Tap the “↓” button at the top. Android and desktop Chrome/Edge install it directly; on iPhone, tap Share → Add to Home Screen in Safari.</p>
+      </details>
+      <details>
+        <summary>How do I show my records to a doctor?</summary>
+        <p>Go to Stats → Doctor summary, choose a period and tap “Print / save as PDF”. You can also share your Google spreadsheet.</p>
+      </details>
+      <details>
+        <summary>How is the medication-overuse reminder calculated?</summary>
+        <p>It uses the ICHD-3 reference thresholds: simple analgesics on 15 or more days a month; triptans, combination analgesics, ergots or opioids on 10 or more days a month. It's a reminder to talk with your doctor, not a diagnosis.</p>
+      </details>
+      <details>
+        <summary>How do I import older records?</summary>
+        <p>Settings → Import entries. Let an AI (ChatGPT, Claude, …) convert your notes using the provided prompt and paste the reply back, or choose a JSON file exported from this site. The site never sends your data to any AI — you paste it yourself.</p>
+      </details>
+      <details>
+        <summary>Does the weather feature track my location?</summary>
+        <p>Weather is optional and off by default. When on, only your approximate location (about 10 km) is sent to Open-Meteo to look up pressure, temperature and humidity. No health data is sent and your location is not stored.</p>
+      </details>
+      <details>
+        <summary>How do I delete all my data?</summary>
+        <p>Settings → Danger zone → Delete all entries. You can also delete the spreadsheet from your Drive and revoke the site's access on your <a href="https://myaccount.google.com/permissions" rel="noopener">Google Account</a>.</p>
+      </details>
+      <details>
+        <summary>Is this a medical device?</summary>
+        <p>No. It's a record-keeping tool; statistics and alerts are not a diagnosis. Seek medical care immediately for a sudden severe headache, one-sided weakness or difficulty speaking.</p>
+      </details>
+      <details>
+        <summary>Questions or suggestions?</summary>
+        <p>Please open an issue on <a href="https://github.com/Bear1110/headack/issues" rel="noopener">GitHub</a> — you can also help with translations there.</p>
+      </details>
+    </article>
+
+    <footer class="site-footer">
+      <nav><a href="privacy.html">隱私權政策 Privacy</a> · <a href="terms.html">服務條款 Terms</a> · <a href="faq.html">常見問題 FAQ</a></nav>
+      <p>© 2026 Headack. 保留所有權利。All rights reserved.</p>
+      <p class="footer-version">v1.0.0</p>
+    </footer>
+  </main>
+  <!-- 瀏覽量計數（GoatCounter）：只是一張 1×1 圖片，不執行第三方程式碼、不設 Cookie、不含任何紀錄資料 -->
+  <img class="counter" src="https://headack.goatcounter.com/count?p=/faq&amp;t=FAQ" alt="" width="1" height="1" referrerpolicy="no-referrer">
+</body>
+</html>
