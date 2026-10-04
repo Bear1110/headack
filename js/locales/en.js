@@ -116,6 +116,7 @@ export default {
   'st.from': 'From',
   'st.to': 'To',
   'st.types': 'Headache type',
+  'st.typesHint': '(entries without a type count as “Not sure”)',
   'st.allTypes': 'All types',
   'st.meds': 'Medication',
   'st.meds_all': 'All',

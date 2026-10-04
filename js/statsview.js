@@ -36,8 +36,13 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
 
   // ---------- 篩選列 ----------
 
-  function filtersHtml(records) {
-    const presentTypes = OPTIONS.type.filter((c) => records.some((r) => (r.type || 'unknown') === c));
+  function filtersHtml(records, range) {
+    // 與表單相同的類型清單與順序；附上筆數，0 筆的變淡（未填類型算在「不確定」）
+    const typeCount = Object.fromEntries(OPTIONS.type.map((c) => [c, 0]));
+    for (const r of records) {
+      const day = r.start?.slice(0, 10);
+      if (day && day >= range.from && day <= range.to) typeCount[r.type || 'unknown'] = (typeCount[r.type || 'unknown'] ?? 0) + 1;
+    }
     const medCodes = [...new Set(records.flatMap((r) => (r.meds ?? []).map((m) => m.code)))];
     const rangeBtns = RANGE_PRESETS.map((p) => `<button type="button" role="radio" data-range="${p}" aria-checked="${state.range === p}">${esc(t(`st.r${p}`))}</button>`).join('');
     return `
@@ -53,10 +58,13 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
         </div>
         <div class="filter-row">
           <div class="filter-group">
-            <span class="filter-label">${esc(t('st.types'))}</span>
+            <span class="filter-label">${esc(t('st.types'))} <span class="filter-hint">${esc(t('st.typesHint'))}</span></span>
             <div class="chips">
               <button type="button" class="chip-toggle" data-type="" aria-pressed="${!state.types.length}">${esc(t('st.allTypes'))}</button>
-              ${presentTypes.map((c) => `<button type="button" class="chip-toggle" data-type="${c}" aria-pressed="${state.types.includes(c)}">${esc(t(`opt.type.${c}`))}</button>`).join('')}
+              ${OPTIONS.type.map((c) => {
+                const on = state.types.includes(c);
+                return `<button type="button" class="chip-toggle" data-type="${c}" aria-pressed="${on}" ${typeCount[c] || on ? '' : 'disabled'}>${esc(t(`opt.type.${c}`))}<span class="chip-count">${typeCount[c]}</span></button>`;
+              }).join('')}
             </div>
           </div>
           <label class="filter-group">
@@ -312,7 +320,7 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
       ? `<p class="muted empty-state">${esc(t('st.noData'))}</p>`
       : state.tab === 'doctor' ? doctorHtml(a, filtersText) : selfHtml(a, hasPrev ? prev : null);
 
-    root.innerHTML = `${filtersHtml(all)}<div class="stats-body" data-tab="${state.tab}">${body}</div>`;
+    root.innerHTML = `${filtersHtml(all, range)}<div class="stats-body" data-tab="${state.tab}">${body}</div>`;
     drawCharts();
     applyProportions(root);
   }

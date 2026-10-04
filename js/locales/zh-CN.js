@@ -116,6 +116,7 @@ export default {
   'st.from': '从',
   'st.to': '到',
   'st.types': '头痛类型',
+  'st.typesHint': '（未填类型的记录算在“不确定”）',
   'st.allTypes': '全部类型',
   'st.meds': '用药',
   'st.meds_all': '全部',

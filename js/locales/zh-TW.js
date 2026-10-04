@@ -116,6 +116,7 @@ export default {
   'st.from': '從',
   'st.to': '到',
   'st.types': '頭痛類型',
+  'st.typesHint': '（未填類型的紀錄算在「不確定」）',
   'st.allTypes': '全部類型',
   'st.meds': '用藥',
   'st.meds_all': '全部',

@@ -116,6 +116,7 @@ export default {
   'st.from': '開始',
   'st.to': '終了',
   'st.types': '頭痛のタイプ',
+  'st.typesHint': '（タイプ未記入の記録は「わからない」に含めます）',
   'st.allTypes': 'すべて',
   'st.meds': '服薬',
   'st.meds_all': 'すべて',

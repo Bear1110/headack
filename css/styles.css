@@ -307,6 +307,9 @@ body[data-view="settings"] #view-settings { display: flex; }
   padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
 }
 .chip-toggle[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+.chip-toggle:disabled { opacity: .4; cursor: default; }
+.chip-count { margin-inline-start: .4em; font-size: .8em; opacity: .75; font-variant-numeric: tabular-nums; }
+.filter-hint { font-weight: 400; }
 .seg.stats-tabs { flex: none; }
 .seg.stats-tabs button { font-size: .95rem; font-weight: 600; }
 .seg.stats-tabs button[aria-selected="true"] { background: var(--primary); color: var(--primary-text); }
