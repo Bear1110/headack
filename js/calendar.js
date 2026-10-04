@@ -34,8 +34,8 @@ function firstDayOfWeek(lang) {
 }
 
 // 每天的無障礙說明文字
-function dayLabel(t, lang, date, e) {
-  const d = date.toLocaleDateString(lang, { month: 'long', day: 'numeric', weekday: 'short' });
+function dayLabel(t, dayFmt, date, e) {
+  const d = dayFmt.format(date);
   if (!e) return d;
   const parts = [t('cal.headache')];
   if (e.max != null) parts.push(`${e.max}/10`);
@@ -49,6 +49,7 @@ export function renderCalendar({ records, months, lang, t, selected }) {
   const firstDay = firstDayOfWeek(lang);
   const weekdayFmt = new Intl.DateTimeFormat(lang, { weekday: 'narrow' });
   const monthFmt = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' });
+  const dayFmt = new Intl.DateTimeFormat(lang, { month: 'long', day: 'numeric', weekday: 'short' });
 
   // 週幾的標題（以 2023-01-01 週日為基準）
   const weekdays = Array.from({ length: 7 }, (_, i) => weekdayFmt.format(new Date(2023, 0, 1 + ((firstDay + i) % 7))));
@@ -76,7 +77,7 @@ export function renderCalendar({ records, months, lang, t, selected }) {
       const future = key > today;
       cells.push(`
         <button type="button" class="${classes.join(' ')}" data-day="${key}" ${future ? 'disabled' : ''}
-          aria-label="${esc(dayLabel(t, lang, date, e))}" aria-pressed="${key === selected}">
+          aria-label="${esc(dayLabel(t, dayFmt, date, e))}" aria-pressed="${key === selected}">
           <span class="cal-num">${d}</span>${e?.meds ? '<span class="cal-med" aria-hidden="true"></span>' : ''}
         </button>`);
     }

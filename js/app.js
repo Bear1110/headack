@@ -603,7 +603,10 @@ function recordItemHtml(r) {
 
 const CAL_KEY = 'hl.calMonths';
 let calMonths = 3;
-try { calMonths = [3, 6, 12].includes(Number(localStorage.getItem(CAL_KEY))) ? Number(localStorage.getItem(CAL_KEY)) : 3; } catch { /* ignore */ }
+try {
+  const saved = Number(localStorage.getItem(CAL_KEY));
+  if ([3, 6, 12].includes(saved)) calMonths = saved;
+} catch { /* ignore */ }
 // 12 個月 = 年度總覽：縮小的月曆一次全部顯示（手機也不左右滑）
 const isYearView = () => calMonths === 12;
 let calSelected = null; // 'YYYY-MM-DD'
@@ -615,23 +618,25 @@ function renderCalendarView() {
   document.querySelectorAll('.cal-range [data-months]').forEach((b) => {
     b.setAttribute('aria-checked', String(Number(b.dataset.months) === calMonths));
   });
-  const records = store.getRecords();
+  // 版面在這裡決定一次：年度總覽是格狀，其他（手機）是左右滑；CSS 依 #view-calendar.year 切換
+  $('#view-calendar').classList.toggle('year', isYearView());
   const box = $('#calendar-months');
-  box.innerHTML = calendarHtml({ records, months: calMonths, lang: getLang(), t, selected: calSelected });
-  box.classList.toggle('year', isYearView());
-  $('#cal-pager').hidden = isYearView();
-  $('#cal-year-detail').innerHTML = '';
+  box.innerHTML = calendarHtml({ records: store.getRecords(), months: calMonths, lang: getLang(), t, selected: calSelected });
   renderCalPager();
   showCalPage(calPage ?? calMonths - 1, false);
+  renderDayDetail();
+}
 
-  // 選取的日期：在該月下方顯示當天紀錄
-  const btn = calSelected && box.querySelector(`[data-day="${calSelected}"]`);
+// 選取的日期：一般模式顯示在該月下方；年度總覽的月份很小，顯示在整個年曆下方
+function renderDayDetail() {
+  $('#cal-year-detail').innerHTML = '';
+  document.querySelector('#calendar-months .cal-detail')?.remove();
+  const btn = calSelected && $('#calendar-months').querySelector(`[data-day="${calSelected}"]`);
   if (!btn) return;
-  const dayRecords = records
+  const dayRecords = store.getRecords()
     .filter((r) => daysCovered(r).includes(calSelected))
     .sort((a, b) => a.start.localeCompare(b.start));
   const title = new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
-  // 年度總覽的月份很小：當天紀錄顯示在整個年曆下方
   const target = isYearView() ? $('#cal-year-detail') : btn.closest('.cal-month');
   target.insertAdjacentHTML('beforeend', `
     <div class="cal-detail">
@@ -641,6 +646,19 @@ function renderCalendarView() {
         : `<p class="muted small">${escapeHtml(t('cal.noEntries'))}</p>`}
       <button type="button" class="btn ghost small" data-add-day="${calSelected}">＋ ${escapeHtml(t('cal.addForDay'))}</button>
     </div>`);
+}
+
+// 點日期：只移動選取狀態並更新明細，不重繪整個日曆（年度總覽有 12 個月）
+function selectDay(day) {
+  calSelected = calSelected === day ? null : day;
+  document.querySelectorAll('#calendar-months .cal-day.selected').forEach((b) => {
+    b.classList.remove('selected');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  const btn = calSelected && $('#calendar-months').querySelector(`[data-day="${calSelected}"]`);
+  btn?.classList.add('selected');
+  btn?.setAttribute('aria-pressed', 'true');
+  renderDayDetail();
 }
 
 // 手機的分頁控制：‹ › 箭頭與小圓點
@@ -698,10 +716,7 @@ function onCalendarClick(e) {
     return renderCalendarView();
   }
   const day = e.target.closest('[data-day]');
-  if (day) {
-    calSelected = calSelected === day.dataset.day ? null : day.dataset.day;
-    return renderCalendarView();
-  }
+  if (day) return selectDay(day.dataset.day);
   const item = e.target.closest('li[data-id]');
   if (item) return openForm(store.getRecords().find((r) => r.id === item.dataset.id));
   const add = e.target.closest('[data-add-day]');
@@ -864,7 +879,7 @@ function render() {
   renderTagline();
   renderWeatherPrompt();
   renderList();
-  renderCalendarView();
+  if (document.body.dataset.view === 'calendar') renderCalendarView(); // 隱藏時不畫，切過去時再畫
   renderStats();
   renderSettings();
 }
@@ -888,7 +903,7 @@ function showView(name) {
   // 進入日曆：回到本月（手機上月份是左右滑動，本月在最右邊）
   if (name === 'calendar') {
     calPage = null;
-    showCalPage(calMonths - 1, false);
+    renderCalendarView();
   }
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
 }

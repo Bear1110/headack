@@ -99,11 +99,8 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .install-steps { margin: .5rem 0 0; padding-inline-start: 1.4rem; display: flex; flex-direction: column; gap: .6rem; line-height: 1.6; }
 .install-steps .icon { vertical-align: -0.25em; color: var(--primary); }
 
-/* 語言：只顯示地球 icon（與「加到主畫面」同樣式），原生下拉選單透明疊在上面，點下去開系統清單 */
-.lang-picker {
-  position: relative; display: inline-grid; place-items: center; flex: none; cursor: pointer;
-  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--primary); color: var(--primary);
-}
+/* 語言：外觀沿用 .icon-btn-top；原生下拉選單透明疊在上面，點下去開系統清單 */
+.lang-picker { position: relative; }
 .lang-picker svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; pointer-events: none; }
 .lang-picker select {
   position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; padding: 0; margin: 0;
@@ -235,34 +232,33 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; }
 /* 手機：月份左右滑動（scroll-snap），一次一個月；舊→新，本月在最右邊，與桌機一致 */
 @media (max-width: 599px) {
-  .cal-months {
+  #view-calendar:not(.year) .cal-months {
     display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
     scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter);
     align-items: flex-start;
   }
-  .cal-months::-webkit-scrollbar { display: none; }
-  .cal-month { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+  #view-calendar:not(.year) .cal-months::-webkit-scrollbar { display: none; }
+  #view-calendar:not(.year) .cal-month { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
 }
 .cal-pager { display: none; }
 /* 年度總覽：縮小月曆，只看顏色與用藥點 */
-.cal-months.year { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; overflow: visible; margin-inline: 0; padding-inline: 0; }
-.cal-months.year .cal-month { padding: .5rem; scroll-snap-align: none; }
-.cal-months.year .cal-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: .3rem; }
-.cal-months.year .cal-head h3 { font-size: .85rem; }
-.cal-months.year .cal-head .muted { font-size: .7rem; }
-.cal-months.year .cal-grid { gap: 2px; }
-.cal-months.year .cal-wd { font-size: .6rem; padding-bottom: 0; }
-.cal-months.year .cal-day { min-height: 0; border-radius: 3px; font-size: 0; }
-.cal-months.year .cal-med { width: 3px; height: 3px; bottom: 1px; }
-.cal-months.year .cal-day.today { border-width: 1px; }
-.cal-months.year .cal-day.selected { outline-width: 2px; outline-offset: 0; }
+#view-calendar.year .cal-months { grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+#view-calendar.year .cal-months .cal-month { padding: .5rem; }
+#view-calendar.year .cal-months .cal-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: .3rem; }
+#view-calendar.year .cal-months .cal-head h3 { font-size: .85rem; }
+#view-calendar.year .cal-months .cal-head .muted { font-size: .7rem; }
+#view-calendar.year .cal-months .cal-grid { gap: 2px; }
+#view-calendar.year .cal-months .cal-wd { font-size: .6rem; padding-bottom: 0; }
+#view-calendar.year .cal-months .cal-day { min-height: 0; border-radius: 3px; font-size: 0; }
+#view-calendar.year .cal-months .cal-med { width: 3px; height: 3px; bottom: 1px; }
+#view-calendar.year .cal-months .cal-day.today { border-width: 1px; }
+#view-calendar.year .cal-months .cal-day.selected { outline-width: 2px; outline-offset: 0; }
 #cal-year-detail:empty { display: none; }
 #cal-year-detail .cal-detail { margin-top: 0; }
-@media (min-width: 600px) { .cal-months.year { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 900px) { .cal-months.year { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 600px) { #view-calendar.year .cal-months { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { #view-calendar.year .cal-months { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 599px) {
-  .cal-pager[hidden] { display: none; }
-  .cal-pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: -.25rem; }
+  #view-calendar:not(.year) .cal-pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: -.25rem; }
 }
 .pager-btn {
   appearance: none; width: var(--tap); height: var(--tap); border-radius: 50%; cursor: pointer;
@@ -424,7 +420,7 @@ th[title] { cursor: help; text-decoration: underline dotted; text-underline-offs
 .site-footer p, .site-footer nav { margin: 0; }
 .site-footer a { color: var(--muted); }
 .site-footer nav { display: inline-flex; align-items: center; gap: .3rem; flex-wrap: wrap; justify-content: center; }
-.footer-gh { display: inline-flex; align-items: center; color: var(--muted); }
+.footer-gh { display: inline-flex; align-items: center; }
 .footer-gh:hover { color: var(--text); }
 .footer-gh .icon { width: 18px; height: 18px; }
 .footer-version { font-size: .75rem; opacity: .7; font-variant-numeric: tabular-nums; }
