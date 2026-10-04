@@ -12,6 +12,11 @@
   --danger: #d6336c;
   --warning-bg: #fff4e6;
   --warning-text: #8a4b00;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --grid: #e8eaf0;
+  --good: #0a7d0a;
+  --bad: #c0392b;
   --radius: 14px;
   --gutter: 16px;
   --tabbar-h: 60px;
@@ -32,6 +37,11 @@
     --danger: #f06595;
     --warning-bg: #3a2a12;
     --warning-text: #ffc078;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --grid: #2a2e39;
+    --good: #3fbf3f;
+    --bad: #f06a6a;
   }
 }
 
@@ -214,7 +224,91 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-detail h4 { margin: 0; font-size: .95rem; }
 .cal-detail .record-list { gap: .4rem; }
 
-/* 統計 */
+/* 統計：篩選列 */
+#view-stats { gap: 1rem; }
+.stats-filters { display: flex; flex-direction: column; gap: .75rem; }
+.filter-row { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; align-items: flex-start; }
+.filter-group { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.filter-label { font-size: .8rem; color: var(--muted); font-weight: 600; }
+.seg.range-seg { flex: none; overflow-x: auto; scrollbar-width: none; }
+.seg.range-seg button { flex: 1 0 auto; padding-inline: .7rem; white-space: nowrap; }
+.custom-range { display: flex; flex-wrap: wrap; gap: .5rem; }
+.custom-range label { display: flex; align-items: center; gap: .4rem; font-size: .85rem; }
+.custom-range input { width: auto; }
+.filter-group select { width: auto; min-width: 12rem; }
+.chip-toggle {
+  appearance: none; font: inherit; font-size: .85rem; cursor: pointer; min-height: 36px;
+  padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+}
+.chip-toggle[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+.seg.stats-tabs { flex: none; }
+.seg.stats-tabs button { font-size: .95rem; font-weight: 600; }
+.seg.stats-tabs button[aria-selected="true"] { background: var(--primary); color: var(--primary-text); }
+.stats-body { display: flex; flex-direction: column; gap: 1rem; }
+.empty-state { text-align: center; padding: 2rem 0; }
+
+/* 統計：卡片與圖表 */
+.stat-card { min-width: 0; }
+.stat-card h3 { font-size: .9rem; margin: 1rem 0 .4rem; }
+.stat-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.tile small { font-size: .9rem; font-weight: 400; color: var(--muted); }
+.tile-delta { font-size: .8rem; margin-top: .2rem; color: var(--muted); }
+.tile-delta.good { color: var(--good); }
+.tile-delta.bad { color: var(--bad); }
+.chart { display: block; max-width: 100%; height: auto; overflow: visible; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; }
+.chart .axis { stroke: var(--border); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .ref { stroke: var(--text); stroke-width: 1; opacity: .55; }
+.chart .ref-label { fill: var(--muted); font-size: 11px; }
+.chart .bar { outline: none; cursor: default; }
+.chart .bar .hit { fill: transparent; }
+.chart .bar.s1 path { fill: var(--series-1); }
+.chart .bar.s2 path { fill: var(--series-2); }
+.chart .bar.active path, .chart .bar:focus-visible path { filter: brightness(1.15); }
+.chart .bar.active .hit, .chart .bar:focus-visible .hit { fill: color-mix(in srgb, var(--text) 6%, transparent); }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .8rem; color: var(--muted); margin-bottom: .4rem; }
+.legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.legend .key { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.legend .key.s1 { background: var(--series-1); }
+.legend .key.s2 { background: var(--series-2); }
+.chart-tip {
+  position: fixed; z-index: 50; pointer-events: none; max-width: 260px;
+  padding: .35rem .6rem; border-radius: 8px; font-size: .8rem; font-weight: 600;
+  background: var(--text); color: var(--bg); box-shadow: 0 4px 14px rgb(0 0 0 / .25);
+}
+
+/* 表格（含「以表格顯示」） */
+.table-view { margin-top: .5rem; font-size: .85rem; }
+.table-view summary { cursor: pointer; color: var(--muted); min-height: 32px; display: flex; align-items: center; }
+.table-wrap { overflow-x: auto; }
+.stat-card table, .table-view table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.stat-card th, .stat-card td { padding: .4rem .5rem; border-bottom: 1px solid var(--border); text-align: start; }
+.stat-card thead th { color: var(--muted); font-weight: 600; font-size: .8rem; white-space: nowrap; }
+.stat-card tbody th { font-weight: 500; }
+.stat-card th.num { text-align: end; }
+.stat-card td.num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat-card td.over { color: var(--bad); font-weight: 700; }
+
+/* 比例橫條 */
+.prop-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+.prop-list li { display: grid; grid-template-columns: minmax(6em, 1fr) 2fr auto; gap: .6rem; align-items: center; font-size: .85rem; }
+.prop-label { overflow-wrap: anywhere; }
+.prop-track { height: 8px; border-radius: 4px; background: var(--grid); overflow: hidden; }
+.prop-fill { display: block; width: 0; height: 100%; border-radius: 4px; background: var(--series-1); }
+.prop-value { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* 看診摘要 */
+.report-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.report-head h2 { font-size: 1.15rem; margin: 0 0 .2rem; }
+.key-figures { display: grid; grid-template-columns: 1fr; gap: .1rem; margin: 0; }
+.kf { display: grid; grid-template-columns: minmax(8em, 1fr) 2fr; gap: .75rem; padding: .45rem 0; border-bottom: 1px solid var(--border); }
+.kf:last-child { border-bottom: 0; }
+.kf dt { color: var(--muted); font-size: .85rem; }
+.kf dd { margin: 0; font-weight: 600; }
+.report-foot { text-align: center; }
+
+/* 統計：數字卡片（也用於舊版單月統計） */
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
 .tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
 .tile-value { font-size: 1.8rem; font-weight: 700; }
@@ -403,6 +497,7 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 @media (min-width: 600px) {
   .row { grid-template-columns: 1fr 1fr; }
   .tiles { grid-template-columns: repeat(4, 1fr); }
+  .key-figures { grid-template-columns: 1fr 1fr; column-gap: 2rem; }
   .cal-months { grid-template-columns: repeat(2, 1fr); align-items: start; }
   .intensity-pick { grid-template-columns: repeat(10, 1fr); }
 
@@ -441,12 +536,25 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   .view-title { display: block; margin: 0; }
 
   .cal-months { grid-template-columns: repeat(3, 1fr); }
-  body[data-view="stats"] main,
   body[data-view="settings"] main { max-width: 760px; }
+  body[data-view="stats"] main { max-width: 1120px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; align-items: start; }
 
   .btn.huge { min-height: 160px; font-size: 1.4rem; }
   .intensity-pick { grid-template-columns: repeat(5, 1fr); }
 
   .fab { display: none !important; }
   .toast { bottom: 24px; }
+}
+
+/* ---------- 列印（看診摘要） ---------- */
+@media print {
+  :root { --bg: #fff; --surface: #fff; --text: #111; --muted: #555; --border: #ccc; --grid: #e5e5e5; --series-1: #2a78d6; --series-2: #eb6834; }
+  body { background: #fff; padding: 0; font-size: 12px; }
+  .topbar, .nav, .banner, .fab, .site-footer, .stats-filters, .stats-tabs, .no-print, .table-view, #toast, .chart-tip { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .card, .tile { border-color: #ccc; break-inside: avoid; box-shadow: none; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .chart, .prop-fill, .legend .key { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .warning { border: 1px solid #c77; background: #fff; color: #111; }
 }

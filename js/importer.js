@@ -204,21 +204,23 @@ function normalize(raw) {
 }
 
 // 回傳 { records, duplicates, errors: [{ index, error }] }
-// 與既有紀錄（或同批）開始時間相同者視為重複，略過。
+// 與既有紀錄（或同批）開始時間「且」備註都相同者視為重複，略過。
+// 只比開始時間不夠：只有日期的舊資料，同一天可能有好幾次發作（例如叢集型頭痛）。
 export function parseImport(text, existing) {
   const data = extractJson(text);
   const rows = Array.isArray(data) ? data : data?.records;
   if (!Array.isArray(rows)) throw new Error('no_records');
 
-  const seen = new Set(existing.map((r) => r.start));
+  const key = (r) => `${r.start}|${String(r.notes ?? '').trim()}`;
+  const seen = new Set(existing.map(key));
   const records = [];
   const errors = [];
   let duplicates = 0;
   rows.forEach((raw, index) => {
     const { record, error } = normalize(raw);
     if (error) return errors.push({ index, error });
-    if (seen.has(record.start)) return duplicates++;
-    seen.add(record.start);
+    if (seen.has(key(record))) return duplicates++;
+    seen.add(key(record));
     records.push(record);
   });
   records.sort((a, b) => a.start.localeCompare(b.start));

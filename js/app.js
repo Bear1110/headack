@@ -4,7 +4,8 @@ import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS } from './i18n.js';
-import { monthStats, localDate, daysCovered } from './stats.js';
+import { localDate, daysCovered } from './stats.js';
+import { createStatsView } from './statsview.js';
 import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
@@ -578,25 +579,10 @@ function onCalendarClick(e) {
   }
 }
 
+// 統計頁由 statsview.js 負責（篩選、我的趨勢、看診摘要）
+let statsView = null;
 function renderStats() {
-  const input = $('#stats-month');
-  if (!input.value) input.value = localDate(new Date()).slice(0, 7);
-  const s = monthStats(store.getRecords(), input.value);
-  const tile = (label, value) => `<div class="tile"><div class="tile-value">${value}</div><div class="tile-label">${label}</div></div>`;
-  const types = Object.entries(s.typeCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([k, n]) => `<li>${escapeHtml(t(`opt.type.${k}`))}<span>${n}</span></li>`).join('');
-  const warnings = s.mohWarnings
-    .map((w) => `<p class="warning">${escapeHtml(t('stats.mohWarning', { cat: t(`cat.${w.cat}`), n: w.n, limit: w.limit }))}</p>`).join('');
-  $('#stats-body').innerHTML = `
-    ${warnings}
-    <div class="tiles">
-      ${tile(t('stats.headacheDays'), s.headacheDays)}
-      ${tile(t('stats.medDays'), s.medDays)}
-      ${tile(t('stats.episodes'), s.episodes)}
-      ${tile(t('stats.avgIntensity'), s.avgIntensity == null ? '—' : s.avgIntensity.toFixed(1))}
-    </div>
-    ${types ? `<div class="card"><h2>${t('stats.byType')}</h2><ul class="kv">${types}</ul></div>` : ''}`;
+  statsView?.render();
 }
 
 // 尚未決定是否記錄天氣、且已有紀錄時，在記錄頁詢問一次
@@ -636,6 +622,7 @@ function refreshLanguage() {
 function showView(name) {
   document.body.dataset.view = name;
   window.scrollTo(0, 0);
+  if (name === 'stats') statsView?.render(); // 隱藏時量不到圖表寬度，切過來再畫一次
   // 手機上月份是單欄、本月在最下面：切到日曆時直接捲到本月
   if (name === 'calendar' && matchMedia('(max-width: 599px)').matches) {
     document.querySelector('#calendar-months .cal-month:last-child')?.scrollIntoView({ block: 'start' });
@@ -679,7 +666,7 @@ function bindEvents() {
   $('#btn-cancel').addEventListener('click', () => $('#record-dialog').close());
   $('#btn-delete').addEventListener('click', deleteEditing);
 
-  $('#stats-month').addEventListener('change', renderStats);
+  statsView = createStatsView($('#view-stats'), { t, getLang, getRecords: store.getRecords });
   $('#view-calendar').addEventListener('click', onCalendarClick);
 
   $('#btn-weather-on').addEventListener('click', enableWeather);
