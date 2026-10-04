@@ -17,7 +17,7 @@ const SYMPTOM_CHOICES = [
   ...['nausea', 'vomiting', 'photophobia', 'phonophobia', 'osmophobia', 'dizziness'].map((c) => ({ field: 'symptoms', code: c, key: `opt.symptoms.${c}` })),
 ];
 
-export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, notify }) {
+export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, notify, discard }) {
   let recordId = null;
   let steps = [];
   let index = 0;
@@ -119,6 +119,7 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
     dialog.innerHTML = `
       <div class="qf">
         <header class="qf-top">
+          ${mode === 'start' && index === 0 ? `<button type="button" class="qf-discard" data-act="discard">${esc(t('undo.misTap'))}</button>` : ''}
           <span class="qf-progress">${questions < 2 ? '' : esc(t('qf.step', { i: index + 1, n: questions }))}</span>
           <button type="button" class="qf-close" data-act="close" aria-label="${esc(t('import.close'))}">✕</button>
         </header>
@@ -143,6 +144,7 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
     const step = steps[index];
 
     if (el.dataset.intensity) {
+      try { navigator.vibrate?.(10); } catch { /* ignore */ }
       update({ intensity: Number(el.dataset.intensity) });
       render();
       setTimeout(next, 220); // 讓使用者看到自己點了哪個
@@ -177,6 +179,10 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
         return next();
       case 'skip':
         return next();
+      case 'discard':
+        // 誤按「頭痛開始了」：刪掉這筆（外層會提供「復原」）
+        close();
+        return discard(recordId);
       case 'close':
         if (step === 'where' && headMap) update({ locations: headMap.get() });
         return close();

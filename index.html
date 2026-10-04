@@ -63,11 +63,11 @@
     <h1 class="brand"><img src="icons/logo.svg" alt="" width="34" height="34"><span>headack</span></h1>
     <!-- 手機：固定在畫面底部的分頁列；桌機：標題列中的分頁 -->
     <nav class="nav">
-      <button data-view="log" class="active" data-i18n="nav.log">Log</button>
-      <button data-view="list" data-i18n="nav.list">History</button>
-      <button data-view="calendar" data-i18n="nav.calendar">Calendar</button>
-      <button data-view="stats" data-i18n="nav.stats">Stats</button>
-      <button data-view="settings" data-i18n="nav.settings">Settings</button>
+      <button data-view="log" class="active"><span class="nav-icon" data-icon="log"></span><span data-i18n="nav.log">Log</span></button>
+      <button data-view="list"><span class="nav-icon" data-icon="list"></span><span data-i18n="nav.list">History</span></button>
+      <button data-view="calendar"><span class="nav-icon" data-icon="calendar"></span><span data-i18n="nav.calendar">Calendar</span></button>
+      <button data-view="stats"><span class="nav-icon" data-icon="stats"></span><span data-i18n="nav.stats">Stats</span></button>
+      <button data-view="settings"><span class="nav-icon" data-icon="settings"></span><span data-i18n="nav.settings">Settings</span></button>
     </nav>
     <div class="top-actions">
       <!-- 語言選單放在標題列，第一次來的人不必進設定就能切換 -->
@@ -97,6 +97,7 @@
         <span data-i18n="log.start">Headache started</span>
         <small data-i18n="log.startHint"></small>
       </button>
+      <p id="home-summary" class="home-summary" hidden></p>
       <p id="tagline" class="tagline" hidden data-i18n="about.tagline"></p>
       <button type="button" id="btn-try-demo" class="btn ghost wide" hidden data-i18n="demo.try"></button>
       <div id="ongoing" class="ongoing-list"></div>
@@ -139,14 +140,18 @@
 
     <!-- 設定 -->
     <section id="view-settings" class="view">
+      <!-- 帳號與同步 -->
       <div class="card">
-        <h2 data-i18n="settings.account"></h2>
+        <h2 class="card-title"><span data-icon="user"></span><span data-i18n="settings.account"></span></h2>
         <p id="account-email" class="muted"></p>
         <p><a id="sheet-link" href="#" target="_blank" rel="noopener" hidden data-i18n="settings.openSheet"></a></p>
         <button id="btn-signout" class="btn ghost small" hidden data-i18n="auth.signOut"></button>
       </div>
+
+      <!-- 偏好 -->
+      <h3 class="settings-group" data-i18n="settings.groupPrefs"></h3>
       <div class="card">
-        <h2 data-i18n="weather.title"></h2>
+        <h2 class="card-title"><span data-icon="weather"></span><span data-i18n="weather.title"></span></h2>
         <p class="small" data-i18n="weather.why"></p>
         <label class="switch-row">
           <input type="checkbox" id="weather-toggle">
@@ -155,29 +160,36 @@
         <p class="muted small" data-i18n="weather.promptBody"></p>
         <p class="muted small"><a href="https://open-meteo.com/" target="_blank" rel="noopener" data-i18n="weather.credit"></a></p>
       </div>
+
+      <!-- 資料 -->
+      <h3 class="settings-group" data-i18n="settings.groupData"></h3>
       <div class="card">
-        <h2 data-i18n="import.title"></h2>
+        <h2 class="card-title"><span data-icon="importIcon"></span><span data-i18n="import.title"></span></h2>
         <p class="muted small" data-i18n="import.desc"></p>
         <button id="btn-import" class="btn ghost" data-i18n="import.title"></button>
       </div>
       <div class="card">
-        <h2 data-i18n="export.title"></h2>
+        <h2 class="card-title"><span data-icon="exportIcon"></span><span data-i18n="export.title"></span></h2>
         <p class="muted small" data-i18n="export.desc"></p>
         <button id="btn-export" class="btn ghost" data-i18n="export.button"></button>
       </div>
+
+      <!-- 其他 -->
+      <h3 class="settings-group" data-i18n="settings.groupMore"></h3>
       <div class="card">
-        <h2 data-i18n="demo.title"></h2>
+        <h2 class="card-title"><span data-icon="demo"></span><span data-i18n="demo.title"></span></h2>
         <p class="muted small" data-i18n="demo.desc"></p>
         <button type="button" id="btn-demo" class="btn ghost"></button>
       </div>
       <div class="card">
+        <h2 class="card-title"><span data-icon="info"></span><span data-i18n="settings.groupAbout"></span></h2>
         <p><a href="privacy.html" data-i18n="settings.privacy"></a></p>
         <p><a href="terms.html" data-i18n="footer.terms"></a></p>
         <p><a id="source-link" href="https://github.com/Bear1110/headack" target="_blank" rel="noopener" data-i18n="settings.source"></a></p>
         <p class="muted small" data-i18n="settings.languageHelp"></p>
       </div>
       <div class="card danger-zone">
-        <h2 data-i18n="danger.title"></h2>
+        <h2 class="card-title"><span data-icon="alert"></span><span data-i18n="danger.title"></span></h2>
         <p class="muted small" data-i18n="danger.clearDesc"></p>
         <button type="button" id="btn-clear" class="btn danger ghost" data-i18n="danger.clear"></button>
       </div>

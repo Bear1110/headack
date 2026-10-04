@@ -4,9 +4,10 @@ import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS } from './i18n.js';
-import { localDate, daysCovered } from './stats.js';
+import { localDate, daysCovered, monthStats } from './stats.js';
 import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
+import { applyIcons, icon } from './icons.js';
 import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
@@ -44,12 +45,35 @@ function formatDuration(start, end) {
 }
 
 let toastTimer;
-function toast(msg, ms = 3000) {
+// action：{ label, run }，例如「復原」；有按鈕時停留久一點
+function toast(msg, ms = 3000, action = null) {
   const el = $('#toast');
-  el.textContent = msg;
+  el.innerHTML = `<span>${escapeHtml(msg)}</span>${action ? `<button type="button" class="toast-action">${icon('undo')}${escapeHtml(action.label)}</button>` : ''}`;
   el.hidden = false;
+  if (action) {
+    el.querySelector('.toast-action').addEventListener('click', () => {
+      el.hidden = true;
+      action.run();
+    }, { once: true });
+  }
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+  toastTimer = setTimeout(() => { el.hidden = true; }, action ? Math.max(ms, 6000) : ms);
+}
+
+// 手機上的觸覺回饋（支援的瀏覽器才會震動，例如 Android；iOS 網頁不支援，安靜略過）
+const buzz = (ms = 20) => { try { navigator.vibrate?.(ms); } catch { /* ignore */ } };
+
+// 刪除後可復原：把整筆紀錄當新紀錄加回去
+function deleteWithUndo(record) {
+  store.deleteRecord(record.id);
+  trySync();
+  toast(t('undo.deleted'), 6000, {
+    label: t('undo.undo'),
+    run: () => {
+      store.saveRecord({ ...record, updated_at: new Date().toISOString() }, { isNew: true });
+      trySync();
+    },
+  });
 }
 
 // ---------- 同步 ----------
@@ -203,11 +227,13 @@ function emptyRecord() {
 let quickFlow = null;
 function quickStart() {
   const record = emptyRecord();
-  save(record, true);
+  buzz(40);
+  save(record, true, { quiet: true });
   quickFlow.open(record.id, 'start');
 }
 
 function setIntensity(id, value) {
+  buzz(10);
   const r = store.getRecords().find((x) => x.id === id);
   if (!r) return;
   save({ ...r, intensity: value }, false);
@@ -216,9 +242,11 @@ function setIntensity(id, value) {
 function endRecord(id) {
   const r = store.getRecords().find((x) => x.id === id);
   if (!r) return;
-  save({ ...r, end: nowLocal() }, false);
-  // 有吃藥但還沒填效果：結束當下最記得，問一題就好
+  buzz();
+  save({ ...r, end: nowLocal() }, false, { quiet: true });
+  // 有吃藥但還沒填效果：結束當下最記得，問一題就好；否則提供「復原」（避免誤觸）
   if (r.meds?.length && !r.med_effect) quickFlow.open(id, 'end');
+  else toast(t('undo.ended'), 6000, { label: t('undo.undo'), run: () => save({ ...r }, false, { quiet: true }) });
 }
 
 // ---------- 表單 ----------
@@ -313,11 +341,12 @@ function updateAuraWarning() {
   $('#aura-warning').hidden = !red;
 }
 
+// 不再跳確認視窗，改為刪除後提供「復原」
 function deleteEditing() {
-  if (!editing || !confirm(t('form.confirmDelete'))) return;
-  store.deleteRecord(editing.id);
+  if (!editing) return;
+  const record = editing;
   $('#record-dialog').close();
-  trySync();
+  deleteWithUndo(record);
 }
 
 // ---------- 清空所有紀錄 ----------
@@ -477,10 +506,17 @@ function renderSync() {
   const status = $('#sync-status');
   const banner = $('#banner');
 
-  if (syncState === 'syncing') status.textContent = t('sync.syncing');
-  else if (pending) status.textContent = t('sync.pending', { n: pending });
-  else if (hasToken) status.textContent = t('sync.synced');
-  else status.textContent = '';
+  // 雲朵 icon + 未同步筆數；完整文字放在 title / aria-label（桌機另外顯示文字）
+  let kind = '';
+  let text = '';
+  if (syncState === 'syncing') [kind, text] = ['cloudSync', t('sync.syncing')];
+  else if (syncState === 'offline' || syncState === 'error') [kind, text] = ['cloudOff', t(syncState === 'offline' ? 'sync.offline' : 'sync.failed')];
+  else if (pending) [kind, text] = [hasToken ? 'cloudUp' : 'cloudOff', t('sync.pending', { n: pending })];
+  else if (hasToken) [kind, text] = ['cloudCheck', t('sync.synced')];
+  status.innerHTML = kind ? `${icon(kind)}${pending ? `<span class="sync-count">${pending}</span>` : ''}<span class="sync-text">${escapeHtml(text)}</span>` : '';
+  status.title = text;
+  status.setAttribute('aria-label', text);
+  status.dataset.kind = kind;
 
   const signinBtn = $('#btn-signin');
   signinBtn.hidden = hasToken;
@@ -622,6 +658,26 @@ function renderStats() {
 }
 
 // 尚未決定是否記錄天氣、且已有紀錄時，在記錄頁詢問一次
+// 首頁近況：距離上次頭痛幾天、本月頭痛與用藥天數（用藥達門檻時醒目提示）
+function renderHomeSummary() {
+  const records = store.getRecords().filter((r) => r.start);
+  const el = $('#home-summary');
+  el.hidden = !records.length;
+  if (!records.length) return;
+  const today = localDate(new Date());
+  const lastDay = records.reduce((max, r) => {
+    const d = (r.end || r.start).slice(0, 10);
+    return d > max ? d : max;
+  }, '');
+  const since = Math.round((new Date(`${today}T00:00`) - new Date(`${lastDay}T00:00`)) / 86400000);
+  const m = monthStats(records, today.slice(0, 7));
+  const parts = [];
+  if (!records.some(isOngoing)) parts.push(since <= 0 ? t('home.today') : t('home.since', { n: since }));
+  parts.push(t('home.month', { h: m.headacheDays, m: m.medDays }));
+  el.textContent = parts.join(' · ');
+  el.classList.toggle('alert', m.mohWarnings.length > 0);
+}
+
 // 新使用者（還沒有任何紀錄）在首頁看到一句理念，有紀錄後就收起來
 function renderTagline() {
   const fresh = !store.getRecords().length && !store.isDemo();
@@ -662,6 +718,7 @@ function renderSettings() {
 function render() {
   renderSync();
   renderOngoing();
+  renderHomeSummary();
   renderTagline();
   renderWeatherPrompt();
   renderList();
@@ -742,6 +799,10 @@ function bindEvents() {
     saveRecord: (r) => save(r, false, { quiet: true }),
     frequentMeds,
     notify: (msg) => toast(msg, 5000),
+    discard: (id) => {
+      const r = store.getRecords().find((x) => x.id === id);
+      if (r) deleteWithUndo(r);
+    },
   });
   $('#view-calendar').addEventListener('click', onCalendarClick);
 
@@ -789,6 +850,7 @@ function bindEvents() {
 }
 
 async function init() {
+  applyIcons();
   bindEvents();
   await initI18n();
   $('#lang-select').value = getLang();

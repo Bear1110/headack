@@ -57,6 +57,10 @@ body {
 }
 
 h1 { font-size: 1.15rem; margin: 0; }
+
+/* 線條 icon：跟著文字顏色 */
+.icon { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[data-icon] { display: inline-flex; }
 h2 { font-size: 1rem; margin: 0 0 .5rem; }
 
 /* ---------- 標題列 ---------- */
@@ -76,7 +80,15 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .brand-link { display: inline-flex; align-items: center; gap: .4rem; font-weight: 800; font-size: 1.1rem; color: var(--text); text-decoration: none; }
 .top-actions { display: flex; align-items: center; gap: .5rem; min-width: 0; }
 .sync { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-.sync-status { font-size: .85rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.sync-status { display: inline-flex; align-items: center; gap: .25rem; font-size: .85rem; color: var(--muted); white-space: nowrap; min-width: 0; }
+.sync-status .icon { width: 22px; height: 22px; }
+.sync-status[data-kind="cloudCheck"] { color: var(--good); }
+.sync-status[data-kind="cloudUp"] { color: var(--primary); }
+.sync-status[data-kind="cloudOff"] { color: var(--warning-text); }
+.sync-status[data-kind="cloudSync"] .icon { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.sync-count { font-weight: 700; font-variant-numeric: tabular-nums; }
+.sync-text { display: none; }
 
 .lang-picker { position: relative; display: inline-flex; align-items: center; flex: none; }
 .lang-picker svg {
@@ -113,9 +125,11 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
   background: var(--surface); border-top: 1px solid var(--border);
 }
 .nav button {
-  appearance: none; border: 0; background: none; font: inherit; font-size: .9rem;
+  appearance: none; border: 0; background: none; font: inherit; font-size: .72rem;
   color: var(--muted); cursor: pointer; min-height: var(--tap);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
+.nav-icon .icon { width: 24px; height: 24px; }
 .nav button.active { color: var(--primary); font-weight: 700; }
 
 /* ---------- 內容 ---------- */
@@ -455,6 +469,22 @@ dialog form { display: flex; flex-direction: column; height: 100%; }
 .switch-row { display: flex; align-items: center; gap: .75rem; cursor: pointer; min-height: var(--tap); }
 .switch-row input { width: 1.4rem; height: 1.4rem; min-height: 0; flex: none; accent-color: var(--primary); }
 
+/* 設定：分組標題、卡片標題 icon */
+.settings-group { margin: .5rem 0 -.4rem; font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+.card-title { display: flex; align-items: center; gap: .5rem; }
+.card-title .icon { color: var(--primary); width: 20px; height: 20px; }
+.danger-zone .card-title .icon { color: var(--danger); }
+
+/* 首頁近況 */
+.home-summary { margin: 0; text-align: center; color: var(--muted); font-size: .9rem; }
+.home-summary.alert { color: var(--warning-text); font-weight: 600; }
+
+/* 快速問答：誤按刪除 */
+.qf-discard {
+  appearance: none; border: 0; background: none; color: var(--qf-muted); font: inherit; font-size: .9rem;
+  text-decoration: underline; cursor: pointer; padding: .5rem 0; min-height: 44px;
+}
+
 /* 危險區域、確認對話框 */
 .danger-zone { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
 .danger-zone h2 { color: var(--danger); }
@@ -554,6 +584,12 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
   background: var(--text); color: var(--bg); padding: .6rem 1rem; border-radius: 16px; font-size: .9rem;
   text-align: center; max-width: min(520px, calc(100vw - 2 * var(--gutter)));
+  display: flex; align-items: center; justify-content: center; gap: .75rem;
+}
+.toast[hidden] { display: none; }
+.toast-action {
+  appearance: none; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .4rem; min-height: 36px; text-decoration: underline;
 }
 
 .counter { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -599,7 +635,10 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
     position: static; height: auto; padding: 0; border: 0; background: none;
     display: flex; gap: .25rem;
   }
-  .nav button { padding: .4rem 1rem; border-radius: 999px; min-height: 36px; }
+  .nav button { flex-direction: row; gap: .4rem; font-size: .9rem; padding: .4rem 1rem; border-radius: 999px; min-height: 36px; }
+  .nav-icon .icon { width: 18px; height: 18px; }
+  .sync-text { display: inline; }
+  .sync-count { display: none; } /* 桌機已有完整文字 */
   .nav button.active { background: color-mix(in srgb, var(--primary) 14%, transparent); }
   .nav button[data-view="list"] { display: none; } /* 已併入「記錄」頁 */
 
