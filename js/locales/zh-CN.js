@@ -381,4 +381,11 @@ export default {
   'cat.opioid': '阿片类',
   'cat.ergot': '麦角类',
   'cat.acuteMixed': '急性头痛药物（合计）',
+  'catDesc.simple': '单一成分的止痛药，例如对乙酰氨基酚（必理痛）、布洛芬、萘普生、阿司匹林、洛索洛芬。',
+  'catDesc.combination': '含两种以上有效成分的止痛药，常加了咖啡因或镇静成分，例如 EVE、必理痛特强、散利痛。',
+  'catDesc.triptan': '偏头痛专用的处方药，例如舒马曲坦、利扎曲普坦、佐米曲普坦。',
+  'catDesc.ergot': '较早期的偏头痛处方药，例如麦角胺咖啡因。',
+  'catDesc.opioid': '阿片类止痛药，例如曲马多。',
+  'st.catLimit': '每月 {n} 天以上需注意',
+  'st.catUsed': '你用过的：{list}',
 };

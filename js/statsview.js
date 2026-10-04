@@ -2,7 +2,7 @@
 // - 我的趨勢：使用者自己評估「變好還是變差、什麼時候痛、藥有沒有效」
 // - 看診摘要：醫師會看的數據（頭痛天數、用藥天數與過度使用、發作特徵、叢集型、治療反應），可列印
 
-import { OPTIONS, MOH_THRESHOLDS } from './schema.js';
+import { OPTIONS, MOH_THRESHOLDS, MED_BY_CODE } from './schema.js';
 import { RANGE_PRESETS, resolveRange, previousRange, filterRecords, analyze } from './analysis.js';
 import { columnChart, tableView, proportionList, attachTooltips, applyProportions } from './charts.js';
 import { medLabel } from './widgets.js';
@@ -190,6 +190,22 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
       ${card(t('ai.title'), `<p class="muted small">${esc(t('ai.desc'))}</p><button type="button" class="btn" data-ai>${esc(t('ai.start'))}</button>`, 'ai-card')}`;
   }
 
+  // 藥物類別說明：只列出表格中出現的類別，並標出使用者在這段期間用過哪些藥
+  function catLegend(cats, meds) {
+    if (!cats.length) return '';
+    const items = cats.map((c) => {
+      const used = meds.filter((m) => (MED_BY_CODE[m.code]?.category ?? 'simple') === c).map((m) => medLabel(t, m));
+      return `
+        <li>
+          <strong>${esc(t(`cat.${c}`))}</strong>
+          <span class="muted">（${esc(t('st.catLimit', { n: MOH_THRESHOLDS[c] ?? 10 }))}）</span>
+          ${esc(t(`catDesc.${c}`))}
+          ${used.length ? `<div class="cat-used">${esc(t('st.catUsed', { list: used.join(t('list.separator')) }))}</div>` : ''}
+        </li>`;
+    }).join('');
+    return `<ul class="cat-legend small">${items}</ul>`;
+  }
+
   // ---------- 看診摘要 ----------
 
   function doctorHtml(a, filtersText) {
@@ -221,10 +237,11 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
     }).join('');
     const medByClass = cats.length ? `
       <div class="table-wrap"><table>
-        <thead><tr><th>${esc(t('st.colMonth'))}</th>${cats.map((c) => `<th class="num">${esc(t(`cat.${c}`))}</th>`).join('')}<th class="num">${esc(t('st.colTotal'))}</th></tr></thead>
+        <thead><tr><th>${esc(t('st.colMonth'))}</th>${cats.map((c) => `<th class="num" title="${esc(t(`catDesc.${c}`))}">${esc(t(`cat.${c}`))}</th>`).join('')}<th class="num">${esc(t('st.colTotal'))}</th></tr></thead>
         <tbody>${medRows}</tbody>
       </table></div>
       ${listMonths.length < a.months.length ? `<p class="muted small">${esc(t('st.onlyMedMonths'))}</p>` : ''}
+      ${catLegend(cats, a.meds)}
       <p class="muted small">${esc(t('st.medDaysWhy'))}</p>
       <p class="muted small">${esc(t('st.mohNote'))}</p>
       ${a.moh.length ? `<p class="warning small">⚠ ${esc(t('st.mohMonths', { n: new Set(a.moh.map((x) => x.ym)).size }))}</p>` : ''}` : notEnough();

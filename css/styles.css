@@ -351,7 +351,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 .stat-card table, .table-view table { width: 100%; border-collapse: collapse; font-size: .85rem; }
 .stat-card th, .stat-card td { padding: .4rem .5rem; border-bottom: 1px solid var(--border); text-align: start; }
 .stat-card thead th { color: var(--muted); font-weight: 600; font-size: .8rem; white-space: nowrap; }
-.stat-card tbody th { font-weight: 500; }
+.stat-card tbody th { font-weight: 500; white-space: nowrap; }
 .stat-card th.num { text-align: end; }
 .stat-card td.num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .stat-card td.over { color: var(--bad); font-weight: 700; }
@@ -363,6 +363,12 @@ body[data-view="settings"] #view-settings { display: flex; }
 .prop-track { height: 8px; border-radius: 4px; background: var(--grid); overflow: hidden; }
 .prop-fill { display: block; width: 0; height: 100%; border-radius: 4px; background: var(--series-1); }
 .prop-value { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* 藥物類別說明 */
+.cat-legend { list-style: none; margin: .75rem 0 .25rem; padding: 0; display: flex; flex-direction: column; gap: .5rem; line-height: 1.6; }
+.cat-legend li { padding: .5rem .75rem; border-radius: 10px; background: var(--bg); }
+.cat-used { margin-top: .2rem; font-weight: 600; }
+th[title] { cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
 
 /* 看診摘要 */
 .report-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }

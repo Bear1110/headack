@@ -381,4 +381,11 @@ export default {
   'cat.opioid': '鴉片類',
   'cat.ergot': '麥角類',
   'cat.acuteMixed': '急性頭痛藥物（合計）',
+  'catDesc.simple': '單一成分的止痛藥，例如乙醯胺酚（普拿疼）、布洛芬、拿普生、阿斯匹靈、樂松。',
+  'catDesc.combination': '含兩種以上有效成分的止痛藥，常加了咖啡因或鎮靜成分，例如 EVE、普拿疼加強錠、散利痛。',
+  'catDesc.triptan': '偏頭痛專用的處方藥，例如 Sumatriptan（英明格）、Rizatriptan、Zolmitriptan。',
+  'catDesc.ergot': '較早期的偏頭痛處方藥，例如麥角胺（Cafergot）。',
+  'catDesc.opioid': '鴉片類止痛藥，例如曲馬多（Ultracet）。',
+  'st.catLimit': '每月 {n} 天以上需注意',
+  'st.catUsed': '你用過的：{list}',
 };

@@ -381,4 +381,11 @@ export default {
   'cat.opioid': 'Opioids',
   'cat.ergot': 'Ergots',
   'cat.acuteMixed': 'Acute headache medication (combined)',
+  'catDesc.simple': 'Single-ingredient painkillers, e.g. paracetamol/acetaminophen (Panadol), ibuprofen, naproxen, aspirin, loxoprofen.',
+  'catDesc.combination': 'Painkillers with two or more active ingredients, often with caffeine or a sedative, e.g. EVE, Panadol Extra, Saridon.',
+  'catDesc.triptan': 'Prescription migraine medicines, e.g. sumatriptan (Imigran), rizatriptan, zolmitriptan.',
+  'catDesc.ergot': 'Older prescription migraine medicines, e.g. ergotamine (Cafergot).',
+  'catDesc.opioid': 'Opioid painkillers, e.g. tramadol (Ultracet).',
+  'st.catLimit': 'watch at {n}+ days/month',
+  'st.catUsed': 'You took: {list}',
 };
