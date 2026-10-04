@@ -747,6 +747,47 @@ function renderTagline() {
   $('#btn-try-demo').hidden = !fresh;
 }
 
+// ---------- AI 分析 ----------
+
+const AI_KEY = 'hl.ai';
+let ai = null; // 用到才載入
+let aiPrompt = '';
+const aiState = (() => {
+  try { return { preset: 'overview', count: 30, notes: true, ...JSON.parse(localStorage.getItem(AI_KEY) || '{}') }; } catch { return { preset: 'overview', count: 30, notes: true }; }
+})();
+
+async function openAiDialog() {
+  ai ??= await import('./aianalysis.js');
+  const chip = (field, value, labelText) => `<label class="chip"><input type="radio" name="${field}" value="${value}"><span>${escapeHtml(labelText)}</span></label>`;
+  $('#ai-presets').innerHTML = ai.AI_PRESETS.map((p) => chip('ai-preset', p, t(`ai.p_${p}`))).join('');
+  $('#ai-counts').innerHTML = ai.AI_COUNTS.map((n) => chip('ai-count', n, t('ai.countN', { n }))).join('');
+  $(`#ai-presets input[value="${aiState.preset}"]`).checked = true;
+  $(`#ai-counts input[value="${aiState.count}"]`).checked = true;
+  $('#ai-notes').checked = aiState.notes;
+  updateAiPrompt();
+  $('#ai-dialog').showModal();
+}
+
+function updateAiPrompt() {
+  aiState.preset = $('#ai-presets input:checked')?.value ?? 'overview';
+  aiState.count = Number($('#ai-counts input:checked')?.value ?? 30);
+  aiState.notes = $('#ai-notes').checked;
+  try { localStorage.setItem(AI_KEY, JSON.stringify(aiState)); } catch { /* ignore */ }
+  const { prompt, count } = ai.buildAnalysisPrompt(store.getRecords(), { ...aiState, includeNotes: aiState.notes, lang: getLang() });
+  aiPrompt = prompt;
+  const links = ai.aiLinks(prompt);
+  $('#ai-open-chatgpt').href = links.chatgpt;
+  $('#ai-open-claude').href = links.claude;
+  $('#ai-privacy').textContent = t('ai.privacy', { n: count });
+  $('#ai-hint').textContent = t(links.fits ? 'ai.hintFilled' : 'ai.hintPaste');
+  $('#ai-preview').textContent = prompt;
+}
+
+// 開啟 AI 前一律先複製（內容太長、網址放不下時，使用者貼上即可）
+function copyAiPrompt() {
+  navigator.clipboard?.writeText(aiPrompt).then(() => toast(t('ai.copied'))).catch(() => {});
+}
+
 // ---------- 加到主畫面 ----------
 
 // Chrome / Edge / Android 會先發出 beforeinstallprompt，留著等使用者按按鈕時再顯示
@@ -890,7 +931,13 @@ function bindEvents() {
   $('#btn-cancel').addEventListener('click', () => $('#record-dialog').close());
   $('#btn-delete').addEventListener('click', deleteEditing);
 
-  statsView = createStatsView($('#view-stats'), { t, getLang, getRecords: store.getRecords });
+  statsView = createStatsView($('#view-stats'), { t, getLang, getRecords: store.getRecords, onAiAnalysis: openAiDialog });
+  $('#ai-presets').addEventListener('change', updateAiPrompt);
+  $('#ai-counts').addEventListener('change', updateAiPrompt);
+  $('#ai-notes').addEventListener('change', updateAiPrompt);
+  $('#ai-open-chatgpt').addEventListener('click', copyAiPrompt);
+  $('#ai-open-claude').addEventListener('click', copyAiPrompt);
+  $('#ai-copy').addEventListener('click', copyAiPrompt);
   quickFlow = createQuickFlow($('#quick-dialog'), {
     t,
     getRecord: (id) => store.getRecords().find((r) => r.id === id),

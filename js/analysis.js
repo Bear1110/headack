@@ -179,14 +179,26 @@ export function analyze(records, { from, to }) {
     else if (sides.size === 2) bilateral += 1;
   }
 
-  // 藥物：每種藥的使用次數、有效比例；依服藥時機比較有效比例
+  // 藥物（以單一藥物為單位，顆數只在同一種藥之間比較才有意義）：
+  // 使用天數、服用次數、總量、單日最多、有效比例；依服藥時機比較有效比例
   const medMap = new Map();
   const timing = {};
+  let redosed = 0; // 同一次發作服藥兩次以上（含不同藥）
   for (const r of attacks) {
+    if ((r.meds ?? []).length >= 2) redosed += 1;
     for (const m of r.meds ?? []) {
       const key = m.code === 'other_med' && m.name ? `other:${m.name}` : m.code;
-      const e = medMap.get(key) ?? { key, code: m.code, name: m.code === 'other_med' ? m.name : '', doses: 0, attacks: new Set(), rated: 0, effective: 0 };
+      const e = medMap.get(key) ?? {
+        key, code: m.code, name: m.code === 'other_med' ? m.name : '',
+        doses: 0, attacks: new Set(), rated: 0, effective: 0, amountByDay: new Map(), unknownAmount: 0,
+      };
       e.doses += 1;
+      const day = dayOf(r.start);
+      if (Number.isFinite(m.amount)) e.amountByDay.set(day, (e.amountByDay.get(day) ?? 0) + m.amount);
+      else {
+        e.unknownAmount += 1;
+        if (!e.amountByDay.has(day)) e.amountByDay.set(day, 0);
+      }
       if (!e.attacks.has(r.id)) {
         e.attacks.add(r.id);
         if (r.med_effect) {
@@ -203,8 +215,18 @@ export function analyze(records, { from, to }) {
     }
   }
   const medsTable = [...medMap.values()]
-    .map((e) => ({ ...e, attacks: e.attacks.size }))
-    .sort((a, b) => b.doses - a.doses);
+    .map(({ amountByDay, ...e }) => {
+      const amounts = [...amountByDay.values()];
+      return {
+        ...e,
+        attacks: e.attacks.size,
+        days: amountByDay.size,
+        totalAmount: amounts.reduce((a, b) => a + b, 0),
+        maxPerDay: Math.max(0, ...amounts),
+      };
+    })
+    .sort((a, b) => b.days - a.days || b.doses - a.doses);
+  const withMeds = attacks.filter((r) => r.meds?.length).length;
 
   // 天氣
   const withWeather = attacks.filter((r) => Number.isFinite(r.pressure_change_24h));
@@ -227,7 +249,7 @@ export function analyze(records, { from, to }) {
     duration: { n: durations.length, median: median(durations), p25: quantile(durations, 0.25), p75: quantile(durations, 0.75) },
     weekday, hours, timed: timed.length,
     types, locations, painQuality, aura, symptoms, triggers, unilateral, bilateral,
-    meds: medsTable, timing,
+    meds: medsTable, timing, redose: { n: redosed, of: withMeds },
     weather,
     cluster: clusterAnalysis(attacks.filter((r) => r.type === 'cluster')),
   };

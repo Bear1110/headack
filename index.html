@@ -295,6 +295,30 @@
   <!-- 發作當下的快速問答（內容由 quickflow.js 產生） -->
   <dialog id="quick-dialog" class="quick-dialog"></dialog>
 
+  <!-- AI 分析：選問題與筆數，複製後開啟 AI -->
+  <dialog id="ai-dialog">
+    <form id="ai-form" method="dialog">
+      <div class="dialog-body">
+        <h2 data-i18n="ai.title"></h2>
+        <p id="ai-privacy" class="warning small"></p>
+        <fieldset class="field"><legend data-i18n="ai.question"></legend><div id="ai-presets" class="chips"></div></fieldset>
+        <fieldset class="field"><legend data-i18n="ai.count"></legend><div id="ai-counts" class="chips"></div></fieldset>
+        <label class="switch-row"><input type="checkbox" id="ai-notes" checked><span data-i18n="ai.notes"></span></label>
+        <div class="ai-buttons">
+          <a id="ai-open-chatgpt" class="btn" target="_blank" rel="noopener noreferrer" data-i18n="import.openChatgpt"></a>
+          <a id="ai-open-claude" class="btn" target="_blank" rel="noopener noreferrer" data-i18n="import.openClaude"></a>
+          <button type="button" id="ai-copy" class="btn ghost" data-i18n="ai.copy"></button>
+        </div>
+        <p id="ai-hint" class="muted small"></p>
+        <details class="table-view"><summary data-i18n="ai.preview"></summary><pre id="ai-preview" class="ai-preview"></pre></details>
+      </div>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="submit" class="btn ghost" data-i18n="import.close"></button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- 加到主畫面的說明（瀏覽器不支援直接安裝時） -->
   <dialog id="install-dialog" class="confirm-dialog">
     <form method="dialog">

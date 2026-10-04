@@ -607,6 +607,11 @@ dialog.quick-dialog::backdrop { background: #000; }
 .qf-primary { background: var(--qf-accent); border: 1px solid var(--qf-accent); color: var(--qf-accent-text); }
 .qf-secondary { background: transparent; border: 1px solid var(--qf-border); color: var(--qf-text); }
 
+/* AI 分析 */
+.ai-preview { white-space: pre-wrap; word-break: break-word; font-size: .75rem; max-height: 240px; overflow: auto; margin: .5rem 0 0; padding: .6rem; border-radius: 8px; background: var(--bg); color: var(--muted); }
+#ai-dialog .ai-buttons .btn { flex: 1 1 140px; }
+.ai-card .btn { margin-top: .25rem; }
+
 /* 匯入 */
 .file-pick { display: flex; flex-direction: column; gap: .35rem; margin-top: .75rem; font-size: .85rem; color: var(--muted); }
 .file-pick input { padding: .4rem; font-size: .85rem; min-height: 0; }

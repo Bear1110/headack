@@ -16,7 +16,7 @@ function loadState() {
   try { return { ...def, ...JSON.parse(localStorage.getItem(STATE_KEY) || '{}') }; } catch { return def; }
 }
 
-export function createStatsView(root, { t, getLang, getRecords }) {
+export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) {
   let state = loadState();
   const save = () => { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch { /* ignore */ } };
 
@@ -108,19 +108,24 @@ export function createStatsView(root, { t, getLang, getRecords }) {
       + tableView(t('st.table'), [t('st.colHour'), t('st.attacks')], labels.map((l, i) => [`${l}:00`, hours[i]]).filter((r) => r[1]));
   }
 
+  // 以藥物為單位：使用天數（主要指標）、總量與單日最多（只在同一種藥之間比較）、有效比例
   function medsTable(a) {
     if (!a.meds.length) return notEnough();
+    const amount = (v, m) => (m.unknownAmount && !v ? '—' : `${fmt1(v)}${m.unknownAmount ? '+' : ''}`);
     const rows = a.meds.map((m) => `
       <tr>
         <th scope="row">${esc(medLabel(t, m))}</th>
-        <td class="num">${m.doses}</td>
+        <td class="num">${m.days}</td>
+        <td class="num">${amount(m.totalAmount, m)}</td>
+        <td class="num">${amount(m.maxPerDay, m)}</td>
         <td class="num">${m.rated ? `${pct(m.effective, m.rated)} <span class="muted">(${m.rated})</span>` : '—'}</td>
       </tr>`).join('');
     return `
       <div class="table-wrap"><table>
-        <thead><tr><th>${esc(t('st.colMed'))}</th><th class="num">${esc(t('st.colDoses'))}</th><th class="num">${esc(t('st.colEffective'))}</th></tr></thead>
+        <thead><tr><th>${esc(t('st.colMed'))}</th><th class="num">${esc(t('st.colDays'))}</th><th class="num">${esc(t('st.colTotal'))}</th><th class="num">${esc(t('st.colMaxDay'))}</th><th class="num">${esc(t('st.colEffective'))}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
+      <p class="muted small">${esc(t('st.doseNote'))}</p>
       <p class="muted small">${esc(t('st.effectiveNote'))}</p>`;
   }
 
@@ -181,7 +186,8 @@ export function createStatsView(root, { t, getLang, getRecords }) {
       <div class="stat-grid">
         ${card(t('st.triggersTitle'), trig.length ? proportionList(trig, a.attacks, nOf) : notEnough(t('st.triggersHint')))}
         ${card(t('st.weatherTitle'), weatherHtml)}
-      </div>`;
+      </div>
+      ${card(t('ai.title'), `<p class="muted small">${esc(t('ai.desc'))}</p><button type="button" class="btn" data-ai>${esc(t('ai.start'))}</button>`, 'ai-card')}`;
   }
 
   // ---------- 看診摘要 ----------
@@ -196,6 +202,7 @@ export function createStatsView(root, { t, getLang, getRecords }) {
         ${kf(t('st.kfAttacks'), esc(String(a.attacks)))}
         ${kf(t('st.kfChronic'), esc(t('st.kfChronicVal', { n: a.chronicMonths })))}
         ${kf(t('st.kfMedDays'), esc(t('st.kfDaysVal', { n: a.medDays, m: medPerMonth })))}
+        ${kf(t('st.kfRedose'), a.redose.of ? esc(t('st.kfRedoseVal', { p: pct(a.redose.n, a.redose.of), n: a.redose.n, total: a.redose.of })) : `<span class="muted">${esc(t('st.notRecorded'))}</span>`)}
         ${kf(t('st.kfIntensity'), a.intensity.n ? esc(t('st.kfIntensityVal', { v: fmt1(a.intensity.median), n: a.intensity.n })) : `<span class="muted">${esc(t('st.notRecorded'))}</span>`)}
         ${kf(t('st.kfDuration'), a.duration.n ? esc(t('st.kfDurationVal', { m: durText(a.duration.median), a: durText(a.duration.p25), b: durText(a.duration.p75), n: a.duration.n })) : `<span class="muted">${esc(t('st.notRecorded'))}</span>`)}
       </dl>`;
@@ -218,6 +225,7 @@ export function createStatsView(root, { t, getLang, getRecords }) {
         <tbody>${medRows}</tbody>
       </table></div>
       ${listMonths.length < a.months.length ? `<p class="muted small">${esc(t('st.onlyMedMonths'))}</p>` : ''}
+      <p class="muted small">${esc(t('st.medDaysWhy'))}</p>
       <p class="muted small">${esc(t('st.mohNote'))}</p>
       ${a.moh.length ? `<p class="warning small">⚠ ${esc(t('st.mohMonths', { n: new Set(a.moh.map((x) => x.ym)).size }))}</p>` : ''}` : notEnough();
 
@@ -302,6 +310,7 @@ export function createStatsView(root, { t, getLang, getRecords }) {
   // ---------- 事件 ----------
 
   root.addEventListener('click', (e) => {
+    if (e.target.closest('[data-ai]')) return onAiAnalysis?.();
     const el = e.target.closest('[data-range],[data-type],[data-tab],[data-print]');
     if (!el) return;
     if (el.dataset.print !== undefined) return window.print();
