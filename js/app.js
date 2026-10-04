@@ -574,6 +574,10 @@ function refreshLanguage() {
 function showView(name) {
   document.body.dataset.view = name;
   window.scrollTo(0, 0);
+  // 手機上月份是單欄、本月在最下面：切到日曆時直接捲到本月
+  if (name === 'calendar' && matchMedia('(max-width: 599px)').matches) {
+    document.querySelector('#calendar-months .cal-month:last-child')?.scrollIntoView({ block: 'start' });
+  }
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
 }
 

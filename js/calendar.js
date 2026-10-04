@@ -1,4 +1,5 @@
-// 日曆：最近 N 個月，每天依最痛程度上色，有用藥加記號。只產生 HTML，互動由 app.js 處理。
+// 日曆：最近 N 個月（依時間順序，本月在最後），每天依最痛程度上色，有用藥加記號。
+// 只產生 HTML，互動由 app.js 處理。
 
 import { daysCovered, localDate, monthStats } from './stats.js';
 
@@ -54,7 +55,8 @@ export function renderCalendar({ records, months, lang, t, selected }) {
 
   const now = new Date();
   const blocks = [];
-  for (let m = 0; m < months; m++) {
+  // 依時間順序排列：舊的在前（左 / 上），本月在最後（右 / 下）
+  for (let m = months - 1; m >= 0; m--) {
     const first = new Date(now.getFullYear(), now.getMonth() - m, 1);
     const ym = localDate(first).slice(0, 7);
     const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();

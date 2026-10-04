@@ -182,7 +182,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-legend .sw.no-intensity { background: var(--muted); }
 .cal-legend .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text); display: inline-block; }
 .cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-.cal-month { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
+.cal-month { scroll-margin-top: calc(var(--topbar-h) + 12px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
 .cal-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .cal-head h3 { margin: 0; font-size: 1rem; }
 .cal-warn { color: var(--danger); font-weight: 700; }
