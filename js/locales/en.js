@@ -77,6 +77,8 @@ export default {
   'settings.languageHelp': 'Missing your language or found a mistranslation? Help translate on GitHub.',
   'settings.privacy': 'Privacy policy',
   'settings.source': 'Source code',
+  'footer.terms': 'Terms of Service',
+  'footer.copyright': '© {year} Headache Log. All rights reserved.',
   'error.auth': 'Sign-in failed or was cancelled',
   'error.popup': 'The pop-up was blocked. Please allow pop-ups for this site.',
   'opt.type.migraine': 'Migraine',

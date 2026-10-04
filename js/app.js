@@ -506,6 +506,7 @@ function render() {
 
 // 語言切換後重建由 JS 產生的文字（靜態文字由 i18n.applyI18n 處理）
 function refreshLanguage() {
+  $('#copyright').textContent = t('footer.copyright', { year: new Date().getFullYear() });
   buildFormOptions();
   render();
 }

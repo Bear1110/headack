@@ -77,6 +77,8 @@ export default {
   'settings.languageHelp': 'ご希望の言語がない、または翻訳の誤りを見つけた場合は、GitHub で翻訳にご協力ください。',
   'settings.privacy': 'プライバシーポリシー',
   'settings.source': 'ソースコード',
+  'footer.terms': '利用規約',
+  'footer.copyright': '© {year} 頭痛ダイアリー. All rights reserved.',
   'error.auth': 'ログインに失敗したか、キャンセルされました',
   'error.popup': 'ポップアップがブロックされました。このサイトのポップアップを許可してください',
   'opt.type.migraine': '片頭痛',

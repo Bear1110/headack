@@ -77,6 +77,8 @@ export default {
   'settings.languageHelp': '找不到你的語言，或翻譯有誤？歡迎到 GitHub 協助翻譯。',
   'settings.privacy': '隱私權政策',
   'settings.source': '原始碼',
+  'footer.terms': '服務條款',
+  'footer.copyright': '© {year} 頭痛紀錄. 保留所有權利。',
   'error.auth': '登入失敗或已取消',
   'error.popup': '彈出視窗被擋住了，請允許本網站開啟彈出視窗',
   'opt.type.migraine': '偏頭痛',

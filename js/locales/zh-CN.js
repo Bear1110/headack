@@ -77,6 +77,8 @@ export default {
   'settings.languageHelp': '找不到你的语言，或翻译有误？欢迎到 GitHub 协助翻译。',
   'settings.privacy': '隐私政策',
   'settings.source': '源代码',
+  'footer.terms': '服务条款',
+  'footer.copyright': '© {year} 头痛记录. 保留所有权利。',
   'error.auth': '登录失败或已取消',
   'error.popup': '弹出窗口被拦截了，请允许本网站打开弹出窗口',
   'opt.type.migraine': '偏头痛',
