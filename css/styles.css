@@ -276,7 +276,6 @@ body[data-view="settings"] #view-settings { display: flex; }
 /* 月檢視：一個月 + 明細（手機上下排，桌機左右排）；年檢視：12 個月縮圖，不顯示明細 */
 .cal-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
 .cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; touch-action: pan-y; }
-#view-calendar.year .cal-layout { grid-template-columns: 1fr; }
 #view-calendar.year .cal-months { grid-template-columns: repeat(2, 1fr); gap: .6rem; }
 #view-calendar.year .cal-months .cal-month { padding: .5rem; }
 #view-calendar.year .cal-months .cal-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: .3rem; }
@@ -292,10 +291,11 @@ body[data-view="settings"] #view-settings { display: flex; }
   #view-calendar.year .cal-months { grid-template-columns: repeat(4, 1fr); }
   #view-calendar:not(.year) .cal-layout { grid-template-columns: minmax(340px, 460px) 1fr; }
 }
-.cal-month-link { appearance: none; border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
-.cal-month-link:hover { color: var(--primary); }
 .link-btn { appearance: none; border: 0; background: none; padding: .25rem 0; font: inherit; font-size: .85rem; color: var(--primary); cursor: pointer; text-decoration: underline; }
-.cal-month { scroll-margin-top: calc(var(--topbar-h) + 12px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
+/* 年檢視的月份標題：沿用 .link-btn，只改成標題字樣與虛線底線 */
+.link-btn.cal-month-link { padding: 0; font-size: inherit; color: inherit; text-decoration-style: dotted; text-underline-offset: 3px; }
+.link-btn.cal-month-link:hover { color: var(--primary); }
+.cal-month { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
 .cal-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .cal-head h3 { margin: 0; font-size: 1rem; }
 .cal-warn { color: var(--danger); font-weight: 700; }

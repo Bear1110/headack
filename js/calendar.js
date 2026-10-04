@@ -83,7 +83,7 @@ export function renderCalendar({ records, months, lang, t, selected, linkMonths 
     blocks.push(`
       <section class="cal-month">
         <header class="cal-head">
-          <h3>${linkMonths ? `<button type="button" class="cal-month-link" data-open-month="${ym}">${esc(monthFmt.format(first))}</button>` : esc(monthFmt.format(first))}</h3>
+          <h3>${linkMonths ? `<button type="button" class="link-btn cal-month-link" data-open-month="${ym}">${esc(monthFmt.format(first))}</button>` : esc(monthFmt.format(first))}</h3>
           <span class="muted small">${esc(t('cal.summary', { h: s.headacheDays, m: s.medDays }))}${s.mohWarnings.length ? ' <span class="cal-warn" title="' + esc(t('cal.mohHint')) + '">⚠</span>' : ''}</span>
         </header>
         <div class="cal-grid">
