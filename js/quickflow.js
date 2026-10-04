@@ -2,8 +2,9 @@
 // 給正在頭痛、沒耐心也不想看刺眼畫面的人用；事後的完整編輯仍用一般表單。
 //
 // 模式：
-// - 'start'：按「頭痛開始了」之後 → 程度 → 位置 → 症狀 → 用藥 → 完成
+// - 'start'：按「頭痛開始了」之後 → 程度 → 位置 → 症狀 → 用藥
 // - 'end'：按「結束了」時，若有用藥但沒填效果 → 只問「藥有效嗎？」
+// 最後一題答完直接關閉，用提示訊息告知已記錄（不另外放一頁「完成」，少按一次）。
 
 import { OPTIONS } from './schema.js';
 import { createHeadMap } from './widgets.js';
@@ -16,11 +17,12 @@ const SYMPTOM_CHOICES = [
   ...['nausea', 'vomiting', 'photophobia', 'phonophobia', 'osmophobia', 'dizziness'].map((c) => ({ field: 'symptoms', code: c, key: `opt.symptoms.${c}` })),
 ];
 
-export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, openFullForm }) {
+export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, notify }) {
   let recordId = null;
   let steps = [];
   let index = 0;
   let headMap = null;
+  let mode = 'start';
 
   const record = () => getRecord(recordId);
   const update = (patch) => {
@@ -28,19 +30,25 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
     if (r) saveRecord({ ...r, ...patch });
   };
 
-  function open(id, mode = 'start') {
+  function open(id, openMode = 'start') {
     recordId = id;
-    steps = mode === 'end' ? ['effect', 'done'] : ['intensity', 'where', 'symptoms', 'meds', 'done'];
+    mode = openMode;
+    steps = mode === 'end' ? ['effect'] : ['intensity', 'where', 'symptoms', 'meds'];
     index = 0;
     render();
     if (!dialog.open) dialog.showModal();
   }
 
+  const close = () => dialog.close();
+  const finish = () => {
+    close();
+    notify(t(mode === 'end' ? 'qf.doneEnd' : 'qf.doneStart'));
+  };
   const next = () => {
-    index = Math.min(index + 1, steps.length - 1);
+    if (index >= steps.length - 1) return finish();
+    index += 1;
     render();
   };
-  const close = () => dialog.close();
 
   // ---------- 每一題 ----------
 
@@ -89,40 +97,29 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       <div class="qf-stack">${btns}</div>`;
   }
 
-  function doneStep() {
-    const ended = !!record()?.end;
-    return `
-      <div class="qf-done">
-        <div class="qf-check" aria-hidden="true">✓</div>
-        <h2>${esc(t(ended ? 'qf.doneEndTitle' : 'qf.doneTitle'))}</h2>
-        ${ended ? '' : `<p class="qf-hint">${esc(t('qf.doneBody'))}</p>`}
-      </div>`;
-  }
-
   // ---------- 畫面 ----------
 
   function render() {
     const r = record();
     if (!r) return close();
     const step = steps[index];
-    const questions = steps.length - 1;
+    const questions = steps.length;
     const body = {
-      intensity: intensityStep, where: whereStep, symptoms: symptomsStep, meds: medsStep, effect: effectStep, done: doneStep,
+      intensity: intensityStep, where: whereStep, symptoms: symptomsStep, meds: medsStep, effect: effectStep,
     }[step](r);
 
     // 多選題用「下一步」；單選題點了就自動前進，所以只有「跳過」
     const multi = ['where', 'symptoms', 'meds'].includes(step);
     const hasValue = step === 'meds' ? r.meds?.length : step === 'symptoms' ? (r.aura?.length || r.symptoms?.length) : true;
-    const footer = step === 'done'
-      ? `<button type="button" class="qf-secondary" data-act="full">${esc(t('qf.more'))}</button>
-         <button type="button" class="qf-primary" data-act="close">${esc(t('qf.finish'))}</button>`
-      : `<button type="button" class="qf-secondary" data-act="skip">${esc(t('qf.skip'))}</button>
-         ${multi ? `<button type="button" class="qf-primary" data-act="next">${esc(t(step === 'meds' && !hasValue ? 'qf.noMeds' : 'qf.next'))}</button>` : ''}`;
+    const last = index === steps.length - 1;
+    const nextLabel = step === 'meds' && !hasValue ? 'qf.noMeds' : last ? 'qf.finish' : 'qf.next';
+    const footer = `<button type="button" class="qf-secondary" data-act="skip">${esc(t('qf.skip'))}</button>
+         ${multi ? `<button type="button" class="qf-primary" data-act="next">${esc(t(nextLabel))}</button>` : ''}`;
 
     dialog.innerHTML = `
       <div class="qf">
         <header class="qf-top">
-          <span class="qf-progress">${step === 'done' || questions < 2 ? '' : esc(t('qf.step', { i: index + 1, n: questions }))}</span>
+          <span class="qf-progress">${questions < 2 ? '' : esc(t('qf.step', { i: index + 1, n: questions }))}</span>
           <button type="button" class="qf-close" data-act="close" aria-label="${esc(t('import.close'))}">✕</button>
         </header>
         <div class="qf-body">${body}</div>
@@ -180,9 +177,6 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
         return next();
       case 'skip':
         return next();
-      case 'full':
-        close();
-        return openFullForm(recordId);
       case 'close':
         if (step === 'where' && headMap) update({ locations: headMap.get() });
         return close();

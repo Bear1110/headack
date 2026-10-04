@@ -535,7 +535,8 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 .toast {
   position: fixed; inset-inline: var(--gutter); margin-inline: auto; width: fit-content; z-index: 20;
   bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
-  background: var(--text); color: var(--bg); padding: .6rem 1rem; border-radius: 999px; font-size: .9rem;
+  background: var(--text); color: var(--bg); padding: .6rem 1rem; border-radius: 16px; font-size: .9rem;
+  text-align: center; max-width: min(520px, calc(100vw - 2 * var(--gutter)));
 }
 
 .label-short { display: none; }

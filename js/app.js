@@ -44,12 +44,12 @@ function formatDuration(start, end) {
 }
 
 let toastTimer;
-function toast(msg) {
+function toast(msg, ms = 3000) {
   const el = $('#toast');
   el.textContent = msg;
   el.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.hidden = true; }, 3000);
+  toastTimer = setTimeout(() => { el.hidden = true; }, ms);
 }
 
 // ---------- 同步 ----------
@@ -193,7 +193,7 @@ function weatherSummary(r) {
 
 function emptyRecord() {
   return {
-    id: newId(), start: nowLocal(), end: '', intensity: null, type: '', locations: [], aura: [], symptoms: [],
+    id: newId(), start: nowLocal(), end: '', intensity: null, type: '', locations: [], pain_quality: [], aura: [], symptoms: [],
     meds: [], med_effect: '', triggers: [], notes: '',
   };
 }
@@ -224,14 +224,13 @@ function endRecord(id) {
 
 function buildFormOptions() {
   const form = $('#record-form');
-  const fillSelect = (select, field, codes) => {
-    select.innerHTML = '<option value="">—</option>' + codes.map((c) => `<option value="${c}">${escapeHtml(t(`opt.${field}.${c}`))}</option>`).join('');
+  // 選項少的欄位一律用膠囊按鈕：單選用 radio（再點一次可取消，見 bindEvents），複選用 checkbox
+  const chips = (container, field, codes, type = 'checkbox') => {
+    container.innerHTML = codes.map((c) => `<label class="chip"><input type="${type}" name="${field}" value="${c}"><span>${escapeHtml(t(`opt.${field}.${c}`))}</span></label>`).join('');
   };
-  fillSelect(form.elements.type, 'type', OPTIONS.type);
-  fillSelect(form.elements.med_effect, 'med_effect', OPTIONS.med_effect);
-  const chips = (container, field, codes) => {
-    container.innerHTML = codes.map((c) => `<label class="chip"><input type="checkbox" name="${field}" value="${c}"><span>${escapeHtml(t(`opt.${field}.${c}`))}</span></label>`).join('');
-  };
+  chips($('#type-options'), 'type', OPTIONS.type, 'radio');
+  chips($('#effect-options'), 'med_effect', OPTIONS.med_effect, 'radio');
+  chips($('#pain-quality-options'), 'pain_quality', OPTIONS.pain_quality);
   chips($('#triggers-options'), 'triggers', OPTIONS.triggers);
   chips($('#aura-options'), 'aura', OPTIONS.aura);
   chips($('#symptoms-options'), 'symptoms', OPTIONS.symptoms);
@@ -260,12 +259,13 @@ function openForm(record, preset = {}) {
   form.elements.end.value = r.end || '';
   form.elements.intensity.value = r.intensity ?? 5;
   $('#intensity-out').textContent = form.elements.intensity.value;
-  form.elements.type.value = r.type || '';
-  form.elements.med_effect.value = r.med_effect || '';
+  for (const field of ['type', 'med_effect']) {
+    form.querySelectorAll(`input[name="${field}"]`).forEach((el) => { el.checked = el.value === r[field]; });
+  }
   form.elements.notes.value = r.notes || '';
   medEditor.set(r.meds);
   headMap.set(r.locations);
-  for (const field of ['triggers', 'aura', 'symptoms']) {
+  for (const field of ['triggers', 'aura', 'symptoms', 'pain_quality']) {
     form.querySelectorAll(`input[name="${field}"]`).forEach((el) => { el.checked = r[field]?.includes(el.value); });
   }
   updateAuraWarning();
@@ -292,10 +292,11 @@ function submitForm(e) {
     start: f.start.value,
     end: f.end.value,
     intensity: Number(f.intensity.value),
-    type: f.type.value,
+    type: form.querySelector('input[name="type"]:checked')?.value ?? '',
+    pain_quality: checked('pain_quality'),
     locations: headMap.get(),
     meds: medEditor.get(),
-    med_effect: f.med_effect.value,
+    med_effect: form.querySelector('input[name="med_effect"]:checked')?.value ?? '',
     triggers: checked('triggers'),
     aura: checked('aura'),
     symptoms: checked('symptoms'),
@@ -688,6 +689,16 @@ function bindEvents() {
   });
 
   $('#record-form').addEventListener('submit', submitForm);
+  // 單選膠囊：點已選的那一個可以取消（radio 預設不能取消）
+  $('#record-form').addEventListener('pointerdown', (e) => {
+    const input = e.target.closest('label.chip')?.querySelector('input[type="radio"]');
+    if (input) input.dataset.wasChecked = String(input.checked);
+  });
+  $('#record-form').addEventListener('click', (e) => {
+    const input = e.target.closest('input[type="radio"]');
+    if (input?.dataset.wasChecked === 'true') input.checked = false;
+    if (input) delete input.dataset.wasChecked;
+  });
   $('#record-form').elements.intensity.addEventListener('input', (e) => { $('#intensity-out').textContent = e.target.value; });
   $('#btn-cancel').addEventListener('click', () => $('#record-dialog').close());
   $('#btn-delete').addEventListener('click', deleteEditing);
@@ -698,7 +709,7 @@ function bindEvents() {
     getRecord: (id) => store.getRecords().find((r) => r.id === id),
     saveRecord: (r) => save(r, false, { quiet: true }),
     frequentMeds,
-    openFullForm: (id) => openForm(store.getRecords().find((r) => r.id === id)),
+    notify: (msg) => toast(msg, 5000),
   });
   $('#view-calendar').addEventListener('click', onCalendarClick);
 

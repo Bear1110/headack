@@ -19,6 +19,7 @@ export const RECORD_COLUMNS = [
   'intensity',   // 疼痛程度 0–10
   'type',        // 頭痛類型代碼
   'locations',   // 疼痛位置代碼，以 ; 分隔
+  'pain_quality', // 疼痛感覺代碼，以 ; 分隔（描述症狀，不用來推測類型）
   'aura',        // 預兆（先兆）代碼，以 ; 分隔
   'symptoms',    // 伴隨症狀代碼，以 ; 分隔
   'meds',        // 每次用藥，以 ; 分隔；每筆為「代碼:用量:時機[:自訂名稱]」，例如 eve:1:early;sumatriptan:0.5:severe
@@ -33,7 +34,7 @@ export const RECORD_COLUMNS = [
   'updated_at',
 ];
 
-export const MULTI_FIELDS = ['locations', 'aura', 'symptoms', 'triggers'];
+export const MULTI_FIELDS = ['locations', 'pain_quality', 'aura', 'symptoms', 'triggers'];
 export const NUMERIC_FIELDS = ['intensity', 'pressure_hpa', 'pressure_change_24h', 'temp_c', 'humidity_pct'];
 
 // 藥物目錄。顯示名稱在 locales 的 med.<code>。
@@ -85,7 +86,10 @@ export const LOCATIONS = [
 
 // 選項代碼（顯示文字在 locales）。後續可改由「設定」分頁自訂。
 export const OPTIONS = {
+  // 頭痛類型：使用者「被醫師告知」的類型，不是由本網站推測
   type: ['migraine', 'tension', 'cluster', 'other', 'unknown'],
+  // 疼痛感覺（ICHD-3 診斷條件會參考疼痛性質，但這裡只記錄、不判斷）
+  pain_quality: ['pulsating', 'pressing', 'stabbing', 'boring', 'burning', 'dull'],
   // 預兆：通常在頭痛前或頭痛時出現、持續 5–60 分鐘。motor / speech 第一次出現時需提醒就醫。
   aura: ['visual', 'sensory', 'speech', 'motor', 'other_aura'],
   // 伴隨症狀（ICHD-3 偏頭痛診斷條件會用到）

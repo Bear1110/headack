@@ -36,6 +36,7 @@ After this message I will paste my notes. Convert every headache episode in them
       "intensity": 6,
       "type": "migraine",
       "locations": ["temple_r", "eye_r"],
+      "pain_quality": ["pulsating"],
       "aura": ["visual"],
       "symptoms": ["nausea", "photophobia"],
       "meds": [
@@ -58,6 +59,8 @@ Rules:
 ${list('opt.type', OPTIONS.type)}
 - "locations": where it hurt, as a list of codes ("_l" / "_r" = my own left / right), or []:
 ${list('loc', LOCATIONS)}
+- "pain_quality": what the pain felt like, list of codes, or []:
+${list('opt.pain_quality', OPTIONS.pain_quality)}
 - "aura": aura symptoms before or during the headache (usually 5-60 min), list of codes, or []:
 ${list('opt.aura', OPTIONS.aura)}
 - "symptoms": other symptoms during the headache, list of codes, or []:
@@ -125,6 +128,7 @@ const lookups = {
   med_effect: buildLookup('opt.med_effect', OPTIONS.med_effect),
   triggers: buildLookup('opt.triggers', OPTIONS.triggers),
   locations: buildLookup('loc', LOCATIONS),
+  pain_quality: buildLookup('opt.pain_quality', OPTIONS.pain_quality),
   aura: buildLookup('opt.aura', OPTIONS.aura),
   symptoms: buildLookup('opt.symptoms', OPTIONS.symptoms),
   timing: buildLookup('timing', MED_TIMINGS),
@@ -177,7 +181,7 @@ function weatherFields(raw) {
 // ---------- 匯出 ----------
 
 // 匯出格式與匯入格式相同，可直接匯回本網站，或交給 AI / 其他工具使用
-const EXPORT_FIELDS = ['start', 'end', 'intensity', 'type', 'locations', 'aura', 'symptoms', 'meds', 'med_effect', 'triggers', 'notes', ...WEATHER_FIELDS, 'created_at', 'updated_at'];
+const EXPORT_FIELDS = ['start', 'end', 'intensity', 'type', 'locations', 'pain_quality', 'aura', 'symptoms', 'meds', 'med_effect', 'triggers', 'notes', ...WEATHER_FIELDS, 'created_at', 'updated_at'];
 export function buildExport(records) {
   const list = [...records]
     .sort((a, b) => (a.start || '').localeCompare(b.start || ''))
@@ -227,6 +231,7 @@ function normalize(raw) {
   const meds = toList(raw.meds).map(normMed).filter(Boolean);
   const codes = (field) => [...new Set(toList(raw[field]).map((x) => lookups[field].get(norm(x))).filter(Boolean))];
   const locations = codes('locations');
+  const pain_quality = codes('pain_quality');
   const aura = codes('aura');
   const symptoms = codes('symptoms');
   const type = lookups.type.get(norm(raw.type)) ?? '';
@@ -235,7 +240,7 @@ function normalize(raw) {
 
   return {
     record: {
-      id: newId(), start, end, intensity, type, locations, aura, symptoms, meds, med_effect, triggers: [...triggers], notes,
+      id: newId(), start, end, intensity, type, locations, pain_quality, aura, symptoms, meds, med_effect, triggers: [...triggers], notes,
       ...weatherFields(raw),
     },
   };

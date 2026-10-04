@@ -166,6 +166,7 @@ export function analyze(records, { from, to }) {
   };
   const types = count((r) => [r.type || 'unknown']).counts;
   const locations = count((r) => r.locations);
+  const painQuality = count((r) => r.pain_quality);
   const aura = count((r) => r.aura);
   const symptoms = count((r) => r.symptoms);
   const triggers = count((r) => r.triggers);
@@ -225,7 +226,7 @@ export function analyze(records, { from, to }) {
     intensity: { n: intensities.length, median: median(intensities), mean: intensities.length ? intensities.reduce((a, b) => a + b, 0) / intensities.length : null, dist: intensityDist },
     duration: { n: durations.length, median: median(durations), p25: quantile(durations, 0.25), p75: quantile(durations, 0.75) },
     weekday, hours, timed: timed.length,
-    types, locations, aura, symptoms, triggers, unilateral, bilateral,
+    types, locations, painQuality, aura, symptoms, triggers, unilateral, bilateral,
     meds: medsTable, timing,
     weather,
     cluster: clusterAnalysis(attacks.filter((r) => r.type === 'cluster')),

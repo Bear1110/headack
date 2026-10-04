@@ -164,8 +164,13 @@
           <span><span data-i18n="form.intensity"></span> <strong><output id="intensity-out">5</output>/10</strong></span>
           <input type="range" name="intensity" min="0" max="10" step="1" value="5">
         </label>
-        <label class="field"><span data-i18n="form.type"></span><select name="type"></select></label>
+        <fieldset class="field">
+          <legend data-i18n="form.type"></legend>
+          <p class="muted small hint" data-i18n="form.typeHint"></p>
+          <div id="type-options" class="chips"></div>
+        </fieldset>
         <fieldset class="field"><legend data-i18n="form.locations"></legend><div id="head-map"></div></fieldset>
+        <fieldset class="field"><legend data-i18n="form.painQuality"></legend><div id="pain-quality-options" class="chips"></div></fieldset>
         <fieldset class="field">
           <legend data-i18n="form.aura"></legend>
           <p class="muted small hint" data-i18n="form.auraHint"></p>
@@ -174,7 +179,7 @@
         </fieldset>
         <fieldset class="field"><legend data-i18n="form.symptoms"></legend><div id="symptoms-options" class="chips"></div></fieldset>
         <fieldset class="field"><legend data-i18n="form.meds"></legend><div id="med-editor" class="med-editor"></div></fieldset>
-        <label class="field"><span data-i18n="form.medEffect"></span><select name="med_effect"></select></label>
+        <fieldset class="field"><legend data-i18n="form.medEffect"></legend><div id="effect-options" class="chips"></div></fieldset>
         <fieldset class="field"><legend data-i18n="form.triggers"></legend><div id="triggers-options" class="chips"></div></fieldset>
         <label class="field"><span data-i18n="form.notes"></span><textarea name="notes" rows="3"></textarea></label>
         <p id="form-weather" class="muted small weather-line" hidden></p>

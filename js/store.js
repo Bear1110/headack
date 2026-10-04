@@ -16,7 +16,7 @@ function write(key, value) {
 }
 
 // 舊版快取的欄位格式轉換
-const migrate = (r) => ({ ...r, meds: normalizeMeds(r.meds), locations: r.locations ?? [], aura: r.aura ?? [], symptoms: r.symptoms ?? [] });
+const migrate = (r) => ({ ...r, meds: normalizeMeds(r.meds), locations: r.locations ?? [], pain_quality: r.pain_quality ?? [], aura: r.aura ?? [], symptoms: r.symptoms ?? [] });
 
 let records = read(CACHE_KEY, []).map(migrate);
 let outbox = read(OUTBOX_KEY, []).map((op) => (op.record ? { ...op, record: migrate(op.record) } : op)); // [{ type: 'upsert', record, isNew } | { type: 'delete', id }]

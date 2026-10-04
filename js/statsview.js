@@ -230,6 +230,7 @@ export function createStatsView(root, { t, getLang, getRecords }) {
     ];
     const types = Object.entries(a.types).sort((x, y) => y[1] - x[1]).map(([k, n]) => ({ label: t(`opt.type.${k}`), n }));
     const locs = Object.entries(a.locations.counts).sort((x, y) => y[1] - x[1]).slice(0, 8).map(([k, n]) => ({ label: t(`loc.${k}`), n }));
+    const quality = OPTIONS.pain_quality.map((q) => ({ label: t(`opt.pain_quality.${q}`), n: a.painQuality.counts[q] ?? 0 })).filter((x) => x.n);
     const auraTypes = Object.entries(a.aura.counts).sort((x, y) => y[1] - x[1]).map(([k, n]) => ({ label: t(`opt.aura.${k}`), n }));
 
     // 叢集型
@@ -256,7 +257,9 @@ export function createStatsView(root, { t, getLang, getRecords }) {
       ${card(t('st.monthlyDaysTitle'), monthsChart(a, { withMeds: false, ref: { value: 15, label: t('st.ref15') } }))}
       ${card(t('st.medByClassTitle'), medByClass)}
       <div class="stat-grid">
-        ${card(t('st.featuresTitle'), N ? proportionList(feat, N, nOf) + `<p class="muted small">${esc(t('st.featuresNote', { n: N }))}</p>` : notEnough())}
+        ${card(t('st.featuresTitle'), N ? proportionList(feat, N, nOf)
+          + (quality.length ? `<h3>${esc(t('st.painQualityTitle'))}</h3>${proportionList(quality, N, nOf)}` : '')
+          + `<p class="muted small">${esc(t('st.featuresNote', { n: N }))}</p>` : notEnough())}
         ${card(t('st.typesTitle'), proportionList(types, N, nOf) + (auraTypes.length ? `<h3>${esc(t('form.aura'))}</h3>${proportionList(auraTypes, N, nOf)}` : '') + (locs.length ? `<h3>${esc(t('form.locations'))}</h3>${proportionList(locs, N, nOf)}` : ''))}
       </div>
       ${clusterHtml}
