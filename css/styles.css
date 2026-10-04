@@ -95,6 +95,15 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
   background: var(--warning-bg); color: var(--warning-text);
 }
 
+/* 示範模式橫幅：一直顯示，避免誤以為是自己的資料 */
+.demo-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  padding: .55rem var(--gutter); font-size: .9rem;
+  background: color-mix(in srgb, var(--primary) 22%, var(--surface)); color: var(--text);
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+.demo-banner[hidden] { display: none; }
+
 /* ---------- 分頁：手機固定在底部 ---------- */
 
 .nav {

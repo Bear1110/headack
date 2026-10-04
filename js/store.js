@@ -3,9 +3,35 @@ import { normalizeMeds } from './schema.js';
 // 本機優先（local-first）：所有寫入先進 localStorage 的待送佇列並立即反映在畫面上，
 // 有權杖、有網路時再同步到試算表。頭痛發作時存檔不必等登入或網路。
 
-const CACHE_KEY = 'hl.records';
-const OUTBOX_KEY = 'hl.outbox';
-const SHEET_KEY = 'hl.sheetId';
+// 示範模式：用另一組儲存鍵（hl.demo.*），與真實紀錄完全隔離；切換時重新載入頁面
+const DEMO_FLAG = 'hl.demoMode';
+let demo = false;
+try { demo = localStorage.getItem(DEMO_FLAG) === '1'; } catch { /* ignore */ }
+const PREFIX = demo ? 'hl.demo.' : 'hl.';
+
+const CACHE_KEY = `${PREFIX}records`;
+const OUTBOX_KEY = `${PREFIX}outbox`;
+const SHEET_KEY = `${PREFIX}sheetId`;
+
+export function isDemo() {
+  return demo;
+}
+
+// 進入示範：寫入範例資料（只放進示範用的儲存鍵）。呼叫後請重新載入頁面。
+export function enterDemo(sampleRecords) {
+  try {
+    localStorage.setItem('hl.demo.records', JSON.stringify(sampleRecords));
+    localStorage.setItem('hl.demo.outbox', '[]');
+    localStorage.setItem(DEMO_FLAG, '1');
+  } catch { /* ignore */ }
+}
+
+// 離開示範：丟掉示範資料。呼叫後請重新載入頁面。
+export function exitDemo() {
+  try {
+    ['hl.demo.records', 'hl.demo.outbox', 'hl.demo.sheetId', DEMO_FLAG].forEach((k) => localStorage.removeItem(k));
+  } catch { /* ignore */ }
+}
 
 function read(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch { return fallback; }

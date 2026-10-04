@@ -55,6 +55,7 @@ function toast(msg, ms = 3000) {
 // ---------- 同步 ----------
 
 async function trySync() {
+  if (store.isDemo()) return render(); // 示範模式完全不連外
   const token = auth.getToken();
   if (!token) return render();
   if (!navigator.onLine) {
@@ -133,7 +134,7 @@ const hasWeather = (r) => r.pressure_hpa != null && r.pressure_hpa !== '';
 
 // 為最近 48 小時內、還沒有天氣資料的紀錄補上天氣（背景執行，失敗就略過）
 async function fillWeather() {
-  if (weather.getPref() !== 'on' || !navigator.onLine) return;
+  if (store.isDemo() || weather.getPref() !== 'on' || !navigator.onLine) return;
   const due = store.getRecords().filter((r) => r.start && !hasWeather(r) && !weatherTried.has(r.id) && weather.isInWindow(r.start));
   if (!due.length) return;
   due.forEach((r) => weatherTried.add(r.id));
@@ -323,7 +324,7 @@ function deleteEditing() {
 
 function openClearDialog() {
   const n = store.getRecords().length;
-  const linked = !!auth.getEmail();
+  const linked = !store.isDemo() && !!auth.getEmail();
   $('#clear-body').textContent = t(linked ? 'clear.body' : 'clear.bodyLocal', { n });
   $('#clear-restore').textContent = t(linked ? 'clear.restore' : 'clear.restoreLocal');
   $('#clear-hint').textContent = t('clear.typeHint', { word: t('clear.word') });
@@ -342,7 +343,7 @@ function onClearInput() {
 function confirmClear(e) {
   e.preventDefault();
   if ($('#btn-clear-confirm').disabled) return;
-  const linked = !!auth.getEmail();
+  const linked = !store.isDemo() && !!auth.getEmail();
   const tokenPromise = !linked ? Promise.resolve(null)
     : auth.hasValidToken() ? Promise.resolve(auth.getToken())
     : auth.requestToken();
@@ -461,6 +462,15 @@ function confirmImport(e) {
 // ---------- 畫面 ----------
 
 function renderSync() {
+  const demo = store.isDemo();
+  $('#demo-banner').hidden = !demo;
+  if (demo) {
+    $('#sync-status').textContent = '';
+    $('#btn-signin').hidden = true;
+    $('#btn-sync').hidden = true;
+    $('#banner').hidden = true;
+    return;
+  }
   const hasToken = auth.hasValidToken();
   const email = auth.getEmail();
   const pending = store.pendingCount();
@@ -614,14 +624,30 @@ function renderStats() {
 // 尚未決定是否記錄天氣、且已有紀錄時，在記錄頁詢問一次
 // 新使用者（還沒有任何紀錄）在首頁看到一句理念，有紀錄後就收起來
 function renderTagline() {
-  $('#tagline').hidden = store.getRecords().length > 0;
+  const fresh = !store.getRecords().length && !store.isDemo();
+  $('#tagline').hidden = !fresh;
+  $('#btn-try-demo').hidden = !fresh;
+}
+
+// ---------- 示範模式 ----------
+
+async function enterDemo() {
+  const { buildDemoRecords } = await import('./demo.js');
+  store.enterDemo(buildDemoRecords());
+  location.reload();
+}
+
+function exitDemo() {
+  store.exitDemo();
+  location.reload();
 }
 
 function renderWeatherPrompt() {
-  $('#weather-prompt').hidden = weather.getPref() != null || !store.getRecords().length;
+  $('#weather-prompt').hidden = store.isDemo() || weather.getPref() != null || !store.getRecords().length;
 }
 
 function renderSettings() {
+  $('#btn-demo').textContent = t(store.isDemo() ? 'demo.exit' : 'demo.enter');
   $('#weather-toggle').checked = weather.getPref() === 'on';
   const email = auth.getEmail();
   $('#account-email').textContent = email || t('auth.localOnly');
@@ -725,6 +751,9 @@ function bindEvents() {
   $('#aura-options').addEventListener('change', updateAuraWarning);
 
   $('#btn-clear').addEventListener('click', openClearDialog);
+  $('#btn-try-demo').addEventListener('click', enterDemo);
+  $('#btn-demo-exit').addEventListener('click', exitDemo);
+  $('#btn-demo').addEventListener('click', () => (store.isDemo() ? exitDemo() : enterDemo()));
   $('#clear-input').addEventListener('input', onClearInput);
   $('#clear-form').addEventListener('submit', confirmClear);
   $('#btn-clear-cancel').addEventListener('click', () => $('#clear-dialog').close());

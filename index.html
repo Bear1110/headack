@@ -84,6 +84,10 @@
   </header>
 
   <p id="banner" class="banner" hidden></p>
+  <div id="demo-banner" class="demo-banner" hidden>
+    <span data-i18n="demo.banner"></span>
+    <button type="button" id="btn-demo-exit" class="btn small" data-i18n="demo.exit"></button>
+  </div>
 
   <main>
     <noscript><p class="card">Headack is a free headache diary that stores your entries in your own Google Drive. Please enable JavaScript to use it.<br>Headack 是免費的頭痛日記，紀錄存在你自己的 Google 雲端硬碟。請啟用 JavaScript 以使用本網站。</p></noscript>
@@ -94,6 +98,7 @@
         <small data-i18n="log.startHint"></small>
       </button>
       <p id="tagline" class="tagline" hidden data-i18n="about.tagline"></p>
+      <button type="button" id="btn-try-demo" class="btn ghost wide" hidden data-i18n="demo.try"></button>
       <div id="ongoing" class="ongoing-list"></div>
       <div id="weather-prompt" class="card weather-prompt" hidden>
         <h2 data-i18n="weather.promptTitle"></h2>
@@ -159,6 +164,11 @@
         <h2 data-i18n="export.title"></h2>
         <p class="muted small" data-i18n="export.desc"></p>
         <button id="btn-export" class="btn ghost" data-i18n="export.button"></button>
+      </div>
+      <div class="card">
+        <h2 data-i18n="demo.title"></h2>
+        <p class="muted small" data-i18n="demo.desc"></p>
+        <button type="button" id="btn-demo" class="btn ghost"></button>
       </div>
       <div class="card about">
         <h2 data-i18n="about.title"></h2>

@@ -167,7 +167,7 @@ export function createStatsView(root, { t, getLang, getRecords }) {
 
     const mohMonths = new Set(a.moh.map((x) => x.ym)).size;
     return `
-      ${mohMonths ? `<p class="warning">⚠ ${esc(t('st.mohMonths', { n: mohMonths }))} ${esc(t('st.mohNote').replace(/^⚠\s*[=＝]\s*/, ''))}</p>` : ''}
+      ${mohMonths ? `<p class="warning">⚠ ${esc(t('st.mohMonths', { n: mohMonths }))} ${esc(t('st.mohLimits'))}</p>` : ''}
       ${tiles}
       ${card(t('st.trendTitle'), monthsChart(a, { withMeds: true }))}
       <div class="stat-grid">
