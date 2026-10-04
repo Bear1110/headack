@@ -436,7 +436,6 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
     display: grid; grid-template-columns: minmax(320px, 380px) 1fr; gap: 24px; align-items: start;
   }
   body[data-view="log"] #view-list { display: flex; }
-  body[data-view="log"] #view-log { position: sticky; top: calc(var(--topbar-h) + 24px); }
   body[data-view="log"] .site-footer { grid-column: 1 / -1; }
   .view-title { display: block; margin: 0; }
 
