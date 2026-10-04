@@ -687,6 +687,9 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   .row { grid-template-columns: 1fr 1fr; }
   .tiles { grid-template-columns: repeat(4, 1fr); }
   .key-figures { grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+  /* 桌機：子分頁不必拉滿整列，AI 分析靠右 */
+  .stats-tabs-row { justify-content: space-between; }
+  .stats-tabs-row .stats-tabs { flex: 0 1 420px; }
   .cal-months { grid-template-columns: repeat(2, 1fr); align-items: start; }
   .intensity-pick { grid-template-columns: repeat(10, 1fr); }
 
