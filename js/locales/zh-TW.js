@@ -18,6 +18,8 @@ export default {
   'cal.legendMild': '輕',
   'cal.legendSevere': '重',
   'cal.legendUnknown': '未記錄程度',
+  'cal.prev': '上個月',
+  'cal.next': '下個月',
   'cal.noEntries': '這天沒有紀錄',
   'cal.addForDay': '新增這天的紀錄',
   'auth.signIn': '用 Google 登入',

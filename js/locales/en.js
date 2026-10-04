@@ -18,6 +18,8 @@ export default {
   'cal.legendMild': 'Mild',
   'cal.legendSevere': 'Severe',
   'cal.legendUnknown': 'Intensity not recorded',
+  'cal.prev': 'Previous month',
+  'cal.next': 'Next month',
   'cal.noEntries': 'No entries on this day',
   'cal.addForDay': 'Add an entry for this day',
   'auth.signIn': 'Sign in with Google',

@@ -233,6 +233,32 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-legend .sw.no-intensity { background: var(--muted); }
 .cal-legend .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text); display: inline-block; }
 .cal-months { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+/* 手機：月份左右滑動（scroll-snap），一次一個月；舊→新，本月在最右邊，與桌機一致 */
+@media (max-width: 599px) {
+  .cal-months {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+    scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter);
+    align-items: flex-start;
+  }
+  .cal-months::-webkit-scrollbar { display: none; }
+  .cal-month { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+}
+.cal-pager { display: none; }
+@media (max-width: 599px) {
+  .cal-pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: -.25rem; }
+}
+.pager-btn {
+  appearance: none; width: var(--tap); height: var(--tap); border-radius: 50%; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.4rem; line-height: 1;
+}
+.pager-btn:disabled { opacity: .3; cursor: default; }
+.pager-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pager-dot {
+  appearance: none; width: 10px; height: 10px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 0; background: var(--border);
+}
+.pager-dot[aria-current="true"] { background: var(--primary); width: 22px; border-radius: 5px; }
+[dir="rtl"] .pager-btn { transform: scaleX(-1); }
 .cal-month { scroll-margin-top: calc(var(--topbar-h) + 12px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
 .cal-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .cal-head h3 { margin: 0; font-size: 1rem; }

@@ -603,6 +603,9 @@ const CAL_KEY = 'hl.calMonths';
 let calMonths = 3;
 try { calMonths = Number(localStorage.getItem(CAL_KEY)) === 6 ? 6 : 3; } catch { /* ignore */ }
 let calSelected = null; // 'YYYY-MM-DD'
+// 手機：月份左右滑動（舊→新，本月在最右）。記住目前停在第幾個月，重繪後回到同一個月
+let calPage = null; // null = 本月（最後一個）
+const isNarrow = () => matchMedia('(max-width: 599px)').matches;
 
 function renderCalendarView() {
   document.querySelectorAll('.cal-range [data-months]').forEach((b) => {
@@ -611,6 +614,8 @@ function renderCalendarView() {
   const records = store.getRecords();
   const box = $('#calendar-months');
   box.innerHTML = calendarHtml({ records, months: calMonths, lang: getLang(), t, selected: calSelected });
+  renderCalPager();
+  showCalPage(calPage ?? calMonths - 1, false);
 
   // 選取的日期：在該月下方顯示當天紀錄
   const btn = calSelected && box.querySelector(`[data-day="${calSelected}"]`);
@@ -629,9 +634,56 @@ function renderCalendarView() {
     </div>`);
 }
 
+// 手機的分頁控制：‹ › 箭頭與小圓點
+function renderCalPager() {
+  const n = calMonths;
+  $('#cal-pager').innerHTML = `
+    <button type="button" class="pager-btn" data-page-step="-1" aria-label="${escapeHtml(t('cal.prev'))}">‹</button>
+    <span class="pager-dots">${Array.from({ length: n }, (_, i) => `<button type="button" class="pager-dot" data-page="${i}" aria-label="${i + 1} / ${n}"></button>`).join('')}</span>
+    <button type="button" class="pager-btn" data-page-step="1" aria-label="${escapeHtml(t('cal.next'))}">›</button>`;
+}
+
+function updateCalPager() {
+  const i = calPage ?? calMonths - 1;
+  document.querySelectorAll('#cal-pager .pager-dot').forEach((d, k) => d.setAttribute('aria-current', String(k === i)));
+  const [prev, next] = document.querySelectorAll('#cal-pager .pager-btn');
+  if (prev) prev.disabled = i <= 0;
+  if (next) next.disabled = i >= calMonths - 1;
+}
+
+function showCalPage(i, smooth = true) {
+  calPage = Math.max(0, Math.min(calMonths - 1, i));
+  updateCalPager();
+  if (!isNarrow()) return;
+  const box = $('#calendar-months');
+  const month = box.children[calPage];
+  // 以第一個月為基準算位移（容器有左右內距與月份間距）
+  if (month) box.scrollTo({ left: month.offsetLeft - box.firstElementChild.offsetLeft, behavior: smooth ? 'smooth' : 'instant' });
+}
+
+// 使用者自己滑動時，更新目前月份
+let calScrollTimer;
+function onCalendarScroll() {
+  clearTimeout(calScrollTimer);
+  calScrollTimer = setTimeout(() => {
+    const box = $('#calendar-months');
+    const months = [...box.children];
+    if (!months.length) return;
+    const base = months[0].offsetLeft;
+    const pos = Math.abs(box.scrollLeft);
+    calPage = months.reduce((best, m, i) => (Math.abs(m.offsetLeft - base - pos) < Math.abs(months[best].offsetLeft - base - pos) ? i : best), 0);
+    updateCalPager();
+  }, 80);
+}
+
 function onCalendarClick(e) {
+  const step = e.target.closest('[data-page-step]');
+  if (step) return showCalPage((calPage ?? calMonths - 1) + Number(step.dataset.pageStep));
+  const dot = e.target.closest('[data-page]');
+  if (dot) return showCalPage(Number(dot.dataset.page));
   const range = e.target.closest('[data-months]');
   if (range) {
+    calPage = null; // 換範圍：回到本月
     calMonths = Number(range.dataset.months);
     try { localStorage.setItem(CAL_KEY, String(calMonths)); } catch { /* ignore */ }
     return renderCalendarView();
@@ -770,8 +822,10 @@ function showView(name) {
   window.scrollTo(0, 0);
   if (name === 'stats') statsView?.render(); // 隱藏時量不到圖表寬度，切過來再畫一次
   // 手機上月份是單欄、本月在最下面：切到日曆時直接捲到本月
-  if (name === 'calendar' && matchMedia('(max-width: 599px)').matches) {
-    document.querySelector('#calendar-months .cal-month:last-child')?.scrollIntoView({ block: 'start' });
+  // 進入日曆：回到本月（手機上月份是左右滑動，本月在最右邊）
+  if (name === 'calendar') {
+    calPage = null;
+    showCalPage(calMonths - 1, false);
   }
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
 }
@@ -835,6 +889,7 @@ function bindEvents() {
     },
   });
   $('#view-calendar').addEventListener('click', onCalendarClick);
+  $('#calendar-months').addEventListener('scroll', onCalendarScroll, { passive: true });
 
   $('#btn-weather-on').addEventListener('click', enableWeather);
   $('#btn-weather-off').addEventListener('click', disableWeather);

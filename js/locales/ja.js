@@ -18,6 +18,8 @@ export default {
   'cal.legendMild': '軽い',
   'cal.legendSevere': '強い',
   'cal.legendUnknown': '強さ未記録',
+  'cal.prev': '前の月',
+  'cal.next': '次の月',
   'cal.noEntries': 'この日の記録はありません',
   'cal.addForDay': 'この日の記録を追加',
   'auth.signIn': 'Google でログイン',
