@@ -6,6 +6,7 @@ import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.j
 import { t, getLang, setLang, initI18n, formatList, LANGS } from './i18n.js';
 import { localDate, daysCovered } from './stats.js';
 import { createStatsView } from './statsview.js';
+import { createQuickFlow } from './quickflow.js';
 import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
@@ -115,12 +116,12 @@ function signOut() {
 
 // ---------- 紀錄操作 ----------
 
-function save(record, isNew) {
+function save(record, isNew, { quiet = false } = {}) {
   const now = new Date().toISOString();
   record.updated_at = now;
   if (isNew) record.created_at = now;
   store.saveRecord(record, { isNew });
-  toast(t('log.saved'));
+  if (!quiet) toast(t('log.saved'));
   trySync();
   fillWeather();
 }
@@ -197,8 +198,12 @@ function emptyRecord() {
   };
 }
 
+// 先存檔（就算接下來什麼都不填，開始時間也已記下），再跳出一題一題的快速問答
+let quickFlow = null;
 function quickStart() {
-  save(emptyRecord(), true);
+  const record = emptyRecord();
+  save(record, true);
+  quickFlow.open(record.id, 'start');
 }
 
 function setIntensity(id, value) {
@@ -211,6 +216,8 @@ function endRecord(id) {
   const r = store.getRecords().find((x) => x.id === id);
   if (!r) return;
   save({ ...r, end: nowLocal() }, false);
+  // 有吃藥但還沒填效果：結束當下最記得，問一題就好
+  if (r.meds?.length && !r.med_effect) quickFlow.open(id, 'end');
 }
 
 // ---------- 表單 ----------
@@ -686,6 +693,13 @@ function bindEvents() {
   $('#btn-delete').addEventListener('click', deleteEditing);
 
   statsView = createStatsView($('#view-stats'), { t, getLang, getRecords: store.getRecords });
+  quickFlow = createQuickFlow($('#quick-dialog'), {
+    t,
+    getRecord: (id) => store.getRecords().find((r) => r.id === id),
+    saveRecord: (r) => save(r, false, { quiet: true }),
+    frequentMeds,
+    openFullForm: (id) => openForm(store.getRecords().find((r) => r.id === id)),
+  });
   $('#view-calendar').addEventListener('click', onCalendarClick);
 
   $('#btn-weather-on').addEventListener('click', enableWeather);
