@@ -27,6 +27,7 @@ const PATHS = {
   bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
   aura: '<path d="M2 12l3-5 3 10 3-10 3 10 3-10 3 10 2-5"/>',
+  pill: '<rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M12 7v10"/>',
   undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
 };
 

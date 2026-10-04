@@ -85,6 +85,7 @@ export default {
   'list.auraOnly': 'With aura',
   'list.auraBadge': 'Aura',
   'list.noMatch': 'No entries match these filters',
+  'list.pressureDrop': 'Pressure ↓{d}',
   'list.empty': 'No entries yet',
   'list.ongoing': 'Ongoing',
   'list.more': { one: 'Show more ({n} more entry)', other: 'Show more ({n} more entries)' },

@@ -183,13 +183,26 @@ body[data-view="settings"] #view-settings { display: flex; }
 .btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
 
 /* 有預兆的紀錄：紫色小膠囊（鋸齒線＝典型的視覺預兆） */
-.record-when { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
-.badge-aura {
-  display: inline-flex; align-items: center; gap: .2rem; padding: .05rem .5rem; border-radius: 999px;
-  font-size: .75rem; font-weight: 600; color: var(--text);
-  border: 1px solid var(--aura); background: color-mix(in srgb, var(--aura) 18%, transparent);
+/* 列表的一列：日期為主、時間與持續時間較淡；類別資訊做成膠囊 */
+.record-main { flex: 1; min-width: 0; }
+.record-head { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.record-date { font-weight: 600; }
+.record-time, .record-dur { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.record-dur::before { content: '· '; }
+.record-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .35rem; }
+.tag {
+  display: inline-flex; align-items: center; gap: .25rem; padding: .1rem .55rem; border-radius: 999px;
+  font-size: .75rem; line-height: 1.5; color: var(--text); border: 1px solid var(--border); background: var(--bg);
 }
-.badge-aura .icon { width: 14px; height: 14px; color: var(--aura); }
+.tag .icon { width: 13px; height: 13px; flex: none; }
+.tag.med .icon { color: var(--primary); }
+.tag.aura { font-weight: 600; border-color: var(--aura); background: color-mix(in srgb, var(--aura) 18%, transparent); }
+.tag.aura .icon { color: var(--aura); }
+.tag.ongoing { font-weight: 600; border-color: var(--primary); color: var(--primary); }
+.tag.pressure .icon { color: var(--warning-text); }
+.tag.type { color: var(--muted); }
+.list-month { list-style: none; margin: .75rem 0 .1rem; font-size: .85rem; font-weight: 700; color: var(--muted); }
+.list-month:first-child { margin-top: 0; }
 .list-filters { margin-bottom: .25rem; }
 .list-filters[hidden] { display: none; }
 .list-filters .chip-toggle .icon { width: 14px; height: 14px; margin-inline-end: .2rem; vertical-align: -2px; color: var(--aura); }
@@ -222,7 +235,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 /* 列表 */
 .record-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
 .record {
-  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  display: flex; align-items: center; gap: .85rem;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: .75rem 1rem; cursor: pointer; min-height: var(--tap);
 }
@@ -230,8 +243,9 @@ body[data-view="settings"] #view-settings { display: flex; }
 .record-main { min-width: 0; }
 .list-more { list-style: none; margin-top: .25rem; }
 .record-main .small { overflow-wrap: anywhere; }
+.intensity.none { background: var(--bg); color: var(--muted); border: 1px dashed var(--border); }
 .intensity {
-  flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  flex: none; width: 2.4rem; height: 2.4rem; border-radius: 12px;
   display: grid; place-items: center; font-weight: 700; color: #fff;
   background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%);
 }

@@ -85,6 +85,7 @@ export default {
   'list.auraOnly': '有預兆',
   'list.auraBadge': '預兆',
   'list.noMatch': '沒有符合條件的紀錄',
+  'list.pressureDrop': '氣壓↓{d}',
   'list.empty': '還沒有紀錄',
   'list.ongoing': '進行中',
   'list.more': '顯示更多（還有 {n} 筆）',

@@ -606,21 +606,59 @@ function renderList() {
     $('#record-list').innerHTML = `<li class="muted">${t('list.noMatch')}</li>`;
     return;
   }
+  const showType = hasMultipleTypes(all);
+  const monthFmt = new Intl.DateTimeFormat(getLang(), { year: 'numeric', month: 'long' });
+  let lastMonth = '';
+  const rows = list.slice(0, listLimit).map((r) => {
+    const ym = r.start.slice(0, 7);
+    const header = ym !== lastMonth ? `<li class="list-month">${escapeHtml(monthFmt.format(new Date(`${ym}-01T00:00`)))}</li>` : '';
+    lastMonth = ym;
+    return header + recordItemHtml(r, { showType });
+  });
   const rest = list.length - listLimit;
-  $('#record-list').innerHTML = list.slice(0, listLimit).map(recordItemHtml).join('')
+  $('#record-list').innerHTML = rows.join('')
     + (rest > 0 ? `<li class="list-more"><button type="button" class="btn ghost wide" data-more>${escapeHtml(t('list.more', { n: rest }))}</button></li>` : '');
 }
 
-// 列表與日曆共用的一列
-function recordItemHtml(r) {
+// 列表與日曆共用的一列：
+// - 左：疼痛程度色塊（掃視時的錨點）
+// - 主行：日期、時間（未知時省略）、持續時間或「進行中」
+// - 膠囊：用藥、預兆、類型（只有使用者紀錄裡有兩種以上類型時才顯示）、明顯的氣壓下降
+// showType 由呼叫端依整體紀錄決定
+const PRESSURE_DROP = -5;
+function recordItemHtml(r, { showType = false } = {}) {
+  const d = new Date(r.start);
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  const date = d.toLocaleDateString(getLang(), { ...(sameYear ? {} : { year: 'numeric' }), month: 'numeric', day: 'numeric', weekday: 'short' });
+  const time = r.start.slice(11, 16) !== '00:00' ? d.toLocaleTimeString(getLang(), { hour: '2-digit', minute: '2-digit' }) : '';
+  const when = r.end ? formatDuration(r.start, r.end) : '';
+  const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;
+  const tags = [
+    isOngoing(r) ? tag('ongoing', escapeHtml(t('list.ongoing'))) : '',
+    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml([medLabel(t, m), doseLabel(t, m)].filter(Boolean).join(' '))}`)),
+    r.aura?.length ? tag('aura', `${icon('aura')}${escapeHtml(t('list.auraBadge'))}`) : '',
+    showType && r.type && r.type !== 'unknown' ? tag('type', escapeHtml(t(`opt.type.${r.type}`))) : '',
+    Number.isFinite(r.pressure_change_24h) && r.pressure_change_24h <= PRESSURE_DROP
+      ? tag('pressure', `${icon('weather')}${escapeHtml(t('list.pressureDrop', { d: Math.abs(r.pressure_change_24h) }))}`) : '',
+  ].filter(Boolean).join('');
+  const level = Number.isFinite(r.intensity) ? Math.min(10, Math.max(0, r.intensity)) : null;
   return `
     <li class="record" data-id="${escapeHtml(r.id)}">
+      <span class="intensity ${level == null ? 'none' : `i${level}`}" ${level == null ? `title="${escapeHtml(t('cal.legendUnknown'))}"` : ''}>${level ?? '–'}</span>
       <div class="record-main">
-        <div class="record-when">${escapeHtml(formatDateTime(r.start))}${r.aura?.length ? `<span class="badge-aura">${icon('aura')}${escapeHtml(t('list.auraBadge'))}</span>` : ''}</div>
-        <div class="muted small">${escapeHtml(recordSummary(r))}</div>
+        <div class="record-head">
+          <span class="record-date">${escapeHtml(date)}</span>
+          ${time ? `<span class="record-time">${escapeHtml(time)}</span>` : ''}
+          ${when ? `<span class="record-dur">${escapeHtml(when)}</span>` : ''}
+        </div>
+        ${tags ? `<div class="record-tags">${tags}</div>` : ''}
       </div>
-      ${Number.isFinite(r.intensity) ? `<span class="intensity i${Math.min(10, Math.max(0, r.intensity))}">${r.intensity}</span>` : ''}
     </li>`;
+}
+
+// 使用者的紀錄裡有兩種以上（非「不確定」的）頭痛類型時，列表才顯示類型膠囊
+function hasMultipleTypes(records) {
+  return new Set(records.map((r) => r.type).filter((x) => x && x !== 'unknown')).size > 1;
 }
 
 // ---------- 日曆 ----------
@@ -666,7 +704,7 @@ function renderDayDetail() {
     <div class="cal-detail">
       <h4>${escapeHtml(title)}</h4>
       ${dayRecords.length
-        ? `<ul class="record-list">${dayRecords.map(recordItemHtml).join('')}</ul>`
+        ? `<ul class="record-list">${dayRecords.map((r) => recordItemHtml(r, { showType: hasMultipleTypes(store.getRecords()) })).join('')}</ul>`
         : `<p class="muted small">${escapeHtml(t('cal.noEntries'))}</p>`}
       <button type="button" class="btn ghost small" data-add-day="${calSelected}">＋ ${escapeHtml(t('cal.addForDay'))}</button>
     </div>`);

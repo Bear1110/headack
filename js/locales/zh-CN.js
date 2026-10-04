@@ -85,6 +85,7 @@ export default {
   'list.auraOnly': '有先兆',
   'list.auraBadge': '先兆',
   'list.noMatch': '没有符合条件的记录',
+  'list.pressureDrop': '气压↓{d}',
   'list.empty': '还没有记录',
   'list.ongoing': '进行中',
   'list.more': '显示更多（还有 {n} 条）',

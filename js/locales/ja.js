@@ -85,6 +85,7 @@ export default {
   'list.auraOnly': '前兆あり',
   'list.auraBadge': '前兆',
   'list.noMatch': '条件に合う記録はありません',
+  'list.pressureDrop': '気圧↓{d}',
   'list.empty': 'まだ記録がありません',
   'list.ongoing': '継続中',
   'list.more': 'さらに表示（残り {n} 件）',
