@@ -108,6 +108,7 @@
       </div>
       <div class="card">
         <h2 data-i18n="weather.title"></h2>
+        <p class="small" data-i18n="weather.why"></p>
         <label class="switch-row">
           <input type="checkbox" id="weather-toggle">
           <span data-i18n="weather.setting"></span>
@@ -119,6 +120,11 @@
         <h2 data-i18n="import.title"></h2>
         <p class="muted small" data-i18n="import.desc"></p>
         <button id="btn-import" class="btn ghost" data-i18n="import.title"></button>
+      </div>
+      <div class="card">
+        <h2 data-i18n="export.title"></h2>
+        <p class="muted small" data-i18n="export.desc"></p>
+        <button id="btn-export" class="btn ghost" data-i18n="export.button"></button>
       </div>
       <div class="card">
         <p><a href="privacy.html" data-i18n="settings.privacy"></a></p>
@@ -199,6 +205,10 @@
 
         <p class="step" data-i18n="import.step2"></p>
         <textarea id="import-text" rows="6" data-i18n-attr="placeholder:import.placeholder"></textarea>
+        <label class="file-pick">
+          <span data-i18n="import.file"></span>
+          <input type="file" id="import-file" accept=".json,application/json,text/plain">
+        </label>
         <div id="import-preview" class="import-preview"></div>
       </div>
       <div class="dialog-actions">

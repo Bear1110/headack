@@ -362,6 +362,24 @@ function confirmClear(e) {
     });
 }
 
+// ---------- 匯出 ----------
+
+async function exportRecords() {
+  importer ??= await import('./importer.js');
+  const records = store.getRecords();
+  const data = importer.buildExport(records);
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `headache-log-${localDate(new Date())}.json`;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(t('export.done', { n: records.length }));
+}
+
 // ---------- 匯入 ----------
 
 let importer = null; // 用到才載入
@@ -596,6 +614,7 @@ function renderSettings() {
   $('#account-email').textContent = email || t('auth.localOnly');
   $('#btn-signout').hidden = !email;
   $('#btn-clear').disabled = !store.getRecords().length;
+  $('#btn-export').disabled = !store.getRecords().length;
   const link = $('#sheet-link');
   link.hidden = !sheet;
   if (sheet) link.href = sheet.url;
@@ -682,6 +701,15 @@ function bindEvents() {
   $('#btn-import').addEventListener('click', openImport);
   $('#btn-copy-prompt').addEventListener('click', copyPrompt);
   $('#import-text').addEventListener('input', previewImport);
+  // 直接選擇匯出的 JSON 檔：讀進文字框，沿用同一套解析與預覽
+  $('#import-file').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    $('#import-text').value = await file.text();
+    e.target.value = '';
+    previewImport();
+  });
+  $('#btn-export').addEventListener('click', exportRecords);
   $('#import-form').addEventListener('submit', confirmImport);
   $('#btn-import-close').addEventListener('click', () => $('#import-dialog').close());
 

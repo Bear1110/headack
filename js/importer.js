@@ -163,6 +163,43 @@ function normTime(v) {
   return `${y}-${p(mo)}-${p(d)}T${p(h)}:${p(mi)}`;
 }
 
+// 天氣欄位：匯入本網站匯出的檔案時保留（AI 整理的資料通常沒有）
+const WEATHER_FIELDS = ['pressure_hpa', 'pressure_change_24h', 'temp_c', 'humidity_pct'];
+function weatherFields(raw) {
+  const out = {};
+  for (const f of WEATHER_FIELDS) {
+    const v = Number(raw[f]);
+    if (raw[f] !== '' && raw[f] != null && Number.isFinite(v)) out[f] = v;
+  }
+  return out;
+}
+
+// ---------- 匯出 ----------
+
+// 匯出格式與匯入格式相同，可直接匯回本網站，或交給 AI / 其他工具使用
+const EXPORT_FIELDS = ['start', 'end', 'intensity', 'type', 'locations', 'aura', 'symptoms', 'meds', 'med_effect', 'triggers', 'notes', ...WEATHER_FIELDS, 'created_at', 'updated_at'];
+export function buildExport(records) {
+  const list = [...records]
+    .sort((a, b) => (a.start || '').localeCompare(b.start || ''))
+    .map((r) => {
+      const out = {};
+      for (const f of EXPORT_FIELDS) {
+        let v = r[f];
+        if (v == null || v === '') continue;
+        if (f === 'meds') v = v.map((m) => Object.fromEntries(Object.entries(m).filter(([, x]) => x !== '' && x != null)));
+        if (Array.isArray(v) && !v.length) continue;
+        out[f] = v;
+      }
+      return out;
+    });
+  return {
+    format: IMPORT_FORMAT,
+    version: IMPORT_VERSION,
+    exported_at: new Date().toISOString(),
+    records: list,
+  };
+}
+
 function normalize(raw) {
   if (!raw || typeof raw !== 'object') return { error: 'not_object' };
   const start = normTime(raw.start ?? raw.date);
@@ -199,6 +236,7 @@ function normalize(raw) {
   return {
     record: {
       id: newId(), start, end, intensity, type, locations, aura, symptoms, meds, med_effect, triggers: [...triggers], notes,
+      ...weatherFields(raw),
     },
   };
 }

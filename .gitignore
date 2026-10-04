@@ -4,4 +4,4 @@ node_modules/
 .vscode/
 
 # 本機 debug 資料（可能含個人健康資料，絕不 commit）
-headache-log-full*.json
+headache-log-*.json

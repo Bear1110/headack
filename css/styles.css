@@ -452,6 +452,8 @@ dialog.confirm-dialog form { height: auto; }
 dialog.confirm-dialog .dialog-body { padding-top: 1.25rem; }
 
 /* 匯入 */
+.file-pick { display: flex; flex-direction: column; gap: .35rem; margin-top: .75rem; font-size: .85rem; color: var(--muted); }
+.file-pick input { padding: .4rem; font-size: .85rem; min-height: 0; }
 .step { font-weight: 600; margin: 1.25rem 0 .5rem; }
 .ai-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
 .ai-buttons .btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; flex: 1 1 auto; }
