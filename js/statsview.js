@@ -153,8 +153,8 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
     const tile = (label, value, delta = '') => `<div class="tile"><div class="tile-value">${value}</div><div class="tile-label">${esc(label)}</div>${delta}</div>`;
     const tiles = `
       <div class="tiles">
-        ${tile(t('st.headacheDaysPerMonth'), fmt1(perM(a.headacheDays)), prev && deltaHtml(perM(a.headacheDays), prev.perMonth(prev.headacheDays)))}
-        ${tile(t('st.medDaysPerMonth'), fmt1(perM(a.medDays)), prev && deltaHtml(perM(a.medDays), prev.perMonth(prev.medDays)))}
+        ${tile(t('st.headacheDaysPerMonth'), fmt1(perM(a.headacheDays)), prev ? deltaHtml(perM(a.headacheDays), prev.perMonth(prev.headacheDays)) : '')}
+        ${tile(t('st.medDaysPerMonth'), fmt1(perM(a.medDays)), prev ? deltaHtml(perM(a.medDays), prev.perMonth(prev.medDays)) : '')}
         ${tile(t('st.attacks'), a.attacks)}
         ${tile(t('st.avgIntensity'), a.intensity.n ? `${fmt1(a.intensity.mean)}<small>/10</small>` : '—')}
       </div>
