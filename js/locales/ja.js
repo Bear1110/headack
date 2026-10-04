@@ -1,5 +1,6 @@
 export default {
-  'app.title': '頭痛ダイアリー',
+  'app.title': 'Headack',
+  'app.sheetTitle': 'Headack 頭痛ダイアリー',
   'disclaimer': 'このサイトは個人の記録用です。統計や通知は医学的な診断ではありません。判断は医師にご相談ください。',
   'nav.log': '記録',
   'nav.list': '履歴',
@@ -208,7 +209,7 @@ export default {
   'settings.privacy': 'プライバシーポリシー',
   'settings.source': 'ソースコード',
   'footer.terms': '利用規約',
-  'footer.copyright': '© {year} 頭痛ダイアリー. All rights reserved.',
+  'footer.copyright': '© {year} Headack. All rights reserved.',
   'danger.title': '危険な操作',
   'danger.clear': 'すべての記録を削除',
   'danger.clearDesc': 'このブラウザと Google スプレッドシートにある頭痛の記録をすべて削除します。',

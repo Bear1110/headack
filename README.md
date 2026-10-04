@@ -1,8 +1,10 @@
-# 頭痛紀錄 Headache Log
+<p align="center"><img src="icons/logo.svg" width="120" alt=""></p>
+
+<h1 align="center">Headack</h1>
 
 **👉 https://bear1110.github.io/headack/**
 
-免費的頭痛日記。頭痛發作時點一下就能記錄，看診時可以給醫師看每月統計。
+Headack 是免費的頭痛日記。頭痛發作時點一下就能記錄，看診時可以給醫師看每月統計。
 紀錄存在**你自己的 Google 雲端硬碟**，網站作者看不到任何人的資料。
 
 [English below](#english)
@@ -24,7 +26,7 @@
 
 1. 用手機或電腦打開上面的網址
 2. 按「用 Google 登入」
-3. 第一次登入時，網站會在你的雲端硬碟建立一份「頭痛紀錄」試算表，之後的紀錄都存在這裡
+3. 第一次登入時，網站會在你的雲端硬碟建立一份「Headack 頭痛紀錄」試算表，之後的紀錄都存在這裡
 
 手機可以「加到主畫面」，用起來就像 App。沒登入也能先記，登入後會自動同步。
 
@@ -49,13 +51,13 @@
 
 ## English
 
-A free headache diary. Log a headache with one tap when it starts, and show your doctor monthly stats at your appointment. Your entries are stored in **your own Google Drive** — the site's author never sees anyone's data.
+Headack is a free headache diary. Log a headache with one tap when it starts, and show your doctor monthly stats at your appointment. Your entries are stored in **your own Google Drive** — the site's author never sees anyone's data.
 
 **What you can log:** start and end time, pain intensity (1–10), pain location on a head map, aura and other symptoms, medication (name, dose, and when you took it), possible triggers, and optionally the weather (air pressure, temperature, humidity).
 
 **Monthly stats:** headache days, medication days, average intensity, and a reminder to talk to your doctor if you are taking painkillers often enough to risk medication-overuse headache.
 
-**Getting started:** open the link above, sign in with Google, and the site creates a "Headache Log" spreadsheet in your Drive. On a phone, add it to your home screen to use it like an app. You can log entries before signing in; they sync once you do. Already have notes elsewhere? Use Settings → Import entries to have an AI tidy them up for import.
+**Getting started:** open the link above, sign in with Google, and the site creates a "Headack Headache Log" spreadsheet in your Drive. On a phone, add it to your home screen to use it like an app. You can log entries before signing in; they sync once you do. Already have notes elsewhere? Use Settings → Import entries to have an AI tidy them up for import.
 
 **Your data:** entries live only in your own spreadsheet, which you can open, share or delete at any time. The site can only access the file it created. No backend, no ads, no tracking. See the [privacy policy](https://bear1110.github.io/headack/privacy.html).
 

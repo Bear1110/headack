@@ -69,6 +69,11 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
   background: var(--surface); border-bottom: 1px solid var(--border);
 }
 .topbar h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 品牌：熊熊 logo + 小寫文字標誌 */
+.brand { display: flex; align-items: center; gap: .45rem; flex: none; }
+.brand img { width: 34px; height: 34px; flex: none; }
+.brand span { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.brand-link { display: inline-flex; align-items: center; gap: .4rem; font-weight: 800; font-size: 1.1rem; color: var(--text); text-decoration: none; }
 .top-actions { display: flex; align-items: center; gap: .5rem; min-width: 0; }
 .sync { display: flex; align-items: center; gap: .5rem; min-width: 0; }
 .sync-status { font-size: .85rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -546,7 +551,8 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   .topbar { gap: .5rem; }
   .label-full { display: none; }
   .label-short { display: inline; }
-  .topbar h1 { font-size: 1.05rem; }
+  .brand img { width: 30px; height: 30px; }
+  .brand span { font-size: 1.15rem; }
   .sync:has(#btn-signin:not([hidden])) .sync-status { display: none; }
 }
 

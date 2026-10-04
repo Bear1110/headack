@@ -1,5 +1,6 @@
 export default {
-  'app.title': '头痛记录',
+  'app.title': 'Headack',
+  'app.sheetTitle': 'Headack 头痛记录',
   'disclaimer': '本网站仅供个人记录，统计与提醒不构成医疗诊断，请与医生讨论解读。',
   'nav.log': '记录',
   'nav.list': '列表',
@@ -208,7 +209,7 @@ export default {
   'settings.privacy': '隐私政策',
   'settings.source': '源代码',
   'footer.terms': '服务条款',
-  'footer.copyright': '© {year} 头痛记录. 保留所有权利。',
+  'footer.copyright': '© {year} Headack. 保留所有权利。',
   'danger.title': '危险区域',
   'danger.clear': '清空所有记录',
   'danger.clearDesc': '删除此浏览器与你 Google 表格中的所有头痛记录。',

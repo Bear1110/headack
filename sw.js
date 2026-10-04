@@ -2,7 +2,7 @@
 // Google 的 API 與登入請求一律不經快取。
 // 採「網路優先」，一般部署會自動拿到新版；SHELL 清單有增減時請把 VERSION 加一。
 
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = `headache-log-${VERSION}`;
 const SHELL = [
   './',
@@ -32,6 +32,7 @@ const SHELL = [
   'js/locales/ja.js',
   'manifest.webmanifest',
   'icons/icon.svg',
+  'icons/logo.svg',
   'icons/icon-192.png',
   'icons/icon-512.png',
 ];

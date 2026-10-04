@@ -1,7 +1,7 @@
 {
-  "name": "頭痛紀錄 Headache Log",
-  "short_name": "頭痛紀錄",
-  "description": "記錄頭痛發作、用藥與每月統計；資料存在你自己的 Google 試算表。",
+  "name": "Headack",
+  "short_name": "Headack",
+  "description": "Headack：記錄頭痛發作、用藥與每月統計；資料存在你自己的 Google 試算表。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

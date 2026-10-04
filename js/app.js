@@ -65,7 +65,7 @@ async function trySync() {
   renderSync();
   try {
     if (!sheet) {
-      sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.title') });
+      sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.sheetTitle') });
       store.setCachedSheetId(sheet.id);
     }
     await store.sync(sheet, token);
@@ -352,7 +352,7 @@ function confirmClear(e) {
       await store.whenIdle();
       if (token) {
         if (!sheet) {
-          sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.title') });
+          sheet = await openSpreadsheet(token, { cachedId: store.getCachedSheetId(), title: t('app.sheetTitle') });
           store.setCachedSheetId(sheet.id);
         }
         await sheet.clearAll(token);

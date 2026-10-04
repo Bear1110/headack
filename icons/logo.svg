@@ -1,17 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- App 圖示：藍底 + 頭痛熊熊（內容縮在中央 80% 內，符合 maskable 安全區） -->
-  <rect width="512" height="512" rx="112" fill="#3b5bdb"/>
-  <g transform="translate(256 270) scale(.8) translate(-256 -270)" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Headack：頭痛的熊熊 + 止痛藥膠囊（透明背景，用於標題列） -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- 痛痛閃線 -->
     <path d="M58 176 l34 22 l-22 8 l36 20" fill="none" stroke="#ffc53d" stroke-width="16"/>
+    <!-- 耳朵 -->
     <circle cx="146" cy="140" r="64" fill="#a8703f"/>
     <circle cx="366" cy="140" r="64" fill="#a8703f"/>
     <circle cx="146" cy="140" r="34" fill="#e7b88c"/>
     <circle cx="366" cy="140" r="34" fill="#e7b88c"/>
+    <!-- 頭 -->
     <ellipse cx="256" cy="292" rx="182" ry="160" fill="#b97f4b"/>
+    <!-- 瞇眼 > < -->
     <path d="M160 262 l36 20 l-36 20" fill="none" stroke="#3d2414" stroke-width="13"/>
     <path d="M352 262 l-36 20 l36 20" fill="none" stroke="#3d2414" stroke-width="13"/>
+    <!-- 腮紅 -->
     <ellipse cx="160" cy="340" rx="26" ry="15" fill="#f08c8c" opacity=".75"/>
     <ellipse cx="352" cy="340" rx="26" ry="15" fill="#f08c8c" opacity=".75"/>
+    <!-- 嘴鼻 -->
     <ellipse cx="256" cy="352" rx="82" ry="62" fill="#f2d4ae"/>
     <ellipse cx="256" cy="324" rx="24" ry="16" fill="#3d2414"/>
     <path d="M226 382 q30 -20 60 0" fill="none" stroke="#3d2414" stroke-width="10"/>

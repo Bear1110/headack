@@ -1,5 +1,6 @@
 export default {
-  'app.title': 'Headache Log',
+  'app.title': 'Headack',
+  'app.sheetTitle': 'Headack Headache Log',
   'disclaimer': 'For personal record-keeping only. Statistics and alerts are not a medical diagnosis — discuss them with your doctor.',
   'nav.log': 'Log',
   'nav.list': 'History',
@@ -208,7 +209,7 @@ export default {
   'settings.privacy': 'Privacy policy',
   'settings.source': 'Source code',
   'footer.terms': 'Terms of Service',
-  'footer.copyright': '© {year} Headache Log. All rights reserved.',
+  'footer.copyright': '© {year} Headack. All rights reserved.',
   'danger.title': 'Danger zone',
   'danger.clear': 'Delete all entries',
   'danger.clearDesc': 'Deletes every headache entry in this browser and in your Google spreadsheet.',

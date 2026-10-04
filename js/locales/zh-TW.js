@@ -1,5 +1,6 @@
 export default {
-  'app.title': '頭痛紀錄',
+  'app.title': 'Headack',
+  'app.sheetTitle': 'Headack 頭痛紀錄',
   'disclaimer': '本網站僅供個人記錄，統計與提醒不構成醫療診斷，判讀請與醫師討論。',
   'nav.log': '記錄',
   'nav.list': '列表',
@@ -208,7 +209,7 @@ export default {
   'settings.privacy': '隱私權政策',
   'settings.source': '原始碼',
   'footer.terms': '服務條款',
-  'footer.copyright': '© {year} 頭痛紀錄. 保留所有權利。',
+  'footer.copyright': '© {year} Headack. 保留所有權利。',
   'danger.title': '危險區域',
   'danger.clear': '清空所有紀錄',
   'danger.clearDesc': '刪除這個瀏覽器與你 Google 試算表中的所有頭痛紀錄。',
