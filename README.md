@@ -36,7 +36,7 @@ Headack 是免費的頭痛日記。頭痛發作時點一下就能記錄，看診
 
 - 紀錄只存在你自己的 Google 試算表，可以直接打開、分享給醫師或刪除
 - 網站只能存取它自己建立的那份檔案，看不到你雲端硬碟的其他內容
-- 沒有後端伺服器、沒有廣告、沒有追蹤
+- 沒有後端伺服器、沒有廣告、沒有 Cookie；只用 GoatCounter 計數圖片統計匿名瀏覽量
 - 詳見[隱私權政策](https://bear1110.github.io/headack/privacy.html)
 
 ## 注意
@@ -59,6 +59,6 @@ Headack is a free headache diary. Log a headache with one tap when it starts, an
 
 **Getting started:** open the link above, sign in with Google, and the site creates a "Headack Headache Log" spreadsheet in your Drive. On a phone, add it to your home screen to use it like an app. You can log entries before signing in; they sync once you do. Already have notes elsewhere? Use Settings → Import entries to have an AI tidy them up for import.
 
-**Your data:** entries live only in your own spreadsheet, which you can open, share or delete at any time. The site can only access the file it created. No backend, no ads, no tracking. See the [privacy policy](https://bear1110.github.io/headack/privacy.html).
+**Your data:** entries live only in your own spreadsheet, which you can open, share or delete at any time. The site can only access the file it created. No backend, no ads, no cookies — only an anonymous GoatCounter page-view counter. See the [privacy policy](https://bear1110.github.io/headack/privacy.html).
 
 For personal record-keeping only — not a medical diagnosis. Please discuss your results with a doctor.

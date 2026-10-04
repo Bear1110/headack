@@ -544,6 +544,7 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   text-align: center; max-width: min(520px, calc(100vw - 2 * var(--gutter)));
 }
 
+.counter { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .label-short { display: none; }
 .btn.small { white-space: nowrap; }
 

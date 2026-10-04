@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://headack.goatcounter.com; base-uri 'self'">
   <title>隱私權政策 Privacy Policy｜Headack</title>
   <meta name="description" content="Headack 隱私權政策：網站沒有後端、不收集資料，紀錄只存在你自己的 Google 雲端硬碟。 Headack privacy policy: no backend and no data collection; entries stay in your own Google Drive.">
   <link rel="canonical" href="https://bear1110.github.io/headack/privacy.html">
@@ -33,8 +33,10 @@
       <p>本網站對 Google 使用者資料的使用遵守 <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>，包括其中的 Limited Use 規定。資料不會傳送給任何第三方，也不會用於廣告。</p>
       <h2>天氣記錄（選用）</h2>
       <p>你可以在「設定」開啟自動記錄天氣。開啟後，新增頭痛時瀏覽器會向 <a href="https://open-meteo.com/" rel="noopener">Open-Meteo</a> 查詢當地的氣壓、氣溫與濕度。送出的只有四捨五入到約 10 公里範圍的座標，不包含任何健康資料；位置不會存進你的試算表。這項功能預設關閉，隨時可以關掉。</p>
-      <h2>無廣告、無追蹤</h2>
-      <p>本網站不放廣告，也不使用任何分析或追蹤工具（例如 Google Analytics），不設定追蹤用的 Cookie。</p>
+      <h2>無廣告、無追蹤 Cookie</h2>
+      <p>本網站不放廣告，不使用 Google Analytics 這類追蹤工具，也不設定任何 Cookie。</p>
+      <h2>匿名瀏覽量統計</h2>
+      <p>為了知道網站有多少人使用，每個頁面會向 <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a> 載入一張 1×1 的計數圖片。這只會記錄「哪一頁被瀏覽了一次」，以及瀏覽器一般會送出的資訊（例如瀏覽器類型、大約的國家）。它不執行任何程式碼、不設 Cookie、不追蹤個人，也完全接觸不到你的頭痛紀錄或 Google 帳號。</p>
       <h2>刪除資料</h2>
       <p>你可以隨時直接刪除雲端硬碟中的試算表；在本網站「設定」中登出會清除瀏覽器內的本機資料。你也可以在 <a href="https://myaccount.google.com/permissions" rel="noopener">Google 帳戶的第三方存取權</a> 頁面撤銷本網站的授權。</p>
       <h2>非醫療器材</h2>
@@ -63,8 +65,10 @@
       <p>This site's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements. Data is never sent to third parties or used for advertising.</p>
       <h2>Weather recording (optional)</h2>
       <p>You can turn on automatic weather recording in Settings. When it is on and you log a headache, your browser asks <a href="https://open-meteo.com/" rel="noopener">Open-Meteo</a> for the local air pressure, temperature and humidity. Only coordinates rounded to about 10 km are sent — no health data — and your location is not saved to your spreadsheet. It is off by default and can be turned off at any time.</p>
-      <h2>No ads, no tracking</h2>
-      <p>The site shows no ads and uses no analytics or tracking tools (such as Google Analytics), and sets no tracking cookies.</p>
+      <h2>No ads, no tracking cookies</h2>
+      <p>The site shows no ads, uses no tracking tools such as Google Analytics, and sets no cookies.</p>
+      <h2>Anonymous page-view counts</h2>
+      <p>To know how many people use the site, each page loads a 1×1 counter image from <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>. It records only that a page was viewed, plus what browsers normally send (such as browser type and approximate country). It runs no code, sets no cookies, does not track individuals, and has no access to your headache entries or Google account.</p>
       <h2>Deleting your data</h2>
       <p>You can delete the spreadsheet from your Drive at any time. Signing out in Settings clears the data stored in this browser. You can also revoke this site's access on your <a href="https://myaccount.google.com/permissions" rel="noopener">Google Account third-party access</a> page.</p>
       <h2>Not a medical device</h2>
@@ -80,5 +84,7 @@
       <p>© 2026 Headack. 保留所有權利。All rights reserved.</p>
     </footer>
   </main>
+  <!-- 瀏覽量計數（GoatCounter）：只是一張 1×1 圖片，不執行第三方程式碼、不設 Cookie、不含任何紀錄資料 -->
+  <img class="counter" src="https://headack.goatcounter.com/count?p=/privacy&amp;t=Privacy" alt="" width="1" height="1" referrerpolicy="no-referrer">
 </body>
 </html>

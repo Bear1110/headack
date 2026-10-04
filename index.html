@@ -10,7 +10,7 @@
     style-src 'self' https://accounts.google.com/gsi/style;
     frame-src https://accounts.google.com/gsi/;
     connect-src 'self' https://accounts.google.com/gsi/ https://sheets.googleapis.com https://www.googleapis.com https://api.open-meteo.com;
-    img-src 'self' data:;
+    img-src 'self' data: https://headack.goatcounter.com;
     base-uri 'self';
     form-action 'self';
   ">
@@ -282,5 +282,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <!-- 瀏覽量計數（GoatCounter）：只是一張 1×1 圖片，不執行第三方程式碼、不設 Cookie、不含任何紀錄資料 -->
+  <img class="counter" src="https://headack.goatcounter.com/count?p=/&amp;t=Headack" alt="" width="1" height="1" referrerpolicy="no-referrer">
 </body>
 </html>
