@@ -765,7 +765,24 @@ function selectDay(day) {
 }
 
 // 往前／往後一個月（年檢視一次一年）
-const stepCalendar = (n) => goCal({ month: shiftMonth(calMonth, calMode === 'year' ? 12 * n : n) });
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+// 換月份／年份時，新內容從移動的方向滑入一小段，看得出是往前還是往後（dir：-1 往前、1 往後）
+function slideCalendar(dir) {
+  if (reduceMotion.matches) return;
+  const x = dir * (document.documentElement.dir === 'rtl' ? -1 : 1) * 24;
+  $('#calendar-months').animate(
+    [{ transform: `translateX(${x}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
+    { duration: 200, easing: 'cubic-bezier(.2, .8, .2, 1)' },
+  );
+}
+
+// 往前／往後一個月（年檢視一年）；已在本月時不動
+function stepCalendar(n) {
+  const before = calMonth;
+  goCal({ month: shiftMonth(calMonth, calMode === 'year' ? 12 * n : n) });
+  if (calMonth !== before) slideCalendar(n);
+}
 
 function onCalendarClick(e) {
   const el = e.target.closest('[data-cal-mode],#cal-prev,#cal-next,#cal-today,[data-open-month],[data-day],[data-clear-day],li[data-id],[data-add-day]');
@@ -773,7 +790,10 @@ function onCalendarClick(e) {
   if (el.dataset.calMode) return goCal({ mode: el.dataset.calMode });
   if (el.id === 'cal-prev') return stepCalendar(-1);
   if (el.id === 'cal-next') return stepCalendar(1);
-  if (el.id === 'cal-today') return goCal({ month: thisMonth() });
+  if (el.id === 'cal-today') {
+    goCal({ month: thisMonth() });
+    return slideCalendar(1);
+  }
   if (el.dataset.openMonth) return goCal({ mode: 'month', month: el.dataset.openMonth });
   if (el.dataset.day) return selectDay(el.dataset.day);
   if (el.hasAttribute('data-clear-day')) return goCal();

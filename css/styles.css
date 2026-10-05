@@ -816,3 +816,31 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   .chart, .prop-fill, .legend .key { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .warning { border: 1px solid #c77; background: #fff; color: #111; }
 }
+
+/* ---------- 動態：短而安靜（發作時常對光與動態敏感），系統設定「減少動態效果」時完全不動 ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* 主按鈕：按下去感覺得到 */
+  .btn.huge { transition: transform .12s ease, box-shadow .12s ease; }
+  .btn.huge:active { box-shadow: 0 4px 12px var(--bear-shadow); }
+
+  /* 對話框：手機全螢幕的從下方滑入；置中的（確認框、桌機）淡入微放大。關閉時反向（瀏覽器支援才有） */
+  dialog {
+    --enter: translateY(32px);
+    opacity: 0; transform: var(--enter);
+    transition: opacity .2s ease, transform .24s cubic-bezier(.2, .8, .2, 1), overlay .24s allow-discrete, display .24s allow-discrete;
+  }
+  dialog.confirm-dialog { --enter: scale(.97); }
+  dialog[open] { opacity: 1; transform: none; }
+  @starting-style { dialog[open] { opacity: 0; transform: var(--enter); } }
+  dialog::backdrop { opacity: 0; transition: opacity .24s ease, overlay .24s allow-discrete, display .24s allow-discrete; }
+  dialog[open]::backdrop { opacity: 1; }
+  @starting-style { dialog[open]::backdrop { opacity: 0; } }
+
+  /* 提示訊息：輕輕往上浮出，比較不會錯過「復原」 */
+  .toast { transition: opacity .2s ease, transform .2s ease, display .2s allow-discrete; }
+  .toast[hidden] { opacity: 0; transform: translateY(8px); }
+  @starting-style { .toast:not([hidden]) { opacity: 0; transform: translateY(8px); } }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 600px) {
+  dialog { --enter: scale(.97); }
+}
