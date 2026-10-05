@@ -53,6 +53,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/styles.css">
   <script id="gis" src="https://accounts.google.com/gsi/client" async></script>
   <script type="module" src="js/app.js"></script>
@@ -169,6 +170,14 @@
 
       <!-- 偏好 -->
       <h3 class="settings-group" data-i18n="settings.groupPrefs"></h3>
+      <div class="card">
+        <h2 class="card-title"><span data-icon="theme"></span><span data-i18n="settings.theme"></span></h2>
+        <div class="seg theme-seg" role="radiogroup" data-i18n-attr="aria-label:settings.theme">
+          <button type="button" role="radio" data-theme-choice="system" data-i18n="settings.themeSystem"></button>
+          <button type="button" role="radio" data-theme-choice="light" data-i18n="settings.themeLight"></button>
+          <button type="button" role="radio" data-theme-choice="dark" data-i18n="settings.themeDark"></button>
+        </div>
+      </div>
       <div class="card">
         <h2 class="card-title"><span data-icon="weather"></span><span data-i18n="weather.title"></span></h2>
         <p class="small" data-i18n="weather.why"></p>

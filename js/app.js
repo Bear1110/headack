@@ -932,6 +932,8 @@ function renderWeatherPrompt() {
 function renderSettings() {
   $('#btn-demo').textContent = t(store.isDemo() ? 'demo.exit' : 'demo.enter');
   $('#weather-toggle').checked = weather.getPref() === 'on';
+  const theme = window.headackTheme?.get() ?? 'system';
+  document.querySelectorAll('[data-theme-choice]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === theme)));
   const email = auth.getEmail();
   $('#account-email').textContent = email || t('auth.localOnly');
   $('#btn-signout').hidden = !email;
@@ -1058,6 +1060,12 @@ function bindEvents() {
   $('#btn-weather-on').addEventListener('click', enableWeather);
   $('#btn-weather-off').addEventListener('click', disableWeather);
   $('#weather-toggle').addEventListener('change', (e) => (e.target.checked ? enableWeather() : disableWeather()));
+  $('.theme-seg').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-theme-choice]');
+    if (!btn) return;
+    window.headackTheme?.set(btn.dataset.themeChoice);
+    renderSettings();
+  });
   $('#aura-options').addEventListener('change', updateAuraWarning);
 
   $('#btn-clear').addEventListener('click', openClearDialog);

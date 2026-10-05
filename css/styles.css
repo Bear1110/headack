@@ -28,31 +28,31 @@
   --tabbar-h: 60px;
   --topbar-h: 56px;
   --tap: 44px; /* 最小觸控尺寸 */
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14161c;
-    --surface: #1d2029;
-    --text: #e8eaf0;
-    --muted: #9aa0ae;
-    --border: #2d313d;
-    --primary: #748ffc;
-    --primary-text: #10131a;
-    --bear-bg: #ead8bf; /* 深色模式稍微調暗，避免一大塊太刺眼 */
-    --bear-border: #d9c09f;
-    --bear-shadow: rgb(0 0 0 / .35);
-    --danger: #f06595;
-    --warning-bg: #3a2a12;
-    --warning-text: #ffc078;
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --aura: #9085e9;
-    --grid: #2a2e39;
-    --good: #3fbf3f;
-    --bad: #f06a6a;
-  }
+/* 深色：js/theme.js 依設定（或跟隨系統）在 <html> 加上 data-theme="dark" */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14161c;
+  --surface: #1d2029;
+  --text: #e8eaf0;
+  --muted: #9aa0ae;
+  --border: #2d313d;
+  --primary: #748ffc;
+  --primary-text: #10131a;
+  --bear-bg: #ead8bf; /* 深色模式稍微調暗，避免一大塊太刺眼 */
+  --bear-border: #d9c09f;
+  --bear-shadow: rgb(0 0 0 / .35);
+  --danger: #f06595;
+  --warning-bg: #3a2a12;
+  --warning-text: #ffc078;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --aura: #9085e9;
+  --grid: #2a2e39;
+  --good: #3fbf3f;
+  --bad: #f06a6a;
 }
 
 * { box-sizing: border-box; }
