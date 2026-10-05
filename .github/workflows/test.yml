@@ -1,0 +1,19 @@
+# 每次 push 或 PR 自動跑：統計邏輯的測試、多國語系檢查。公開 repo 的 Actions 免費。
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Unit tests
+        run: node --test
+      - name: Locale check
+        run: node tools/check-locales.mjs

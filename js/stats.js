@@ -9,7 +9,8 @@ const dayOf = (iso) => (iso ? iso.slice(0, 10) : null);
 export function daysCovered(r) {
   const start = dayOf(r.start);
   if (!start) return [];
-  const end = dayOf(r.end) || start;
+  // 結束早於開始（匯入或手動改表可能出現）：當作沒有結束時間，至少開始那天要算
+  const end = r.end && r.end >= r.start ? dayOf(r.end) : start;
   const days = [];
   const d = new Date(`${start}T00:00`);
   const last = new Date(`${end}T00:00`);
