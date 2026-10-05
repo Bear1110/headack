@@ -9,6 +9,11 @@
   --border: #e2e5ee;
   --primary: #3b5bdb;
   --primary-text: #ffffff;
+  /* 熊熊 logo 的配色：首頁「頭痛開始了」按鈕用 */
+  --bear-bg: #fbeedd;
+  --bear-border: #ecd3b4;
+  --bear-text: #4b2b1e;
+  --bear-shadow: rgb(143 85 54 / .22);
   --danger: #d6336c;
   --warning-bg: #fff4e6;
   --warning-text: #8a4b00;
@@ -35,6 +40,9 @@
     --border: #2d313d;
     --primary: #748ffc;
     --primary-text: #10131a;
+    --bear-bg: #ead8bf; /* 深色模式稍微調暗，避免一大塊太刺眼 */
+    --bear-border: #d9c09f;
+    --bear-shadow: rgb(0 0 0 / .35);
     --danger: #f06595;
     --warning-bg: #3a2a12;
     --warning-text: #ffc078;
@@ -176,10 +184,12 @@ body[data-view="settings"] #view-settings { display: flex; }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem;
   width: 100%; min-height: max(180px, 32vh); padding: 1.5rem 1rem;
   font-size: 1.6rem; border-radius: 24px;
-  box-shadow: 0 8px 24px rgb(59 91 219 / .25);
+  background: var(--bear-bg); border-color: var(--bear-border); color: var(--bear-text);
+  box-shadow: 0 8px 24px var(--bear-shadow);
 }
 .btn.huge small { font-size: .9rem; font-weight: 400; opacity: .85; }
-.huge-icon .icon { width: 44px; height: 44px; stroke-width: 2.2; }
+/* 熊熊本身就是「頭痛了」的意思，去背後直接站在按鈕上 */
+.huge-logo { width: 96px; height: 83px; }
 .btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
 
 /* 有預兆的紀錄：紫色小膠囊（鋸齒線＝典型的視覺預兆） */
@@ -253,7 +263,21 @@ body[data-view="settings"] #view-settings { display: flex; }
 .i6 { --lvl: 6 } .i7 { --lvl: 7 } .i8 { --lvl: 8 } .i9 { --lvl: 9 } .i10 { --lvl: 10 }
 
 /* 日曆 */
-.cal-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
+/* 手機：第一列「月／年」+「今天」，第二列換頁；「今天」不顯示時仍保留位置，版面不會跳動 */
+.cal-toolbar {
+  display: grid; grid-template-columns: auto 1fr; grid-template-areas: "mode today" "nav nav";
+  gap: .75rem; align-items: center;
+}
+.cal-mode { grid-area: mode; }
+#cal-today { grid-area: today; justify-self: end; }
+#cal-today[hidden] { display: inline-block; visibility: hidden; }
+.cal-nav { grid-area: nav; }
+.cal-nav .cal-label { flex: 1; }
+@media (min-width: 600px) {
+  .cal-toolbar { grid-template-columns: auto 1fr auto; grid-template-areas: "mode nav today"; }
+  .cal-nav { justify-self: end; }
+  .cal-nav .cal-label { flex: none; }
+}
 .cal-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .8rem; color: var(--muted); }
 .cal-legend > span { display: inline-flex; align-items: center; gap: .25rem; }
 .cal-legend .sw { width: .85rem; height: .85rem; border-radius: 3px; display: inline-block; background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%); }
@@ -265,7 +289,6 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-label { min-width: 9.5rem; text-align: center; font-weight: 700; }
 .cal-label input[type="month"] { width: 100%; min-height: var(--tap); text-align: center; font-weight: 700; cursor: pointer; }
 .cal-label-text { font-size: 1.15rem; }
-.cal-nav .btn[hidden] { display: none; }
 .pager-btn {
   appearance: none; width: var(--tap); height: var(--tap); border-radius: 50%; cursor: pointer; flex: none;
   border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.4rem; line-height: 1;

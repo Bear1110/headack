@@ -96,7 +96,7 @@
     <!-- 記錄：手機的首頁；桌機時與列表並排 -->
     <section id="view-log" class="view">
       <button id="btn-quick-start" class="btn huge">
-        <span class="huge-icon" data-icon="bolt"></span>
+        <img class="huge-logo" src="icons/bear.svg" alt="" width="96" height="83">
         <span data-i18n="log.start">Headache started</span>
         <small data-i18n="log.startHint"></small>
       </button>
@@ -135,11 +135,11 @@
           <button type="button" role="radio" data-cal-mode="month" data-i18n="cal.modeMonth"></button>
           <button type="button" role="radio" data-cal-mode="year" data-i18n="cal.modeYear"></button>
         </div>
+          <button type="button" id="cal-today" class="btn ghost small" data-i18n="cal.today"></button>
         <div class="cal-nav">
           <button type="button" id="cal-prev" class="pager-btn" data-i18n-attr="aria-label:cal.prev,title:cal.prev">‹</button>
           <div id="cal-label" class="cal-label"></div>
           <button type="button" id="cal-next" class="pager-btn" data-i18n-attr="aria-label:cal.next,title:cal.next">›</button>
-          <button type="button" id="cal-today" class="btn ghost small" data-i18n="cal.today"></button>
         </div>
       </div>
       <div class="cal-legend" aria-hidden="true">
