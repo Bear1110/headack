@@ -163,5 +163,11 @@ export function rowToRecord(row, headers) {
   for (const f of MULTI_FIELDS) r[f] = r[f] ? String(r[f]).split(';').filter(Boolean) : [];
   r.meds = parseMeds(r.meds);
   for (const f of NUMERIC_FIELDS) r[f] = r[f] === '' || r[f] == null ? null : Number(r[f]);
+  return normalizeRecord(r);
+}
+
+// 結束早於開始（匯入或手動改表可能出現）：當作沒有結束時間，下游就不必各自防守
+export function normalizeRecord(r) {
+  if (r.end && r.start && r.end < r.start) return { ...r, end: '' };
   return r;
 }

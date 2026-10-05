@@ -188,8 +188,6 @@ body[data-view="settings"] #view-settings { display: flex; }
   box-shadow: 0 8px 24px var(--bear-shadow);
 }
 .btn.huge small { font-size: .9rem; font-weight: 400; opacity: .85; }
-/* 熊熊本身就是「頭痛了」的意思，去背後直接站在按鈕上 */
-.huge-logo { width: 120px; height: auto; }
 .btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
 
 /* 有預兆的紀錄：紫色小膠囊（鋸齒線＝典型的視覺預兆） */
@@ -229,11 +227,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 .ongoing .label { margin: .75rem 0 .4rem; font-size: .9rem; color: var(--muted); }
 /* 開始很久還沒結束：邊框改警示色，加一行提醒 */
 .ongoing.stale { border-color: var(--warning-text); }
-.ongoing-note {
-  display: flex; align-items: flex-start; gap: .4rem; margin: .6rem 0 0;
-  padding: .5rem .65rem; border-radius: 10px; font-size: .9rem; line-height: 1.4;
-  background: var(--warning-bg); color: var(--warning-text);
-}
+.ongoing-note { display: flex; align-items: flex-start; gap: .4rem; margin-top: .6rem; padding: .5rem .65rem; border-radius: 10px; line-height: 1.4; }
 .ongoing-note .icon { width: 18px; height: 18px; flex: none; margin-top: .1em; }
 .intensity-pick { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }
 .intensity-pick button {
@@ -276,10 +270,8 @@ body[data-view="settings"] #view-settings { display: flex; }
   display: grid; grid-template-columns: auto 1fr; grid-template-areas: "mode today" "nav nav";
   gap: .75rem; align-items: center;
 }
-.cal-mode { grid-area: mode; }
 #cal-today { grid-area: today; justify-self: end; }
-#cal-today[hidden] { display: inline-block; visibility: hidden; }
-.cal-nav { grid-area: nav; }
+#cal-today:disabled { visibility: hidden; } /* 已在本月：隱形但保留位置，版面不跳 */
 .cal-nav .cal-label { flex: 1; }
 @media (min-width: 600px) {
   .cal-toolbar { grid-template-columns: auto 1fr auto; grid-template-areas: "mode nav today"; }
@@ -291,9 +283,9 @@ body[data-view="settings"] #view-settings { display: flex; }
 .cal-legend .sw { width: .85rem; height: .85rem; border-radius: 3px; display: inline-block; background: hsl(calc(120 - var(--lvl, 5) * 12) 65% 45%); }
 .cal-legend .sw.no-intensity { background: var(--muted); }
 .cal-legend .dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text); display: inline-block; }
-.cal-mode.seg { flex: 0 0 auto; }
+.cal-mode.seg { grid-area: mode; flex: 0 0 auto; }
 .cal-mode.seg button { min-width: 3.4rem; padding-inline: .9rem; }
-.cal-nav { display: flex; align-items: center; gap: .4rem; }
+.cal-nav { grid-area: nav; display: flex; align-items: center; gap: .4rem; }
 .cal-label { min-width: 9.5rem; text-align: center; font-weight: 700; }
 .cal-label input[type="month"] { width: 100%; min-height: var(--tap); text-align: center; font-weight: 700; cursor: pointer; }
 .cal-label-text { font-size: 1.15rem; }
@@ -528,6 +520,7 @@ dialog {
   width: 100%; max-width: 100%; height: 100%; max-height: 100%;
   margin: 0; padding: 0; border: 0; border-radius: 0; overflow: hidden; /* 只讓 .dialog-body 捲動 */
   background: var(--surface); color: var(--text);
+  --enter: translateY(32px); /* 開啟動畫的起點（見檔尾的動態區塊）：全螢幕從下方滑入、置中的微放大 */
 }
 dialog::backdrop { background: rgb(0 0 0 / .45); }
 dialog form { display: flex; flex-direction: column; height: 100%; }
@@ -629,7 +622,7 @@ dialog form { display: flex; flex-direction: column; height: 100%; }
 /* 確認對話框內容少，手機上也不必全螢幕 */
 dialog.confirm-dialog {
   width: min(480px, calc(100vw - 32px)); height: fit-content; max-height: calc(100dvh - 32px);
-  margin: auto; border-radius: var(--radius);
+  margin: auto; border-radius: var(--radius); --enter: scale(.97);
 }
 dialog.confirm-dialog form { height: auto; }
 dialog.confirm-dialog .dialog-body { padding-top: 1.25rem; }
@@ -767,7 +760,7 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 
   dialog {
     width: min(640px, calc(100vw - 48px)); height: auto; max-height: calc(100dvh - 48px);
-    margin: auto; border-radius: var(--radius);
+    margin: auto; border-radius: var(--radius); --enter: scale(.97);
   }
   dialog form { height: auto; max-height: calc(100dvh - 48px); }
   .dialog-body { padding: 1.25rem 1.5rem; }
@@ -833,11 +826,9 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 
   /* 對話框：手機全螢幕的從下方滑入；置中的（確認框、桌機）淡入微放大。關閉時反向（瀏覽器支援才有） */
   dialog {
-    --enter: translateY(32px);
     opacity: 0; transform: var(--enter);
     transition: opacity .2s ease, transform .24s cubic-bezier(.2, .8, .2, 1), overlay .24s allow-discrete, display .24s allow-discrete;
   }
-  dialog.confirm-dialog { --enter: scale(.97); }
   dialog[open] { opacity: 1; transform: none; }
   @starting-style { dialog[open] { opacity: 0; transform: var(--enter); } }
   dialog::backdrop { opacity: 0; transition: opacity .24s ease, overlay .24s allow-discrete, display .24s allow-discrete; }
@@ -848,7 +839,4 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
   .toast { transition: opacity .2s ease, transform .2s ease, display .2s allow-discrete; }
   .toast[hidden] { opacity: 0; transform: translateY(8px); }
   @starting-style { .toast:not([hidden]) { opacity: 0; transform: translateY(8px); } }
-}
-@media (prefers-reduced-motion: no-preference) and (min-width: 600px) {
-  dialog { --enter: scale(.97); }
 }

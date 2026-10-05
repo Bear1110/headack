@@ -14,6 +14,9 @@ import * as weather from './weather.js';
 
 const $ = (sel) => document.querySelector(sel);
 const pad = (n) => String(n).padStart(2, '0');
+const isRtl = () => document.documentElement.dir === 'rtl';
+// 一組 role=radio 按鈕：依 data-* 的值同步 aria-checked
+const syncRadios = (selector, key, value) => document.querySelectorAll(selector).forEach((b) => b.setAttribute('aria-checked', String(b.dataset[key] === value)));
 
 let sheet = null;
 let syncState = 'idle'; // idle | syncing | error | offline
@@ -281,7 +284,8 @@ function frequentMeds() {
 }
 
 // preset：新增時預先帶入的欄位（例如從日曆補登某一天）
-function openForm(record, preset = {}) {
+// focus：開啟後聚焦的欄位（例如從「選擇結束時間」進來聚焦 end）
+function openForm(record, preset = {}, { focus = '' } = {}) {
   editing = record;
   const r = record ?? { ...emptyRecord(), intensity: 5, ...preset };
   const form = $('#record-form');
@@ -306,6 +310,7 @@ function openForm(record, preset = {}) {
   $('#btn-delete').hidden = !record;
   $('#form-error').hidden = true;
   $('#record-dialog').showModal();
+  if (focus) form.elements[focus]?.focus();
 }
 
 function submitForm(e) {
@@ -548,7 +553,7 @@ function renderOngoing() {
     return `
     <div class="card ongoing${stale ? ' stale' : ''}" data-id="${escapeHtml(r.id)}">
       <div><strong>${t('log.ongoing')}</strong> · ${escapeHtml(t('log.startedAt', { t: formatDateTime(r.start) }))}</div>
-      ${stale ? `<p class="ongoing-note">${icon('alert')}${escapeHtml(t('log.stale', { h: hours }))}</p>` : ''}
+      ${stale ? `<p class="warning small ongoing-note">${icon('alert')}${escapeHtml(t('log.stale', { h: hours }))}</p>` : ''}
       <p class="label">${escapeHtml(t('log.peak'))}</p>
       <div class="intensity-pick" role="group" aria-label="${escapeHtml(t('form.intensity'))}">
         ${levels.map((n) => `<button type="button" class="i${n}" data-action="intensity" data-value="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('')}
@@ -718,13 +723,13 @@ function renderCalLabel() {
 function renderCalendarView() {
   const year = calMode === 'year';
   $('#view-calendar').classList.toggle('year', year);
-  document.querySelectorAll('.cal-mode [data-cal-mode]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.calMode === calMode)));
+  syncRadios('.cal-mode [data-cal-mode]', 'calMode', calMode);
   renderCalLabel();
   // 已在最新的月份／年份：不能再往後，也不需要「今天」
   const cur = year ? calMonth.slice(0, 4) : calMonth;
   const now = year ? thisMonth().slice(0, 4) : thisMonth();
   $('#cal-next').disabled = cur >= now;
-  $('#cal-today').hidden = cur === now;
+  $('#cal-today').disabled = cur === now;
 
   const months = year ? Array.from({ length: 12 }, (_, i) => `${cur}-${pad(i + 1)}`) : [calMonth];
   $('#calendar-months').innerHTML = calendarHtml({ records: store.getRecords(), months, lang: getLang(), t, selected: calSelected, linkMonths: year });
@@ -779,7 +784,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 // 換月份／年份時，新內容從移動的方向滑入一小段，看得出是往前還是往後（dir：-1 往前、1 往後）
 function slideCalendar(dir) {
   if (reduceMotion.matches) return;
-  const x = dir * (document.documentElement.dir === 'rtl' ? -1 : 1) * 24;
+  const x = dir * (isRtl() ? -1 : 1) * 24;
   $('#calendar-months').animate(
     [{ transform: `translateX(${x}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
     { duration: 200, easing: 'cubic-bezier(.2, .8, .2, 1)' },
@@ -823,8 +828,7 @@ function bindCalendarSwipe() {
     const dy = e.changedTouches[0].clientY - y0;
     x0 = null;
     if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-    const rtl = document.documentElement.dir === 'rtl';
-    stepCalendar((dx > 0) !== rtl ? -1 : 1);
+    stepCalendar((dx > 0) !== isRtl() ? -1 : 1);
   }, { passive: true });
 }
 
@@ -958,11 +962,15 @@ function renderWeatherPrompt() {
   $('#weather-prompt').hidden = store.isDemo() || weather.getPref() != null || !store.getRecords().length;
 }
 
+// js/theme.js 在 <head> 同步載入，headackTheme 一定存在
+function renderThemeChoice() {
+  syncRadios('[data-theme-choice]', 'themeChoice', headackTheme.get());
+}
+
 function renderSettings() {
   $('#btn-demo').textContent = t(store.isDemo() ? 'demo.exit' : 'demo.enter');
   $('#weather-toggle').checked = weather.getPref() === 'on';
-  const theme = window.headackTheme?.get() ?? 'system';
-  document.querySelectorAll('[data-theme-choice]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === theme)));
+  renderThemeChoice();
   const email = auth.getEmail();
   $('#account-email').textContent = email || t('auth.localOnly');
   $('#btn-signout').hidden = !email;
@@ -1025,10 +1033,7 @@ function bindEvents() {
     const id = btn.closest('[data-id]').dataset.id;
     if (btn.dataset.action === 'end') endRecord(id);
     else if (btn.dataset.action === 'intensity') setIntensity(id, Number(btn.dataset.value));
-    else {
-      openForm(store.getRecords().find((r) => r.id === id));
-      if (btn.dataset.action === 'end-at') $('#record-form').elements.end.focus();
-    }
+    else openForm(store.getRecords().find((r) => r.id === id), {}, { focus: btn.dataset.action === 'end-at' ? 'end' : '' });
   });
 
   $('#list-filters').addEventListener('click', (e) => {
@@ -1095,8 +1100,8 @@ function bindEvents() {
   $('.theme-seg').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-theme-choice]');
     if (!btn) return;
-    window.headackTheme?.set(btn.dataset.themeChoice);
-    renderSettings();
+    headackTheme.set(btn.dataset.themeChoice);
+    renderThemeChoice();
   });
   $('#aura-options').addEventListener('change', updateAuraWarning);
 

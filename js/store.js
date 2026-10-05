@@ -1,4 +1,4 @@
-import { normalizeMeds } from './schema.js';
+import { normalizeMeds, normalizeRecord } from './schema.js';
 
 // 本機優先（local-first）：所有寫入先進 localStorage 的待送佇列並立即反映在畫面上，
 // 有權杖、有網路時再同步到試算表。頭痛發作時存檔不必等登入或網路。
@@ -42,7 +42,7 @@ function write(key, value) {
 }
 
 // 舊版快取的欄位格式轉換
-const migrate = (r) => ({ ...r, meds: normalizeMeds(r.meds), locations: r.locations ?? [], pain_quality: r.pain_quality ?? [], aura: r.aura ?? [], symptoms: r.symptoms ?? [] });
+const migrate = (r) => normalizeRecord({ ...r, meds: normalizeMeds(r.meds), locations: r.locations ?? [], pain_quality: r.pain_quality ?? [], aura: r.aura ?? [], symptoms: r.symptoms ?? [] });
 
 let records = read(CACHE_KEY, []).map(migrate);
 let outbox = read(OUTBOX_KEY, []).map((op) => (op.record ? { ...op, record: migrate(op.record) } : op)); // [{ type: 'upsert', record, isNew } | { type: 'delete', id }]

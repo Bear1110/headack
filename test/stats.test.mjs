@@ -4,10 +4,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { daysCovered, localDate, monthStats } from '../js/stats.js';
-import { MED_BY_CODE, MOH_THRESHOLDS } from '../js/schema.js';
+import { MEDS, MOH_THRESHOLDS, normalizeRecord } from '../js/schema.js';
 
 // 依類別挑一個真實的藥品代碼，Schema 改了測試也不用跟著改
-const codeOf = (category) => Object.values(MED_BY_CODE).find((m) => m.category === category).code;
+const codeOf = (category) => MEDS.find((m) => m.category === category).code;
 const SIMPLE = codeOf('simple');
 const TRIPTAN = codeOf('triptan');
 const COMBO = codeOf('combination');
@@ -41,8 +41,11 @@ test('沒有開始時間：空陣列', () => {
   assert.deepEqual(daysCovered({ id: 'x', start: '' }), []);
 });
 
-test('結束早於開始（資料有誤）：只算開始那天', () => {
-  assert.deepEqual(daysCovered(rec('2026-03-10T08:00', { end: '2026-03-09T08:00' })), ['2026-03-10']);
+test('結束早於開始（資料有誤）：讀入時當作沒有結束，只算開始那天', () => {
+  const r = normalizeRecord(rec('2026-03-10T08:00', { end: '2026-03-09T08:00' }));
+  assert.equal(r.end, '');
+  assert.deepEqual(daysCovered(r), ['2026-03-10']);
+  assert.equal(normalizeRecord(rec('2026-03-10T08:00', { end: '2026-03-10T09:00' })).end, '2026-03-10T09:00');
 });
 
 test('超長區間最多 31 天，避免壞資料卡死', () => {
