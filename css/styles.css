@@ -189,7 +189,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 }
 .btn.huge small { font-size: .9rem; font-weight: 400; opacity: .85; }
 /* 熊熊本身就是「頭痛了」的意思，去背後直接站在按鈕上 */
-.huge-logo { width: 96px; height: 83px; }
+.huge-logo { width: 120px; height: auto; }
 .btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
 
 /* 有預兆的紀錄：紫色小膠囊（鋸齒線＝典型的視覺預兆） */
