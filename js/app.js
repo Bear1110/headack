@@ -541,22 +541,31 @@ function renderSync() {
 function renderOngoing() {
   const ongoing = store.getRecords().filter(isOngoing).sort((a, b) => b.start.localeCompare(a.start));
   const levels = Array.from({ length: 10 }, (_, i) => i + 1);
-  $('#ongoing').innerHTML = ongoing.map((r) => `
-    <div class="card ongoing" data-id="${escapeHtml(r.id)}">
+  $('#ongoing').innerHTML = ongoing.map((r) => {
+    // 開始很久了還沒按結束：多半是睡著或忘了，問一句並提供補填結束時間
+    const hours = Math.floor((Date.now() - new Date(r.start)) / 3600000);
+    const stale = hours >= STALE_HOURS;
+    return `
+    <div class="card ongoing${stale ? ' stale' : ''}" data-id="${escapeHtml(r.id)}">
       <div><strong>${t('log.ongoing')}</strong> · ${escapeHtml(t('log.startedAt', { t: formatDateTime(r.start) }))}</div>
+      ${stale ? `<p class="ongoing-note">${icon('alert')}${escapeHtml(t('log.stale', { h: hours }))}</p>` : ''}
       <p class="label">${escapeHtml(t('log.howBad'))}</p>
       <div class="intensity-pick" role="group" aria-label="${escapeHtml(t('form.intensity'))}">
         ${levels.map((n) => `<button type="button" class="i${n}" data-action="intensity" data-value="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('')}
       </div>
       <div class="actions">
         <button class="btn" data-action="end">${t('log.end')}</button>
-        <button class="btn ghost" data-action="details">${t('log.details')}</button>
+        ${stale
+    ? `<button class="btn ghost" data-action="end-at">${t('log.endAt')}</button>`
+    : `<button class="btn ghost" data-action="details">${t('log.details')}</button>`}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // 沒有結束時間、且在 72 小時內開始，才算「進行中」（匯入的舊紀錄常沒有結束時間）
 const ONGOING_WINDOW_MS = 72 * 3600 * 1000;
+const STALE_HOURS = 12; // 超過這麼久還在「進行中」就提醒確認
 function isOngoing(r) {
   return !!r.start && !r.end && Date.now() - new Date(r.start) < ONGOING_WINDOW_MS;
 }
@@ -1016,7 +1025,10 @@ function bindEvents() {
     const id = btn.closest('[data-id]').dataset.id;
     if (btn.dataset.action === 'end') endRecord(id);
     else if (btn.dataset.action === 'intensity') setIntensity(id, Number(btn.dataset.value));
-    else openForm(store.getRecords().find((r) => r.id === id));
+    else {
+      openForm(store.getRecords().find((r) => r.id === id));
+      if (btn.dataset.action === 'end-at') $('#record-form').elements.end.focus();
+    }
   });
 
   $('#list-filters').addEventListener('click', (e) => {

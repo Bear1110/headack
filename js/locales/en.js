@@ -46,6 +46,8 @@ export default {
   'log.end': 'It ended',
   'log.details': 'Add details',
   'log.startedAt': 'Started {t}',
+  'log.stale': 'Started {h} hours ago. Still hurting? If it has passed, please add when it ended.',
+  'log.endAt': 'Pick end time',
   'log.saved': 'Saved',
   'log.howBad': 'How bad is it right now?',
   'qf.step': '{i} of {n}',

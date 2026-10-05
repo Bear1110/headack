@@ -227,6 +227,14 @@ body[data-view="settings"] #view-settings { display: flex; }
 .ongoing-list:empty { display: none; }
 .ongoing { border-color: var(--primary); }
 .ongoing .label { margin: .75rem 0 .4rem; font-size: .9rem; color: var(--muted); }
+/* 開始很久還沒結束：邊框改警示色，加一行提醒 */
+.ongoing.stale { border-color: var(--warning-text); }
+.ongoing-note {
+  display: flex; align-items: flex-start; gap: .4rem; margin: .6rem 0 0;
+  padding: .5rem .65rem; border-radius: 10px; font-size: .9rem; line-height: 1.4;
+  background: var(--warning-bg); color: var(--warning-text);
+}
+.ongoing-note .icon { width: 18px; height: 18px; flex: none; margin-top: .1em; }
 .intensity-pick { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }
 .intensity-pick button {
   appearance: none; font: inherit; font-weight: 700; cursor: pointer;

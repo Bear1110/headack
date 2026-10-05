@@ -46,6 +46,8 @@ export default {
   'log.end': '結束了',
   'log.details': '補充細節',
   'log.startedAt': '開始於 {t}',
+  'log.stale': '開始已經 {h} 小時了，還在痛嗎？如果已經好了，請補上結束時間。',
+  'log.endAt': '選擇結束時間',
   'log.saved': '已記錄',
   'log.howBad': '現在有多痛？',
   'qf.step': '{i} / {n}',

@@ -46,6 +46,8 @@ export default {
   'log.end': '治まった',
   'log.details': '詳細を追加',
   'log.startedAt': '{t} に開始',
+  'log.stale': '開始から {h} 時間経っています。まだ痛みますか？治まっていたら終了時刻を入力してください。',
+  'log.endAt': '終了時刻を選ぶ',
   'log.saved': '記録しました',
   'log.howBad': '今の痛みはどのくらいですか？',
   'qf.step': '{i} / {n}',
