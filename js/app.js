@@ -549,7 +549,7 @@ function renderOngoing() {
     <div class="card ongoing${stale ? ' stale' : ''}" data-id="${escapeHtml(r.id)}">
       <div><strong>${t('log.ongoing')}</strong> · ${escapeHtml(t('log.startedAt', { t: formatDateTime(r.start) }))}</div>
       ${stale ? `<p class="ongoing-note">${icon('alert')}${escapeHtml(t('log.stale', { h: hours }))}</p>` : ''}
-      <p class="label">${escapeHtml(t('log.howBad'))}</p>
+      <p class="label">${escapeHtml(t('log.peak'))}</p>
       <div class="intensity-pick" role="group" aria-label="${escapeHtml(t('form.intensity'))}">
         ${levels.map((n) => `<button type="button" class="i${n}" data-action="intensity" data-value="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('')}
       </div>

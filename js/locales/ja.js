@@ -50,6 +50,7 @@ export default {
   'log.endAt': '終了時刻を選ぶ',
   'log.saved': '記録しました',
   'log.howBad': '今の痛みはどのくらいですか？',
+  'log.peak': '今回いちばん痛かったのは何点？',
   'qf.step': '{i} / {n}',
   'qf.low': '軽い',
   'qf.high': '最も強い',

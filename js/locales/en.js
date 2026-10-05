@@ -50,6 +50,7 @@ export default {
   'log.endAt': 'Pick end time',
   'log.saved': 'Saved',
   'log.howBad': 'How bad is it right now?',
+  'log.peak': 'Worst it has been this time?',
   'qf.step': '{i} of {n}',
   'qf.low': 'Mild',
   'qf.high': 'Worst',

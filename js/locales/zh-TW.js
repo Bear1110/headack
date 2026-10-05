@@ -50,6 +50,7 @@ export default {
   'log.endAt': '選擇結束時間',
   'log.saved': '已記錄',
   'log.howBad': '現在有多痛？',
+  'log.peak': '這次最痛到幾分？',
   'qf.step': '{i} / {n}',
   'qf.low': '輕微',
   'qf.high': '最痛',
