@@ -746,7 +746,7 @@ function renderDayDetail() {
   const items = (calSelected
     ? all.filter((r) => daysCovered(r).includes(calSelected))
     : all.filter((r) => r.start?.startsWith(calMonth)))
-    .sort((a, b) => a.start.localeCompare(b.start));
+    .sort((a, b) => b.start.localeCompare(a.start));
   const title = calSelected
     ? new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { month: 'long', day: 'numeric', weekday: 'short' })
     : t('cal.monthEntries', { n: items.length });
