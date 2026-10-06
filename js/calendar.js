@@ -2,6 +2,7 @@
 // 只產生 HTML，互動由 app.js 處理。
 
 import { daysCovered, localDate, monthStats } from './stats.js';
+import { dateLabel } from './i18n.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -34,8 +35,8 @@ function firstDayOfWeek(lang) {
 }
 
 // 每天的無障礙說明文字
-function dayLabel(t, dayFmt, date, e) {
-  const d = dayFmt.format(date);
+function dayLabel(t, date, e) {
+  const d = dateLabel(date, { long: true });
   if (!e) return d;
   const parts = [t('cal.headache')];
   if (e.max != null) parts.push(`${e.max}/10`);
@@ -50,7 +51,6 @@ export function renderCalendar({ records, months, lang, t, selected, linkMonths 
   const firstDay = firstDayOfWeek(lang);
   const weekdayFmt = new Intl.DateTimeFormat(lang, { weekday: 'narrow' });
   const monthFmt = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' });
-  const dayFmt = new Intl.DateTimeFormat(lang, { month: 'long', day: 'numeric', weekday: 'short' });
 
   // 週幾的標題（以 2023-01-01 週日為基準）
   const weekdays = Array.from({ length: 7 }, (_, i) => weekdayFmt.format(new Date(2023, 0, 1 + ((firstDay + i) % 7))));
@@ -75,7 +75,7 @@ export function renderCalendar({ records, months, lang, t, selected, linkMonths 
       const future = key > today;
       cells.push(`
         <button type="button" class="${classes.join(' ')}" data-day="${key}" ${future ? 'disabled' : ''}
-          aria-label="${esc(dayLabel(t, dayFmt, date, e))}" aria-pressed="${key === selected}">
+          aria-label="${esc(dayLabel(t, date, e))}" aria-pressed="${key === selected}">
           <span class="cal-num">${d}</span>${e?.meds ? '<span class="cal-med" aria-hidden="true"></span>' : ''}
         </button>`);
     }

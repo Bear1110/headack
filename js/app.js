@@ -37,8 +37,7 @@ function escapeHtml(s) {
 function formatDateTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  // 不是今年的紀錄加上年份（匯入的舊資料可能跨好幾年）
-  return `${dateLabel(d, { year: d.getFullYear() !== new Date().getFullYear() })} ${clockLabel(d)}`;
+  return `${dateLabel(d)} ${clockLabel(d)}`;
 }
 
 function formatDuration(start, end) {
@@ -641,8 +640,7 @@ function renderList() {
 const PRESSURE_DROP = -5;
 function recordItemHtml(r, { showType = false } = {}) {
   const d = new Date(r.start);
-  const sameYear = d.getFullYear() === new Date().getFullYear();
-  const date = dateLabel(d, { year: !sameYear });
+  const date = dateLabel(d);
   const time = r.start.slice(11, 16) !== '00:00' ? clockLabel(d) : '';
   const when = r.end ? formatDuration(r.start, r.end) : '';
   const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;

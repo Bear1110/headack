@@ -62,6 +62,7 @@ export async function setLang(next, { remember = true } = {}) {
     lang = 'en';
   }
   pluralRules = new Intl.PluralRules(lang);
+  formatters = {};
   if (remember) {
     try { localStorage.setItem(LANG_KEY, lang); } catch { /* ignore */ }
   }
@@ -88,16 +89,22 @@ export function formatList(items) {
 
 const isZh = () => lang.startsWith('zh');
 
+// Intl 格式器建構很貴、列表每一列都會用到：依語言快取，切換語言時清掉
+let formatters = {};
+const formatter = (key, options) => (formatters[key] ??= new Intl.DateTimeFormat(lang, options));
+
 // 週幾：中文只寫「一二三」（不加「週」）；其他語言用短名稱
 export function weekdayLabel(date) {
-  return new Intl.DateTimeFormat(lang, { weekday: isZh() ? 'narrow' : 'short' }).format(date);
+  return formatter('weekday', { weekday: isZh() ? 'narrow' : 'short' }).format(date);
 }
 
-// 日期＋週幾，例如「10/6（二）」「Tue, 10/6」。year：加上年份；long：月份寫成「10月6日」
+// 日期＋週幾，例如「10/6（二）」「Tue, 10/6」。long：月份寫成「10月6日」。
+// 不是今年的日期（非 long）會加年份：匯入的舊資料可能跨好幾年。
 // 中文自己組字串：Intl 的 narrow 在簡體會變成「10/6二」，沒有分隔。
-export function dateLabel(date, { year = false, long = false } = {}) {
+export function dateLabel(date, { long = false } = {}) {
+  const year = !long && date.getFullYear() !== new Date().getFullYear();
   if (!isZh()) {
-    return date.toLocaleDateString(lang, { ...(year ? { year: 'numeric' } : {}), month: long ? 'long' : 'numeric', day: 'numeric', weekday: 'short' });
+    return formatter(`date${year}${long}`, { ...(year ? { year: 'numeric' } : {}), month: long ? 'long' : 'numeric', day: 'numeric', weekday: 'short' }).format(date);
   }
   const [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
   const day = long ? `${m}月${d}日` : `${year ? `${y}/` : ''}${m}/${d}`;
@@ -106,7 +113,7 @@ export function dateLabel(date, { year = false, long = false } = {}) {
 
 // 時間：12 小時制的語言一律用英文 AM/PM（中文的「上午／下午」佔兩個全形字，比較寬）
 export function clockLabel(date) {
-  const parts = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).formatToParts(date);
+  const parts = formatter('clock', { hour: '2-digit', minute: '2-digit' }).formatToParts(date);
   const i = parts.findIndex((p) => p.type === 'dayPeriod');
   if (i < 0) return parts.map((p) => p.value).join('');
   const ampm = date.getHours() < 12 ? 'AM' : 'PM';
