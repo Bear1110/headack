@@ -4,6 +4,7 @@
 // （呼叫前不能有任何 await），否則會被瀏覽器的彈窗攔截擋掉。
 
 import { CLIENT_ID, SCOPES } from './config.js';
+import { isDemo } from './store.js';
 
 const TOKEN_KEY = 'hl.token';
 const EMAIL_KEY = 'hl.email';
@@ -73,8 +74,9 @@ export function isAuthReady() {
   return tokenClient !== null;
 }
 
+// 示範模式（store.isDemo）從這裡就沒有帳號與權杖：呼叫端不必各自判斷，示範資料也不可能被同步或清到真實試算表
 export function hasValidToken() {
-  return !!token && Date.now() < expiresAt - EXPIRY_MARGIN_MS;
+  return !isDemo() && !!token && Date.now() < expiresAt - EXPIRY_MARGIN_MS;
 }
 
 export function getToken() {
@@ -82,6 +84,7 @@ export function getToken() {
 }
 
 export function getEmail() {
+  if (isDemo()) return null;
   try { return localStorage.getItem(EMAIL_KEY); } catch { return null; }
 }
 
@@ -93,6 +96,7 @@ export function setEmail(email) {
 // 首次讓使用者選帳號（多帳號的人很常見），需要時 Google 會自動顯示同意畫面；
 // 之後帶 prompt: '' 與 login_hint，彈窗通常一閃即關。
 export function requestToken({ firstTime = false } = {}) {
+  if (isDemo()) return Promise.reject(new Error('demo_mode'));
   if (!tokenClient) return Promise.reject(new Error('auth_not_ready'));
   if (pending) pending.reject(new Error('superseded'));
   const promise = new Promise((resolve, reject) => { pending = { resolve, reject }; });

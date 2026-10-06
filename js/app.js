@@ -81,7 +81,6 @@ function deleteWithUndo(record) {
 // ---------- 同步 ----------
 
 async function trySync() {
-  if (store.isDemo()) return render(); // 示範模式完全不連外
   const token = auth.getToken();
   if (!token) return render();
   if (!navigator.onLine) {
@@ -358,7 +357,7 @@ function deleteEditing() {
 
 function openClearDialog() {
   const n = store.getRecords().length;
-  const linked = !store.isDemo() && !!auth.getEmail();
+  const linked = !!auth.getEmail();
   $('#clear-body').textContent = t(linked ? 'clear.body' : 'clear.bodyLocal', { n });
   $('#clear-restore').textContent = t(linked ? 'clear.restore' : 'clear.restoreLocal');
   $('#clear-hint').textContent = t('clear.typeHint', { word: t('clear.word') });
@@ -377,7 +376,7 @@ function onClearInput() {
 function confirmClear(e) {
   e.preventDefault();
   if ($('#btn-clear-confirm').disabled) return;
-  const linked = !store.isDemo() && !!auth.getEmail();
+  const linked = !!auth.getEmail();
   const tokenPromise = !linked ? Promise.resolve(null)
     : auth.hasValidToken() ? Promise.resolve(auth.getToken())
     : auth.requestToken();
@@ -867,7 +866,7 @@ function renderBackupCard() {
 
 // 新使用者（還沒有任何紀錄）在首頁看到一句理念，有紀錄後就收起來
 function renderTagline() {
-  const fresh = !store.getRecords().length && !store.isDemo();
+  const fresh = !store.getRecords().length; // 示範模式一定有資料
   $('#tagline').hidden = !fresh;
   $('#btn-try-demo').hidden = !fresh;
 }
