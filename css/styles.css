@@ -707,7 +707,7 @@ dialog.quick-dialog::backdrop { background: #000; }
 .import-preview ul { list-style: none; margin: .25rem 0 0; padding: 0; font-size: .85rem; }
 .import-preview li { padding: .3rem 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
 
-/* 浮動新增按鈕：手機在列表、統計頁顯示 */
+/* 浮動新增按鈕：手機只在列表頁顯示 */
 .fab {
   position: fixed; z-index: 9; display: none;
   inset-inline-end: var(--gutter);
@@ -717,8 +717,7 @@ dialog.quick-dialog::backdrop { background: #000; }
   box-shadow: 0 6px 18px rgb(0 0 0 / .25);
 }
 .fab svg { width: 26px; height: 26px; }
-body[data-view="list"] .fab,
-body[data-view="stats"] .fab { display: grid; place-items: center; }
+body[data-view="list"] .fab { display: grid; place-items: center; }
 
 .toast {
   position: fixed; inset-inline: var(--gutter); margin-inline: auto; width: fit-content; z-index: 20;
@@ -820,6 +819,11 @@ body[data-view="stats"] .fab { display: grid; place-items: center; }
 
 /* ---------- 動態：短而安靜（發作時常對光與動態敏感），系統設定「減少動態效果」時完全不動 ---------- */
 @media (prefers-reduced-motion: no-preference) {
+  /* 分頁切換：底部/頂部分頁按鈕的顏色與底色漸變 */
+  .nav button { transition: color .18s ease, background-color .18s ease; }
+  .nav-icon .icon { transition: transform .18s ease; }
+  .nav button.active .nav-icon .icon { transform: scale(1.08); }
+
   /* 主按鈕：按下去感覺得到 */
   .btn.huge { transition: transform .12s ease, box-shadow .12s ease; }
   .btn.huge:active { box-shadow: 0 4px 12px var(--bear-shadow); }
