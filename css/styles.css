@@ -109,15 +109,6 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 .install-steps { margin: .5rem 0 0; padding-inline-start: 1.4rem; display: flex; flex-direction: column; gap: .6rem; line-height: 1.6; }
 .install-steps .icon { vertical-align: -0.25em; color: var(--primary); }
 
-/* 語言：外觀沿用 .icon-btn-top；原生下拉選單透明疊在上面，點下去開系統清單 */
-.lang-picker { position: relative; }
-.lang-picker svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; pointer-events: none; }
-.lang-picker select {
-  position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; padding: 0; margin: 0;
-  opacity: 0; cursor: pointer; font-size: 16px; border: 0;
-}
-.lang-picker:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
-
 .banner {
   margin: 0; padding: .6rem var(--gutter); font-size: .9rem;
   background: var(--warning-bg); color: var(--warning-text);
