@@ -156,26 +156,36 @@
     <!-- 設定 -->
     <section id="view-settings" class="view">
       <!-- 帳號與同步 -->
-      <div class="card">
-        <h2 class="card-title"><span data-icon="user"></span><span data-i18n="settings.account"></span></h2>
-        <p id="account-email" class="muted"></p>
-        <p><a id="sheet-link" href="#" target="_blank" rel="noopener" hidden data-i18n="settings.openSheet"></a></p>
-        <button id="btn-signout" class="btn ghost small" hidden data-i18n="auth.signOut"></button>
+      <div class="card set-list">
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="user"></span><span data-i18n="settings.account"></span></h2>
+            <p id="account-email" class="muted small"></p>
+            <p><a id="sheet-link" href="#" target="_blank" rel="noopener" hidden data-i18n="settings.openSheet"></a></p>
+          </div>
+          <button id="btn-signout" class="btn ghost small" hidden data-i18n="auth.signOut"></button>
+        </div>
       </div>
 
       <!-- 偏好 -->
       <h3 class="settings-group" data-i18n="settings.groupPrefs"></h3>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="language"></span><span data-i18n="settings.language"></span></h2>
-        <select id="lang-select" data-i18n-attr="aria-label:settings.language"></select>
-        <p class="muted small" data-i18n="settings.languageHelp"></p>
-      </div>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="theme"></span><span data-i18n="settings.theme"></span></h2>
-        <div class="seg theme-seg" role="radiogroup" data-i18n-attr="aria-label:settings.theme">
-          <button type="button" role="radio" data-theme-choice="system" data-i18n="settings.themeSystem"></button>
-          <button type="button" role="radio" data-theme-choice="light" data-i18n="settings.themeLight"></button>
-          <button type="button" role="radio" data-theme-choice="dark" data-i18n="settings.themeDark"></button>
+      <div class="card set-list">
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="language"></span><span data-i18n="settings.language"></span></h2>
+            <p class="muted small" data-i18n="settings.languageHelp"></p>
+          </div>
+          <select id="lang-select" data-i18n-attr="aria-label:settings.language"></select>
+        </div>
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="theme"></span><span data-i18n="settings.theme"></span></h2>
+          </div>
+          <div class="seg theme-seg" role="radiogroup" data-i18n-attr="aria-label:settings.theme">
+            <button type="button" role="radio" data-theme-choice="system" data-i18n="settings.themeSystem"></button>
+            <button type="button" role="radio" data-theme-choice="light" data-i18n="settings.themeLight"></button>
+            <button type="button" role="radio" data-theme-choice="dark" data-i18n="settings.themeDark"></button>
+          </div>
         </div>
       </div>
       <div class="card">
@@ -191,41 +201,57 @@
 
       <!-- 資料 -->
       <h3 class="settings-group" data-i18n="settings.groupData"></h3>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="importIcon"></span><span data-i18n="import.title"></span></h2>
-        <p class="muted small" data-i18n="import.desc"></p>
-        <button id="btn-import" class="btn ghost" data-i18n="import.title"></button>
-      </div>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="exportIcon"></span><span data-i18n="export.title"></span></h2>
-        <p class="muted small" data-i18n="export.desc"></p>
-        <button id="btn-export" class="btn ghost" data-i18n="export.button"></button>
+      <div class="card set-list">
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="exportIcon"></span><span data-i18n="export.title"></span></h2>
+            <p class="muted small" data-i18n="export.desc"></p>
+          </div>
+          <button id="btn-export" class="btn ghost small" data-i18n="export.button"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="importIcon"></span><span data-i18n="import.title"></span></h2>
+            <p class="muted small" data-i18n="import.desc"></p>
+          </div>
+          <button id="btn-import" class="btn ghost small" data-i18n="import.button"></button>
+        </div>
       </div>
 
       <!-- 其他 -->
       <h3 class="settings-group" data-i18n="settings.groupMore"></h3>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="demo"></span><span data-i18n="demo.title"></span></h2>
-        <p class="muted small" data-i18n="demo.desc"></p>
-        <button type="button" id="btn-demo" class="btn ghost"></button>
+      <div class="card set-list">
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="demo"></span><span data-i18n="demo.title"></span></h2>
+            <p class="muted small" data-i18n="demo.desc"></p>
+          </div>
+          <button type="button" id="btn-demo" class="btn ghost small"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="share"></span><span data-i18n="share.title"></span></h2>
+            <p class="muted small" data-i18n="share.desc"></p>
+          </div>
+          <button type="button" id="btn-share" class="btn ghost small" data-i18n="share.button"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="info"></span><span data-i18n="settings.groupAbout"></span></h2>
+            <p class="small about-links"><a href="faq.html" data-i18n="footer.faq"></a><a href="privacy.html" data-i18n="settings.privacy"></a><a href="terms.html" data-i18n="footer.terms"></a><a id="source-link" href="https://github.com/Bear1110/headack" target="_blank" rel="noopener" data-i18n="settings.source"></a></p>
+            <p class="muted small" id="app-version"></p>
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="share"></span><span data-i18n="share.title"></span></h2>
-        <p class="muted small" data-i18n="share.desc"></p>
-        <button type="button" id="btn-share" class="btn ghost" data-i18n="share.button"></button>
-      </div>
-      <div class="card">
-        <h2 class="card-title"><span data-icon="info"></span><span data-i18n="settings.groupAbout"></span></h2>
-        <p><a href="faq.html" data-i18n="footer.faq"></a></p>
-        <p><a href="privacy.html" data-i18n="settings.privacy"></a></p>
-        <p><a href="terms.html" data-i18n="footer.terms"></a></p>
-        <p><a id="source-link" href="https://github.com/Bear1110/headack" target="_blank" rel="noopener" data-i18n="settings.source"></a></p>
-        <p class="muted small" id="app-version"></p>
-      </div>
-      <div class="card danger-zone">
-        <h2 class="card-title"><span data-icon="alert"></span><span data-i18n="danger.title"></span></h2>
-        <p class="muted small" data-i18n="danger.clearDesc"></p>
-        <button type="button" id="btn-clear" class="btn danger ghost" data-i18n="danger.clear"></button>
+
+      <div class="card set-list danger-zone">
+        <div class="set-row">
+          <div class="set-text">
+            <h2 class="card-title"><span data-icon="alert"></span><span data-i18n="danger.title"></span></h2>
+            <p class="muted small" data-i18n="danger.clearDesc"></p>
+          </div>
+          <button type="button" id="btn-clear" class="btn danger ghost small" data-i18n="danger.clear"></button>
+        </div>
       </div>
     </section>
 

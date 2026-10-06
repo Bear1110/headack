@@ -100,6 +100,7 @@ export default {
   'list.duration': '{h} 小时 {m} 分',
   'list.separator': '、',
   'import.title': '导入记录',
+  'import.button': '导入',
   'import.desc': '把你在其他地方的头痛记录（笔记、其他 App、聊天记录）交给 AI 整理后导入。',
   'import.step1': '1. 打开 AI，把你的头痛记录粘贴在提示词后面发送。',
   'import.openChatgpt': '在 ChatGPT 打开',

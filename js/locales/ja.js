@@ -100,6 +100,7 @@ export default {
   'list.duration': '{h} 時間 {m} 分',
   'list.separator': '、',
   'import.title': '記録をインポート',
+  'import.button': 'インポート',
   'import.desc': '他の場所（メモ、他のアプリ、チャット履歴）にある頭痛の記録を AI に整理してもらい、取り込みます。',
   'import.step1': '1. AI を開き、プロンプトの後に頭痛の記録を貼り付けて送信します。',
   'import.openChatgpt': 'ChatGPT で開く',

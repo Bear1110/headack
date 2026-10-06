@@ -100,6 +100,7 @@ export default {
   'list.duration': '{h} h {m} min',
   'list.separator': ', ',
   'import.title': 'Import entries',
+  'import.button': 'Import',
   'import.desc': 'Bring in headache history from elsewhere (notes, other apps, chat logs) by letting an AI tidy it up.',
   'import.step1': '1. Open an AI, paste your headache notes after the prompt, and send.',
   'import.openChatgpt': 'Open in ChatGPT',

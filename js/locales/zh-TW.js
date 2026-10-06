@@ -100,6 +100,7 @@ export default {
   'list.duration': '{h} 小時 {m} 分',
   'list.separator': '、',
   'import.title': '匯入紀錄',
+  'import.button': '匯入',
   'import.desc': '把你在其他地方的頭痛紀錄（筆記、其他 App、聊天紀錄）交給 AI 整理後匯入。',
   'import.step1': '1. 開啟 AI，把你的頭痛紀錄貼在提示詞後面送出。',
   'import.openChatgpt': '在 ChatGPT 開啟',

@@ -166,7 +166,7 @@ body[data-view="settings"] #view-settings { display: flex; }
 }
 .btn.ghost { background: transparent; color: var(--primary); }
 .btn.danger { border-color: var(--danger); color: var(--danger); }
-.btn.small { padding: .35rem .7rem; font-size: .85rem; min-height: 36px; }
+.btn.small { padding: .35rem .7rem; font-size: .85rem; min-height: 36px; white-space: nowrap; }
 .btn.wide { width: 100%; }
 .btn:disabled { opacity: .5; cursor: default; }
 
@@ -582,6 +582,22 @@ dialog form { display: flex; flex-direction: column; height: 100%; }
 .switch-row { display: flex; align-items: center; gap: .75rem; cursor: pointer; min-height: var(--tap); }
 .switch-row input { width: 1.4rem; height: 1.4rem; min-height: 0; flex: none; accent-color: var(--primary); }
 
+/* 設定頁：同一張卡裡一列一項，左邊名稱與說明、右邊控制項；窄螢幕放不下時控制項換到下一行 */
+.set-list { padding: 0; }
+.set-row { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; padding: .85rem 1rem; }
+.set-row + .set-row { border-top: 1px solid var(--border); }
+.set-text { flex: 1 1 10rem; min-width: 0; }
+.set-text .card-title { margin: 0; }
+.set-text p { margin: .2rem 0 0; }
+/* 按鈕留在右邊（維持最小觸控高度）；其他控制項（語言、外觀等）手機占滿一整行，夠寬時才縮到右邊 */
+.set-row > .btn { min-height: var(--tap); }
+.set-row > :where(:not(.set-text, .btn)) { flex: 1 1 100%; }
+@media (min-width: 600px) {
+  .set-row > .seg { flex: 0 1 18rem; }
+  .set-row > select { flex: 0 1 12rem; }
+}
+.about-links { display: flex; flex-wrap: wrap; gap: .2rem 1rem; }
+
 /* 設定：分組標題、卡片標題 icon */
 .settings-group { margin: .5rem 0 -.4rem; font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
 .card-title { display: flex; align-items: center; gap: .5rem; }
@@ -726,7 +742,6 @@ body[data-view="list"] .fab { display: grid; place-items: center; }
 
 .counter { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .label-short { display: none; }
-.btn.small { white-space: nowrap; }
 
 @media (max-width: 420px) {
   .topbar { gap: .5rem; }
