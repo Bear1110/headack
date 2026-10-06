@@ -405,4 +405,11 @@ export default {
   'catDesc.opioid': 'オピオイド系の鎮痛薬。例：トラマドール（トラムセット）。',
   'st.catLimit': '月 {n} 日以上は要注意',
   'st.catUsed': 'あなたが使った薬：{list}',
+  'share.name': 'Headack — 無料の頭痛日記',
+  'share.text': '記録を自分の Google ドライブに保存できる、無料の頭痛日記です。',
+  'share.title': 'Headack を共有',
+  'share.desc': '頭痛に悩む知り合いはいませんか？このサイトのリンクを送れます。共有されるのはリンクだけで、記録は含まれません。',
+  'share.button': 'このサイトを共有',
+  'share.copied': 'リンクをコピーしました',
+  'share.failed': '共有できませんでした',
 };

@@ -405,4 +405,11 @@ export default {
   'catDesc.opioid': '鴉片類止痛藥，例如曲馬多（Ultracet）。',
   'st.catLimit': '每月 {n} 天以上需注意',
   'st.catUsed': '你用過的：{list}',
+  'share.name': 'Headack — 免費頭痛日記',
+  'share.text': '免費的頭痛日記，紀錄存在你自己的 Google 雲端硬碟。',
+  'share.title': '分享 Headack',
+  'share.desc': '身邊有人也會頭痛嗎？把這個網站的連結傳給他。只會分享網址，不含你的任何紀錄。',
+  'share.button': '分享這個網站',
+  'share.copied': '已複製連結',
+  'share.failed': '無法分享',
 };

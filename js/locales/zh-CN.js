@@ -405,4 +405,11 @@ export default {
   'catDesc.opioid': '阿片类止痛药，例如曲马多。',
   'st.catLimit': '每月 {n} 天以上需注意',
   'st.catUsed': '你用过的：{list}',
+  'share.name': 'Headack — 免费头痛日记',
+  'share.text': '免费的头痛日记，记录存在你自己的 Google 云端硬盘。',
+  'share.title': '分享 Headack',
+  'share.desc': '身边有人也会头痛吗？把这个网站的链接发给他。只会分享网址，不含你的任何记录。',
+  'share.button': '分享这个网站',
+  'share.copied': '已复制链接',
+  'share.failed': '无法分享',
 };

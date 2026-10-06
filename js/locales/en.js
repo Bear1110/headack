@@ -405,4 +405,11 @@ export default {
   'catDesc.opioid': 'Opioid painkillers, e.g. tramadol (Ultracet).',
   'st.catLimit': 'watch at {n}+ days/month',
   'st.catUsed': 'You took: {list}',
+  'share.name': 'Headack — free headache diary',
+  'share.text': 'A free headache diary that keeps your entries in your own Google Drive.',
+  'share.title': 'Share Headack',
+  'share.desc': 'Know someone who gets headaches? Send them the link to this site. Only the link is shared, never your entries.',
+  'share.button': 'Share this site',
+  'share.copied': 'Link copied',
+  'share.failed': 'Could not share',
 };
