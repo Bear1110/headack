@@ -7,6 +7,7 @@ import { RANGE_PRESETS, resolveRange, previousRange, filterRecords, analyze } fr
 import { columnChart, tableView, proportionList, attachTooltips, applyProportions } from './charts.js';
 import { medLabel } from './widgets.js';
 import { icon } from './icons.js';
+import { weekdayLabel } from './i18n.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const STATE_KEY = 'hl.statsState';
@@ -106,8 +107,7 @@ export function createStatsView(root, { t, getLang, getRecords, onAiAnalysis }) 
   }
 
   function weekdayChart(a) {
-    const fmtW = new Intl.DateTimeFormat(lang(), { weekday: 'short' });
-    const labels = Array.from({ length: 7 }, (_, i) => fmtW.format(new Date(2023, 0, 1 + i)));
+    const labels = Array.from({ length: 7 }, (_, i) => weekdayLabel(new Date(2023, 0, 1 + i)));
     return chart({ labels, series: [{ name: t('st.attacks'), values: a.weekday, cls: 's1' }], height: 170, title: t('st.weekdayTitle') })
       + tableView(t('st.table'), [t('st.colWeekday'), t('st.attacks')], labels.map((l, i) => [l, a.weekday[i]]));
   }

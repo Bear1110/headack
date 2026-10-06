@@ -84,6 +84,36 @@ export function formatList(items) {
   return items.join(t('list.separator'));
 }
 
+// ---------- 日期與時間的顯示 ----------
+
+const isZh = () => lang.startsWith('zh');
+
+// 週幾：中文只寫「一二三」（不加「週」）；其他語言用短名稱
+export function weekdayLabel(date) {
+  return new Intl.DateTimeFormat(lang, { weekday: isZh() ? 'narrow' : 'short' }).format(date);
+}
+
+// 日期＋週幾，例如「10/6（二）」「Tue, 10/6」。year：加上年份；long：月份寫成「10月6日」
+// 中文自己組字串：Intl 的 narrow 在簡體會變成「10/6二」，沒有分隔。
+export function dateLabel(date, { year = false, long = false } = {}) {
+  if (!isZh()) {
+    return date.toLocaleDateString(lang, { ...(year ? { year: 'numeric' } : {}), month: long ? 'long' : 'numeric', day: 'numeric', weekday: 'short' });
+  }
+  const [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+  const day = long ? `${m}月${d}日` : `${year ? `${y}/` : ''}${m}/${d}`;
+  return `${day}(${weekdayLabel(date)})`;
+}
+
+// 時間：12 小時制的語言一律用英文 AM/PM（中文的「上午／下午」佔兩個全形字，比較寬）
+export function clockLabel(date) {
+  const parts = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).formatToParts(date);
+  const i = parts.findIndex((p) => p.type === 'dayPeriod');
+  if (i < 0) return parts.map((p) => p.value).join('');
+  const ampm = date.getHours() < 12 ? 'AM' : 'PM';
+  const rest = parts.filter((p) => p.type !== 'dayPeriod').map((p) => p.value).join('').trim();
+  return i === 0 ? `${ampm} ${rest}` : `${rest} ${ampm}`;
+}
+
 export function applyI18n(root = document) {
   document.documentElement.lang = lang;
   document.documentElement.dir = RTL.has(lang.split('-')[0]) ? 'rtl' : 'ltr';

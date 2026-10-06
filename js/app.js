@@ -3,7 +3,7 @@ import * as store from './store.js';
 import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
-import { t, getLang, setLang, initI18n, formatList, LANGS } from './i18n.js';
+import { t, getLang, setLang, initI18n, formatList, LANGS, dateLabel, clockLabel } from './i18n.js';
 import { localDate, daysCovered, monthStats } from './stats.js';
 import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
@@ -38,8 +38,7 @@ function formatDateTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   // 不是今年的紀錄加上年份（匯入的舊資料可能跨好幾年）
-  const year = d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {};
-  return d.toLocaleString(getLang(), { ...year, month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  return `${dateLabel(d, { year: d.getFullYear() !== new Date().getFullYear() })} ${clockLabel(d)}`;
 }
 
 function formatDuration(start, end) {
@@ -643,8 +642,8 @@ const PRESSURE_DROP = -5;
 function recordItemHtml(r, { showType = false } = {}) {
   const d = new Date(r.start);
   const sameYear = d.getFullYear() === new Date().getFullYear();
-  const date = d.toLocaleDateString(getLang(), { ...(sameYear ? {} : { year: 'numeric' }), month: 'numeric', day: 'numeric', weekday: 'short' });
-  const time = r.start.slice(11, 16) !== '00:00' ? d.toLocaleTimeString(getLang(), { hour: '2-digit', minute: '2-digit' }) : '';
+  const date = dateLabel(d, { year: !sameYear });
+  const time = r.start.slice(11, 16) !== '00:00' ? clockLabel(d) : '';
   const when = r.end ? formatDuration(r.start, r.end) : '';
   const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;
   const tags = [
@@ -748,7 +747,7 @@ function renderDayDetail() {
     : all.filter((r) => r.start?.startsWith(calMonth)))
     .sort((a, b) => b.start.localeCompare(a.start));
   const title = calSelected
-    ? new Date(`${calSelected}T00:00`).toLocaleDateString(getLang(), { month: 'long', day: 'numeric', weekday: 'short' })
+    ? dateLabel(new Date(`${calSelected}T00:00`), { long: true })
     : t('cal.monthEntries', { n: items.length });
   panel.innerHTML = `
     <div class="cal-detail-head">
