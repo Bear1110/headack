@@ -179,6 +179,35 @@ export class Spreadsheet {
     throw new Error('row_moved');
   }
 
+  // 只寫入本機改過的欄位（changes），其他欄位保留雲端的值。每個欄位：
+  // - 雲端那格還是改之前的值（base）→ 別台沒動過，直接套用
+  // - 別台也改了同一格 → 以最後編輯為準（比較整列的 updated_at）
+  // 回傳 'ok'、'deleted'（雲端已刪除），或 'stale'（至少一格保留了別台較新的修改）
+  async patch(token, id, changes, base) {
+    const cell = (field, v) => String(recordToRow({ [field]: v }, [field])[0]);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { rowIndex, remote } = await this.#locate(token, id);
+      if (rowIndex == null) return 'deleted';
+      const remoteNewer = String(remote.updated_at ?? '') > String(changes.updated_at ?? '');
+      const merged = { ...remote };
+      let lost = false;
+      for (const [field, v] of Object.entries(changes)) {
+        if (field === 'updated_at') continue;
+        if (!remoteNewer || cell(field, remote[field]) === cell(field, base[field])) merged[field] = v;
+        else lost = true;
+      }
+      if (!remoteNewer) merged.updated_at = changes.updated_at;
+      if (await this.#idAt(token, rowIndex) !== id) continue; // 列號位移，重新找
+      const range = `${this.recordsRange}!A${rowIndex + 1}`;
+      await api(token, `${SHEETS}/${this.id}/values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
+        method: 'PUT',
+        body: { values: [recordToRow(merged, this.headers)] },
+      });
+      return lost ? 'stale' : 'ok';
+    }
+    throw new Error('row_moved');
+  }
+
   // 清空所有紀錄：只清除標題列以下的內容，保留試算表檔案與標題列。
   // 之後 append 會從第 2 列重新開始寫。
   async clearAll(token) {

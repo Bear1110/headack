@@ -45,7 +45,7 @@ function write(key, value) {
 const migrate = (r) => normalizeRecord({ ...r, meds: normalizeMeds(r.meds), locations: r.locations ?? [], pain_quality: r.pain_quality ?? [], aura: r.aura ?? [], symptoms: r.symptoms ?? [] });
 
 let records = read(CACHE_KEY, []).map(migrate);
-let outbox = read(OUTBOX_KEY, []).map((op) => (op.record ? { ...op, record: migrate(op.record) } : op)); // [{ type: 'upsert', record, isNew } | { type: 'delete', id }]
+let outbox = read(OUTBOX_KEY, []).map((op) => (op.record ? { ...op, record: migrate(op.record) } : op)); // 項目格式見 saveRecord 上方說明
 const listeners = new Set();
 
 function persist() {
@@ -80,20 +80,43 @@ function applyUpsert(list, record) {
   else list.push(record);
 }
 
+// 待送佇列的項目：
+// - { type: 'upsert', record, isNew }：新紀錄整筆送（雲端還沒有這一列）。舊版留下的整筆修改也是這個格式。
+// - { type: 'patch', id, changes, base }：修改只記「改了哪些欄位」與改之前的值，同步時只寫這些欄位，
+//   不會用本機的舊資料蓋掉別台裝置改過的其他欄位。
+// - { type: 'delete', id }
+const opId = (op) => op.id ?? op.record.id;
+const same = (a, b) => JSON.stringify(a ?? '') === JSON.stringify(b ?? '');
+
 export function saveRecord(record, { isNew }) {
+  const old = records.find((r) => r.id === record.id);
   applyUpsert(records, record);
-  const existing = outbox.find((op) => !inFlight.has(op) && op.type === 'upsert' && op.record.id === record.id);
-  if (existing) {
-    existing.record = record; // 合併同一筆尚未送出的修改
-  } else {
+  const existing = outbox.find((op) => !inFlight.has(op) && op.type !== 'delete' && opId(op) === record.id);
+  if (existing?.type === 'upsert') {
+    existing.record = record; // 合併同一筆尚未送出的新增
+  } else if (isNew || !old) {
     outbox.push({ type: 'upsert', record, isNew });
+  } else {
+    const changes = {};
+    const base = {};
+    for (const k of new Set([...Object.keys(old), ...Object.keys(record)])) {
+      if (same(old[k], record[k])) continue;
+      changes[k] = record[k] ?? '';
+      base[k] = old[k] ?? '';
+    }
+    if (existing) { // 合併同一筆尚未送出的修改：base 保留最早的值
+      for (const k of Object.keys(changes)) if (!(k in existing.base)) existing.base[k] = base[k];
+      Object.assign(existing.changes, changes);
+    } else if (Object.keys(changes).length) {
+      outbox.push({ type: 'patch', id: record.id, changes, base });
+    }
   }
   persist();
 }
 
 export function deleteRecord(id) {
   records = records.filter((r) => r.id !== id);
-  const isQueued = (op) => !inFlight.has(op) && op.type === 'upsert' && op.record.id === id;
+  const isQueued = (op) => !inFlight.has(op) && op.type !== 'delete' && opId(op) === id;
   const queuedNew = outbox.find((op) => isQueued(op) && op.isNew);
   outbox = outbox.filter((op) => !isQueued(op));
   if (!queuedNew) outbox.push({ type: 'delete', id }); // 還沒送出的新紀錄，直接丟掉即可
@@ -132,6 +155,7 @@ export function sync(sheet, token) {
         const [op] = ops;
         if (batch.length) await sheet.append(token, batch.map((o) => o.record));
         else if (op.type === 'delete') await sheet.remove(token, op.id);
+        else if (op.type === 'patch') { if (await sheet.patch(token, op.id, op.changes, op.base) !== 'ok') conflicts += 1; }
         else if (await sheet.update(token, op.record) !== 'ok') conflicts += 1;
         outbox = outbox.filter((o) => !inFlight.has(o));
         inFlight.clear();
@@ -142,7 +166,10 @@ export function sync(sheet, token) {
       records = remote;
       for (const op of outbox) {
         if (op.type === 'delete') records = records.filter((r) => r.id !== op.id);
-        else applyUpsert(records, op.record);
+        else if (op.type === 'patch') {
+          const r = records.find((x) => x.id === op.id);
+          if (r) applyUpsert(records, { ...r, ...op.changes });
+        } else applyUpsert(records, op.record);
       }
       persist();
       return { conflicts };

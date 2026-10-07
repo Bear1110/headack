@@ -1159,7 +1159,7 @@ function bindEvents() {
 
   document.querySelectorAll('.nav button').forEach((b) => b.addEventListener('click', () => showView(b.dataset.view)));
 
-  window.addEventListener('online', () => { trySync(); fillWeather(); });
+  window.addEventListener('online', () => { trySync().finally(fillWeather); });
   window.addEventListener('offline', () => { syncState = 'offline'; renderSync(); });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') trySync(); });
   store.onChange(render);
@@ -1179,8 +1179,7 @@ async function init() {
     console.warn('GIS unavailable (offline?)', e); // 離線時仍可本機記錄
   }
   render();
-  trySync();
-  fillWeather();
+  trySync().finally(fillWeather); // 先拉一次雲端最新資料再補天氣
 }
 
 init();
