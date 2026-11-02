@@ -232,6 +232,8 @@ export default {
   'demo.try': '先看看範例',
   'demo.banner': '示範模式：這些是範例資料，不會同步，也不會影響你的紀錄。',
   'undo.undo': '復原',
+  'update.available': '有新版本可用。',
+  'update.reload': '重新整理',
   'undo.deleted': '已刪除這筆紀錄',
   'undo.ended': '已記錄結束時間',
   'undo.misTap': '誤按了？刪除這筆',

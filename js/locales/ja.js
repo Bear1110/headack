@@ -232,6 +232,8 @@ export default {
   'demo.try': 'まずサンプルを見る',
   'demo.banner': 'デモモード：これはサンプルデータです。同期されず、あなたの記録にも影響しません。',
   'undo.undo': '元に戻す',
+  'update.available': '新しいバージョンがあります。',
+  'update.reload': '再読み込み',
   'undo.deleted': '記録を削除しました',
   'undo.ended': '終了時刻を記録しました',
   'undo.misTap': '押し間違い？この記録を削除',

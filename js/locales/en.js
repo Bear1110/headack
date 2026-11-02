@@ -232,6 +232,8 @@ export default {
   'demo.try': 'See an example first',
   'demo.banner': 'Demo mode: this is sample data. It is not synced and does not affect your entries.',
   'undo.undo': 'Undo',
+  'update.available': 'A new version is available.',
+  'update.reload': 'Reload',
   'undo.deleted': 'Entry deleted',
   'undo.ended': 'End time saved',
   'undo.misTap': 'Tapped by mistake? Delete this',

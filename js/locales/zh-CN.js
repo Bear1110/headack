@@ -232,6 +232,8 @@ export default {
   'demo.try': '先看看示例',
   'demo.banner': '演示模式：这些是示例数据，不会同步，也不会影响你的记录。',
   'undo.undo': '撤销',
+  'update.available': '有新版本可用。',
+  'update.reload': '刷新',
   'undo.deleted': '已删除这条记录',
   'undo.ended': '已记录结束时间',
   'undo.misTap': '误按了？删除这条',

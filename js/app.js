@@ -9,6 +9,7 @@ import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
 import { applyIcons, icon } from './icons.js';
 import { APP_VERSION } from './version.js';
+import { watchForUpdate } from './update.js';
 import { renderCalendar as calendarHtml } from './calendar.js';
 import * as weather from './weather.js';
 
@@ -1172,6 +1173,7 @@ async function init() {
   $('#lang-select').value = getLang();
   refreshLanguage();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW', e));
+  watchForUpdate(() => toast(t('update.available'), 30000, { label: t('update.reload'), icon: 'refresh', run: () => location.reload() }));
   try {
     await auth.initAuth();
     authReady = true;
