@@ -496,7 +496,6 @@ input, select, textarea {
   min-height: var(--tap); width: 100%;
 }
 .field.inline input { width: auto; }
-input[type="range"] { padding: 0; accent-color: var(--primary); }
 .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
 /* 隱藏的核取方塊必須定位在選項本身，否則聚焦時瀏覽器會捲動到它原本的位置而跑版 */
 .chip { position: relative; }
@@ -654,10 +653,8 @@ dialog.quick-dialog::backdrop { background: #000; }
   padding: calc(.5rem + env(safe-area-inset-top)) var(--gutter) .25rem;
 }
 .qf-progress { color: var(--qf-muted); font-size: .95rem; }
-.qf-close {
-  appearance: none; border: 0; background: none; color: var(--qf-muted); cursor: pointer;
-  width: 52px; height: 52px; font-size: 1.4rem; border-radius: 50%;
-}
+.qf-close, .qf-remove { appearance: none; border: 0; background: none; color: var(--qf-muted); cursor: pointer; border-radius: 50%; }
+.qf-close { width: 52px; height: 52px; font-size: 1.4rem; }
 .qf-body { flex: 1; overflow-y: auto; padding: .5rem var(--gutter) 1rem; display: flex; flex-direction: column; }
 .qf-body h2 { font-size: 1.6rem; margin: .5rem 0 .75rem; color: var(--qf-text); }
 .qf-hint { color: var(--qf-muted); margin: -.25rem 0 1rem; }
@@ -675,6 +672,9 @@ dialog.quick-dialog::backdrop { background: #000; }
   min-height: 60px; padding: .6rem .9rem; border-radius: 14px;
   border: 1px solid var(--qf-border); background: var(--qf-surface); color: var(--qf-text);
 }
+.qf-taken { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.qf-taken li { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .3rem .3rem .3rem .75rem; border: 1px solid var(--qf-border); border-radius: 12px; }
+.qf-remove { font: inherit; min-width: 44px; min-height: 44px; }
 .qf-chip[aria-pressed="true"], .qf-big[aria-pressed="true"] { background: var(--qf-accent); border-color: var(--qf-accent); color: var(--qf-accent-text); font-weight: 600; }
 .qf-stack { display: flex; flex-direction: column; gap: .6rem; }
 .qf-big { text-align: center; font-size: 1.2rem; min-height: 64px; }

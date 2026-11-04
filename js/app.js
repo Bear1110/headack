@@ -1,8 +1,8 @@
 import * as auth from './auth.js';
 import * as store from './store.js';
 import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
-import { OPTIONS, MED_BY_CODE, newId, guessTiming } from './schema.js';
-import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
+import { OPTIONS, MED_BY_CODE, newId, newDose } from './schema.js';
+import { createMedEditor, createIntensityPicker, intensityButtons, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS, dateLabel, clockLabel } from './i18n.js';
 import { localDate, daysCovered, monthStats, medTimeOnStart } from './stats.js';
 import { createStatsView } from './statsview.js';
@@ -25,6 +25,7 @@ let authReady = false;
 let editing = null; // 表單正在編輯的紀錄；null = 新增
 let medEditor = null;
 let headMap = null;
+let intensityPicker = null;
 
 function nowLocal() {
   const d = new Date();
@@ -235,11 +236,12 @@ function quickStart() {
   quickFlow.open(record.id, 'start');
 }
 
+// 跟表單一樣：再點一次已選的分數 = 取消
 function setIntensity(id, value) {
   buzz(10);
   const r = store.getRecords().find((x) => x.id === id);
   if (!r) return;
-  save({ ...r, intensity: value }, false);
+  save({ ...r, intensity: r.intensity === value ? null : value }, false);
 }
 
 function endRecord(id) {
@@ -257,7 +259,7 @@ function takeMed(id, code) {
   const r = store.getRecords().find((x) => x.id === id);
   if (!r) return;
   buzz(20);
-  const med = { code, amount: 1, timing: guessTiming(r.intensity), name: '', at: nowLocal() };
+  const med = newDose(code, { intensity: r.intensity, at: nowLocal() });
   save({ ...r, meds: [...(r.meds ?? []), med] }, false, { quiet: true });
   toast(t('log.medTaken', { m: medLabel(t, med), t: clockLabel(new Date(med.at)) }), 6000,
     { label: t('undo.undo'), run: () => save({ ...r }, false, { quiet: true }) });
@@ -281,7 +283,9 @@ function buildFormOptions() {
   headMap?.render();
 }
 
-// 常用藥：依過去紀錄的使用次數排序，不足的用語系預設補上
+// 常用藥：依過去紀錄的使用次數排序，不足的用語系預設補上。
+// 快速問答、進行中卡片、表單都顯示同樣這幾個，位置才記得住
+const QUICK_MED_COUNT = 4;
 function frequentMeds() {
   const count = new Map();
   for (const r of store.getRecords()) {
@@ -289,20 +293,19 @@ function frequentMeds() {
   }
   const used = [...count.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
   const defaults = t('meds.defaults').split(',').map((c) => c.trim()).filter((c) => MED_BY_CODE[c]);
-  return [...new Set([...used, ...defaults])];
+  return [...new Set([...used, ...defaults])].slice(0, QUICK_MED_COUNT);
 }
 
 // preset：新增時預先帶入的欄位（例如從日曆補登某一天）
 // focus：開啟後聚焦的欄位（例如從「選擇結束時間」進來聚焦 end）
 function openForm(record, preset = {}, { focus = '' } = {}) {
   editing = record;
-  const r = record ?? { ...emptyRecord(), intensity: 5, ...preset };
+  const r = record ?? { ...emptyRecord(), ...preset };
   const form = $('#record-form');
   $('#form-title').textContent = t(record ? 'form.titleEdit' : 'form.titleNew');
   form.elements.start.value = r.start || '';
   form.elements.end.value = r.end || '';
-  form.elements.intensity.value = r.intensity ?? 5;
-  $('#intensity-out').textContent = form.elements.intensity.value;
+  intensityPicker.set(r.intensity); // 沒點就維持原值（包含未記錄的 null），不會被預設值蓋掉
   for (const field of ['type', 'med_effect']) {
     form.querySelectorAll(`input[name="${field}"]`).forEach((el) => { el.checked = el.value === r[field]; });
   }
@@ -336,7 +339,7 @@ function submitForm(e) {
     ...(editing ?? { id: newId() }),
     start: f.start.value,
     end: f.end.value,
-    intensity: Number(f.intensity.value),
+    intensity: intensityPicker.get(),
     type: form.querySelector('input[name="type"]:checked')?.value ?? '',
     pain_quality: checked('pain_quality'),
     locations: headMap.get(),
@@ -554,8 +557,7 @@ function renderSync() {
 
 function renderOngoing() {
   const ongoing = store.getRecords().filter(isOngoing).sort((a, b) => b.start.localeCompare(a.start));
-  const levels = Array.from({ length: 10 }, (_, i) => i + 1);
-  const quickMeds = ongoing.length ? frequentMeds().slice(0, 3) : [];
+  const quickMeds = ongoing.length ? frequentMeds() : [];
   $('#ongoing').innerHTML = ongoing.map((r) => {
     // 開始很久了還沒按結束：多半是睡著或忘了，問一句並提供補填結束時間
     const hours = Math.floor((Date.now() - new Date(r.start)) / 3600000);
@@ -566,7 +568,7 @@ function renderOngoing() {
       ${stale ? `<p class="warning small ongoing-note">${icon('alert')}${escapeHtml(t('log.stale', { h: hours }))}</p>` : ''}
       <p class="label">${escapeHtml(t('log.peak'))}</p>
       <div class="intensity-pick" role="group" aria-label="${escapeHtml(t('form.intensity'))}">
-        ${levels.map((n) => `<button type="button" class="i${n}" data-action="intensity" data-value="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('')}
+        ${intensityButtons(r.intensity)}
       </div>
       <p class="label">${escapeHtml(t('log.tookMed'))}</p>
       ${r.meds?.length ? `<p class="ongoing-meds small">${icon('pill')}<span>${escapeHtml(formatList(r.meds.map(medText)))}</span></p>` : ''}
@@ -1061,9 +1063,14 @@ function bindEvents() {
   medEditor = createMedEditor($('#med-editor'), {
     t,
     getFrequent: frequentMeds,
-    defaultTime: () => (isLive({ start: f.start.value, end: f.end.value }) ? nowLocal() : ''),
+    // 發作進行中才預填現在；補記過去的留空
+    makeDose: (code) => newDose(code, {
+      intensity: intensityPicker.get(),
+      at: isLive({ start: f.start.value, end: f.end.value }) ? nowLocal() : '',
+    }),
   });
   headMap = createHeadMap($('#head-map'), { t });
+  intensityPicker = createIntensityPicker($('#intensity-options'));
 
   $('#btn-signin').addEventListener('click', signIn);
   $('#btn-sync').addEventListener('click', trySync);
@@ -1073,11 +1080,11 @@ function bindEvents() {
   $('#fab').addEventListener('click', () => openForm(null));
 
   $('#ongoing').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-action]');
+    const btn = e.target.closest('button[data-action], button[data-intensity]');
     if (!btn) return;
     const id = btn.closest('[data-id]').dataset.id;
-    if (btn.dataset.action === 'end') endRecord(id);
-    else if (btn.dataset.action === 'intensity') setIntensity(id, Number(btn.dataset.value));
+    if (btn.dataset.intensity) setIntensity(id, Number(btn.dataset.intensity));
+    else if (btn.dataset.action === 'end') endRecord(id);
     else if (btn.dataset.action === 'med') takeMed(id, btn.dataset.value);
     else openForm(store.getRecords().find((r) => r.id === id), {}, { focus: btn.dataset.action === 'end-at' ? 'end' : '' });
   });
@@ -1110,7 +1117,7 @@ function bindEvents() {
     if (input?.dataset.wasChecked === 'true') input.checked = false;
     if (input) delete input.dataset.wasChecked;
   });
-  $('#record-form').elements.intensity.addEventListener('input', (e) => { $('#intensity-out').textContent = e.target.value; });
+
   $('#btn-cancel').addEventListener('click', () => $('#record-dialog').close());
   $('#btn-delete').addEventListener('click', deleteEditing);
 
@@ -1126,6 +1133,7 @@ function bindEvents() {
     getRecord: (id) => store.getRecords().find((r) => r.id === id),
     saveRecord: (r) => save(r, false, { quiet: true }),
     frequentMeds,
+    medText,
     now: nowLocal,
     notify: (msg) => (needsBackup()
       ? toast(msg, 8000, { label: t('backup.short'), icon: 'cloudUp', run: signIn })

@@ -6,8 +6,8 @@
 // - 'end'：按「結束了」時，若有用藥但沒填效果 → 只問「藥有效嗎？」
 // 最後一題答完直接關閉，用提示訊息告知已記錄（不另外放一頁「完成」，少按一次）。
 
-import { OPTIONS, guessTiming } from './schema.js';
-import { createHeadMap } from './widgets.js';
+import { OPTIONS, newDose } from './schema.js';
+import { createHeadMap, intensityButtons } from './widgets.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -17,7 +17,7 @@ const SYMPTOM_CHOICES = [
   ...['nausea', 'vomiting', 'photophobia', 'phonophobia', 'osmophobia', 'dizziness'].map((c) => ({ field: 'symptoms', code: c, key: `opt.symptoms.${c}` })),
 ];
 
-export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, now, notify, discard }) {
+export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, medText, now, notify, discard }) {
   let recordId = null;
   let steps = [];
   let index = 0;
@@ -53,10 +53,9 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
   // ---------- 每一題 ----------
 
   function intensityStep(r) {
-    const btns = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => `
-      <button type="button" class="qf-num i${n}" data-intensity="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('');
+    const btns = intensityButtons(r.intensity, 'qf-num');
     return `
-      <h2>${esc(t('log.howBad'))}</h2>
+      <h2>${esc(t('log.peak'))}</h2>
       <div class="qf-scale"><span>${esc(t('qf.low'))}</span><span>${esc(t('qf.high'))}</span></div>
       <div class="qf-grid qf-intensity">${btns}</div>`;
   }
@@ -79,14 +78,21 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       ${red ? `<p class="qf-warning" role="alert">${esc(t('form.auraWarning'))}</p>` : ''}`;
   }
 
+  // 跟進行中卡片一樣：點一次記一次（吃了兩次就點兩次），點錯用清單上的 ✕ 刪掉
   function medsStep(r) {
-    const taken = new Set((r.meds ?? []).map((m) => m.code));
-    const btns = frequentMeds().slice(0, 6).map((c) => `
-      <button type="button" class="qf-chip qf-med" data-med="${c}" aria-pressed="${taken.has(c)}">${esc(t(`med.${c}`))}</button>`).join('');
+    const meds = r.meds ?? [];
+    const btns = frequentMeds().map((c) => {
+      const n = meds.filter((m) => m.code === c).length;
+      return `
+      <button type="button" class="qf-chip qf-med" data-med="${c}" aria-pressed="${n > 0}">${esc(t(`med.${c}`))}${n > 1 ? ` ×${n}` : ''}</button>`;
+    }).join('');
+    const taken = meds.map((m, i) => `
+      <li><span>${esc(medText(m))}</span><button type="button" class="qf-remove" data-remove-med="${i}" aria-label="${esc(t('form.remove'))}">✕</button></li>`).join('');
     return `
       <h2>${esc(t('qf.meds'))}</h2>
       <p class="qf-hint">${esc(t('qf.medsHint'))}</p>
-      <div class="qf-grid qf-chips">${btns}</div>`;
+      <div class="qf-grid qf-chips">${btns}</div>
+      ${taken ? `<ul class="qf-taken">${taken}</ul>` : ''}`;
   }
 
   function effectStep(r) {
@@ -164,12 +170,11 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       return render();
     }
     if (el.dataset.med) {
-      const code = el.dataset.med;
-      const meds = (r.meds ?? []).some((m) => m.code === code)
-        ? r.meds.filter((m) => m.code !== code)
-        // 用量先記 1、服藥時間記現在；事後可在完整表單修改
-        : [...(r.meds ?? []), { code, amount: 1, timing: guessTiming(r.intensity), name: '', at: now() }];
-      update({ meds });
+      update({ meds: [...(r.meds ?? []), newDose(el.dataset.med, { intensity: r.intensity, at: now() })] });
+      return render();
+    }
+    if (el.dataset.removeMed) {
+      update({ meds: r.meds.filter((_, i) => i !== Number(el.dataset.removeMed)) });
       return render();
     }
 

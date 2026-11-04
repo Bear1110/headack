@@ -18,15 +18,15 @@ export function doseLabel(t, m) {
 // ---------- 用藥 ----------
 
 // getFrequent(): 依使用者過去紀錄排序的常用藥代碼（無紀錄時用語系預設）
-// defaultTime(): 新增一筆藥時預填的服藥時間（發作進行中 = 現在；補記過去的 = 空白）
+// makeDose(code): 新增一筆藥的預設值（服藥時間、時機由呼叫端依表單狀態決定，見 schema.newDose）
 // 服藥時間在編輯器裡只管時:分，日期由存檔時依開始時間決定（見 app.js submitForm）
-export function createMedEditor(root, { t, getFrequent, defaultTime }) {
+export function createMedEditor(root, { t, getFrequent, makeDose }) {
   let meds = [];
 
   const CATEGORY_ORDER = ['simple', 'combination', 'triptan', 'ergot', 'opioid'];
 
   function render() {
-    const quick = getFrequent().slice(0, 4);
+    const quick = getFrequent();
     const groups = CATEGORY_ORDER.map((cat) => {
       const opts = MEDS.filter((m) => m.category === cat && m.code !== 'other_med')
         .map((m) => `<option value="${m.code}">${esc(t(`med.${m.code}`))}</option>`).join('');
@@ -71,7 +71,7 @@ export function createMedEditor(root, { t, getFrequent, defaultTime }) {
 
   function add(code) {
     if (!MED_BY_CODE[code]) return;
-    meds.push({ code, amount: 1, timing: '', name: '', at: defaultTime() });
+    meds.push(makeDose(code));
     render();
     if (code === 'other_med') root.querySelector('.med-item:last-child .med-name')?.focus();
   }
@@ -114,6 +114,30 @@ export function createMedEditor(root, { t, getFrequent, defaultTime }) {
     set(list) { meds = (list ?? []).map((m) => ({ ...m })); render(); },
     get() { return meds.filter((m) => m.code !== 'other_med' || m.name.trim()).map((m) => ({ ...m, name: m.name?.trim() ?? '' })); },
     render,
+  };
+}
+
+// ---------- 疼痛程度 ----------
+
+// 1–10 按鈕：進行中卡片、表單、快速問答（cls 給大按鈕樣式）共用，點擊以 data-intensity 判斷
+export function intensityButtons(selected, cls = '') {
+  return Array.from({ length: 10 }, (_, i) => i + 1)
+    .map((n) => `<button type="button" class="${cls} i${n}" data-intensity="${n}" aria-pressed="${selected === n}">${n}</button>`).join('');
+}
+
+// 表單用：再點一次已選的分數 = 取消（回到未記錄 null）。只切換按鈕狀態不重繪，保留鍵盤焦點
+export function createIntensityPicker(root) {
+  let value = null;
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-intensity]');
+    if (!btn) return;
+    const n = Number(btn.dataset.intensity);
+    value = value === n ? null : n;
+    root.querySelectorAll('[data-intensity]').forEach((b) => b.setAttribute('aria-pressed', Number(b.dataset.intensity) === value));
+  });
+  return {
+    set(v) { value = v ?? null; root.innerHTML = intensityButtons(value); },
+    get: () => value,
   };
 }
 

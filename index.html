@@ -277,10 +277,10 @@
           <label class="field"><span data-i18n="form.start"></span><input type="datetime-local" name="start" required></label>
           <label class="field"><span data-i18n="form.end"></span><input type="datetime-local" name="end"></label>
         </div>
-        <label class="field">
-          <span><span data-i18n="form.intensity"></span> <strong><output id="intensity-out">5</output>/10</strong></span>
-          <input type="range" name="intensity" min="0" max="10" step="1" value="5">
-        </label>
+        <fieldset class="field">
+          <legend data-i18n="form.intensity"></legend>
+          <div id="intensity-options" class="intensity-pick"></div>
+        </fieldset>
         <fieldset class="field">
           <legend data-i18n="form.type"></legend>
           <p class="muted small hint" data-i18n="form.typeHint"></p>
