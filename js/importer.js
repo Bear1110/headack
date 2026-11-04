@@ -40,7 +40,7 @@ After this message I will paste my notes. Convert every headache episode in them
       "aura": ["visual"],
       "symptoms": ["nausea", "photophobia"],
       "meds": [
-        { "code": "eve", "amount": 1, "timing": "early" },
+        { "code": "eve", "amount": 1, "timing": "early", "at": "2026-09-30T15:00" },
         { "code": "other_med", "name": "Fioricet", "amount": 0.5, "timing": "severe" }
       ],
       "med_effect": "good",
@@ -69,6 +69,7 @@ ${list('opt.symptoms', OPTIONS.symptoms)}
   - "code": from the list below. Map brand names to the matching code. If nothing matches, use "other_med" and put the real name in "name".
   - "amount": number of tablets / sprays / injections (0.5 steps), or null if unknown.
   - "timing": one of ${timings}, or "".
+  - "at": when this dose was taken, "YYYY-MM-DDTHH:mm", or "" if unknown.
 ${list('med', MED_CODES)}
 - "med_effect": one code, or "":
 ${list('opt.med_effect', OPTIONS.med_effect)}
@@ -152,6 +153,7 @@ function normMed(item) {
     amount: hasAmount ? Math.round(amount * 2) / 2 : null,
     timing: lookups.timing.get(norm(obj.timing)) ?? '',
     name: code === 'other_med' ? String(obj.name || obj.code || '').trim() : '',
+    at: normTime(obj.at) || '',
   };
 }
 

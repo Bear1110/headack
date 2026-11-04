@@ -356,6 +356,7 @@ export default {
   'form.remove': 'Remove',
   'form.dose': 'Dose',
   'form.timing': 'When taken',
+  'form.medTime': 'Time taken',
   'form.less': 'Less',
   'form.more': 'More',
   'opt.aura.visual': 'Visual (flashing lights, zigzag lines, blind spots)',

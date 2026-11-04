@@ -356,6 +356,7 @@ export default {
   'form.remove': '削除',
   'form.dose': '量',
   'form.timing': '飲んだタイミング',
+  'form.medTime': '飲んだ時刻',
   'form.less': '減らす',
   'form.more': '増やす',
   'opt.aura.visual': '視覚（閃輝暗点・ギザギザの光・見えにくい部分）',

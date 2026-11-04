@@ -17,7 +17,7 @@ const SYMPTOM_CHOICES = [
   ...['nausea', 'vomiting', 'photophobia', 'phonophobia', 'osmophobia', 'dizziness'].map((c) => ({ field: 'symptoms', code: c, key: `opt.symptoms.${c}` })),
 ];
 
-export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, notify, discard }) {
+export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds, now, notify, discard }) {
   let recordId = null;
   let steps = [];
   let index = 0;
@@ -167,8 +167,8 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       const code = el.dataset.med;
       const meds = (r.meds ?? []).some((m) => m.code === code)
         ? r.meds.filter((m) => m.code !== code)
-        // 用量先記 1，時機依疼痛程度推斷；事後可在完整表單修改
-        : [...(r.meds ?? []), { code, amount: 1, timing: (r.intensity ?? 0) >= 7 ? 'severe' : 'early', name: '' }];
+        // 用量先記 1，時機依疼痛程度推斷，服藥時間記現在；事後可在完整表單修改
+        : [...(r.meds ?? []), { code, amount: 1, timing: (r.intensity ?? 0) >= 7 ? 'severe' : 'early', name: '', at: now() }];
       update({ meds });
       return render();
     }

@@ -31,6 +31,7 @@ function entryLine(r, includeNotes) {
     m.code === 'other_med' && m.name ? m.name.replace(/[,;=|]/g, ' ') : m.code,
     Number.isFinite(m.amount) ? `x${m.amount}` : '',
     m.timing,
+    m.at ? `@${m.at.slice(11, 16)}` : '',
   ].filter(Boolean).join(' ')).join(','));
   add('effect', r.med_effect);
   add('trig', r.triggers?.join(','));

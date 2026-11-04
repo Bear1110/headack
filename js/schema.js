@@ -22,7 +22,8 @@ export const RECORD_COLUMNS = [
   'pain_quality', // 疼痛感覺代碼，以 ; 分隔（描述症狀，不用來推測類型）
   'aura',        // 預兆（先兆）代碼，以 ; 分隔
   'symptoms',    // 伴隨症狀代碼，以 ; 分隔
-  'meds',        // 每次用藥，以 ; 分隔；每筆為「代碼:用量:時機[:自訂名稱]」，例如 eve:1:early;sumatriptan:0.5:severe
+  'meds',        // 每次用藥，以 ; 分隔；每筆為「代碼:用量:時機[:自訂名稱][:@服藥時間]」，例如 eve:1:early::@2026-11-05T1432;sumatriptan:0.5:severe
+                 // 服藥時間寫成 @YYYY-MM-DDTHHmm（不含冒號，因為冒號是分隔符）
   'med_effect',  // 用藥效果代碼
   'triggers',    // 誘發因子代碼，以 ; 分隔
   'notes',       // 自由文字
@@ -108,24 +109,29 @@ export function newId() {
 
 const clean = (s) => String(s ?? '').replace(/[;:]/g, ' ').trim();
 
+const AT_RE = /^@(\d{4}-\d{2}-\d{2}T\d{2})(\d{2})$/;
+
 export function serializeMeds(meds) {
   return (meds ?? []).map((m) => {
-    const parts = [m.code, m.amount ?? '', m.timing ?? ''];
-    if (m.name) parts.push(clean(m.name));
+    const parts = [m.code, m.amount ?? '', m.timing ?? '', m.name ? clean(m.name) : ''];
+    if (m.at) parts.push(`@${m.at.replace(/:/g, '')}`);
     return parts.join(':').replace(/:+$/, '');
   }).join(';');
 }
 
-// 也接受舊格式（只有代碼，例如 "ibuprofen;triptan"）
+// 也接受舊格式（只有代碼，例如 "ibuprofen;triptan"；或沒有服藥時間）
 export function parseMeds(text) {
   return String(text ?? '').split(';').map((s) => s.trim()).filter(Boolean).map((s) => {
     const [code, amount, timing, ...name] = s.split(':');
+    const at = name.at(-1)?.match(AT_RE);
+    if (at) name.pop();
     const n = Number(amount);
     return {
       code: MED_BY_CODE[code] ? code : 'other_med',
       amount: amount && Number.isFinite(n) ? n : null,
       timing: MED_TIMINGS.includes(timing) ? timing : '',
       name: MED_BY_CODE[code] ? name.join(' ').trim() : (name.join(' ').trim() || code),
+      at: at ? `${at[1]}:${at[2]}` : '',
     };
   });
 }

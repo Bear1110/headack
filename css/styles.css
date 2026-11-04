@@ -557,6 +557,10 @@ dialog form { display: flex; flex-direction: column; height: 100%; }
   min-height: var(--tap); padding: .25rem .4rem; cursor: pointer; line-height: 1.2;
 }
 .seg button + button { border-inline-start: 1px solid var(--border); }
+.med-time { display: inline-flex; align-items: center; gap: .3rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding-inline: .5rem; color: var(--muted); }
+.med-time svg { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.med-time input { border: 0; background: transparent; color: var(--text); font: inherit; min-height: 2.4rem; padding: 0; }
+.med-time input::-webkit-calendar-picker-indicator { display: none; }
 .seg button[aria-checked="true"] { background: var(--primary); color: var(--primary-text); font-weight: 600; }
 
 /* 疼痛位置頭部圖 */

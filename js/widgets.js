@@ -18,7 +18,9 @@ export function doseLabel(t, m) {
 // ---------- 用藥 ----------
 
 // getFrequent(): 依使用者過去紀錄排序的常用藥代碼（無紀錄時用語系預設）
-export function createMedEditor(root, { t, getFrequent }) {
+// defaultTime(): 新增一筆藥時預填的服藥時間（發作進行中 = 現在；補記過去的 = 空白）
+// 服藥時間在編輯器裡只管時:分，日期由存檔時依開始時間決定（見 app.js submitForm）
+export function createMedEditor(root, { t, getFrequent, defaultTime }) {
   let meds = [];
 
   const CATEGORY_ORDER = ['simple', 'combination', 'triptan', 'ergot', 'opioid'];
@@ -55,6 +57,10 @@ export function createMedEditor(root, { t, getFrequent }) {
                 <output>${esc(doseLabel(t, m) || '—')}</output>
                 <button type="button" data-act="more" aria-label="${esc(t('form.more'))}">＋</button>
               </div>
+              <label class="med-time" title="${esc(t('form.medTime'))}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <input type="time" class="med-at" value="${esc(m.at?.slice(-5))}" aria-label="${esc(t('form.medTime'))}">
+              </label>
               <div class="seg" role="radiogroup" aria-label="${esc(t('form.timing'))}">
                 ${MED_TIMINGS.map((tm) => `<button type="button" role="radio" data-act="timing" data-v="${tm}" aria-checked="${m.timing === tm}">${esc(t(`timing.${tm}`))}</button>`).join('')}
               </div>
@@ -65,12 +71,18 @@ export function createMedEditor(root, { t, getFrequent }) {
 
   function add(code) {
     if (!MED_BY_CODE[code]) return;
-    meds.push({ code, amount: 1, timing: '', name: '' });
+    meds.push({ code, amount: 1, timing: '', name: '', at: defaultTime() });
     render();
     if (code === 'other_med') root.querySelector('.med-item:last-child .med-name')?.focus();
   }
 
   root.addEventListener('click', (e) => {
+    // 整個時間 chip 都能點開時間選擇器（桌面版 Chrome 預設只有小圖示能點）
+    const timeInput = e.target.closest('.med-time')?.querySelector('.med-at');
+    if (timeInput) {
+      try { timeInput.showPicker(); } catch { /* 不支援時照原生行為 */ }
+      return;
+    }
     const addBtn = e.target.closest('[data-add]');
     if (addBtn) return add(addBtn.dataset.add);
     const btn = e.target.closest('[data-act]');
@@ -88,6 +100,8 @@ export function createMedEditor(root, { t, getFrequent }) {
 
   root.addEventListener('change', (e) => {
     if (e.target.matches('.med-add') && e.target.value) add(e.target.value);
+    // 不重繪：時間選擇器在手機上可能還開著
+    if (e.target.matches('.med-at')) meds[Number(e.target.closest('.med-item').dataset.i)].at = e.target.value;
   });
 
   // 自訂藥名：直接更新狀態，不重繪（避免輸入中失去焦點）

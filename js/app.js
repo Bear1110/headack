@@ -4,7 +4,7 @@ import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS, dateLabel, clockLabel } from './i18n.js';
-import { localDate, daysCovered, monthStats } from './stats.js';
+import { localDate, daysCovered, monthStats, medTimeOnStart } from './stats.js';
 import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
 import { applyIcons, icon } from './icons.js';
@@ -329,7 +329,7 @@ function submitForm(e) {
     type: form.querySelector('input[name="type"]:checked')?.value ?? '',
     pain_quality: checked('pain_quality'),
     locations: headMap.get(),
-    meds: medEditor.get(),
+    meds: medEditor.get().map((m) => ({ ...m, at: medTimeOnStart(f.start.value, m.at?.slice(-5)) })),
     med_effect: form.querySelector('input[name="med_effect"]:checked')?.value ?? '',
     triggers: checked('triggers'),
     aura: checked('aura'),
@@ -573,6 +573,12 @@ function isOngoing(r) {
   return !!r.start && !r.end && Date.now() - new Date(r.start) < ONGOING_WINDOW_MS;
 }
 
+// 新增用藥時要不要預填「現在」：比 isOngoing 嚴格，開始超過 STALE_HOURS 多半是補記，現在的時間反而是錯的
+function isLive(r) {
+  const age = Date.now() - new Date(r.start);
+  return !r.end && age >= 0 && age < STALE_HOURS * 3600 * 1000;
+}
+
 // 列表與匯入預覽共用的一行摘要
 function recordSummary(r) {
   return [
@@ -646,7 +652,7 @@ function recordItemHtml(r, { showType = false } = {}) {
   const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;
   const tags = [
     isOngoing(r) ? tag('ongoing', escapeHtml(t('list.ongoing'))) : '',
-    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml([medLabel(t, m), doseLabel(t, m)].filter(Boolean).join(' '))}`)),
+    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml([medLabel(t, m), doseLabel(t, m), m.at ? clockLabel(new Date(m.at)) : ''].filter(Boolean).join(' '))}`)),
     r.aura?.length ? tag('aura', `${icon('aura')}${escapeHtml(t('list.auraBadge'))}`) : '',
     showType && r.type && r.type !== 'unknown' ? tag('type', escapeHtml(t(`opt.type.${r.type}`))) : '',
     Number.isFinite(r.pressure_change_24h) && r.pressure_change_24h <= PRESSURE_DROP
@@ -1029,7 +1035,12 @@ function showView(name) {
 // ---------- 啟動 ----------
 
 function bindEvents() {
-  medEditor = createMedEditor($('#med-editor'), { t, getFrequent: frequentMeds });
+  const f = $('#record-form').elements;
+  medEditor = createMedEditor($('#med-editor'), {
+    t,
+    getFrequent: frequentMeds,
+    defaultTime: () => (isLive({ start: f.start.value, end: f.end.value }) ? nowLocal() : ''),
+  });
   headMap = createHeadMap($('#head-map'), { t });
 
   $('#btn-signin').addEventListener('click', signIn);
@@ -1092,6 +1103,7 @@ function bindEvents() {
     getRecord: (id) => store.getRecords().find((r) => r.id === id),
     saveRecord: (r) => save(r, false, { quiet: true }),
     frequentMeds,
+    now: nowLocal,
     notify: (msg) => (needsBackup()
       ? toast(msg, 8000, { label: t('backup.short'), icon: 'cloudUp', run: signIn })
       : toast(msg, 5000)),

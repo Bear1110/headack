@@ -25,6 +25,19 @@ export function localDate(d) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+export function addDays(day, n) {
+  const d = new Date(`${day}T00:00`);
+  d.setDate(d.getDate() + n);
+  return localDate(d);
+}
+
+// 服藥時間只記時:分，日期以發作開始那天為準；早於開始時間的視為跨過午夜（隔天）
+export function medTimeOnStart(start, hhmm) {
+  if (!hhmm || !start) return '';
+  const day = start.slice(0, 10);
+  return `${hhmm >= start.slice(11, 16) ? day : addDays(day, 1)}T${hhmm}`;
+}
+
 // month: 'YYYY-MM'
 export function monthStats(records, month) {
   const inMonth = (day) => day.startsWith(month);

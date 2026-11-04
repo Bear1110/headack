@@ -356,6 +356,7 @@ export default {
   'form.remove': '移除',
   'form.dose': '用量',
   'form.timing': '服用時機',
+  'form.medTime': '服藥時間',
   'form.less': '減少',
   'form.more': '增加',
   'opt.aura.visual': '視覺（閃光、鋸齒線、視野缺損）',
