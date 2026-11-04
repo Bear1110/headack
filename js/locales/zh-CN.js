@@ -51,6 +51,8 @@ export default {
   'log.saved': '已记录',
   'log.howBad': '现在有多痛？',
   'log.peak': '这次最痛到几分？',
+  'log.tookMed': '刚吃了药？',
+  'log.medTaken': '已记录 {m}（{t}）',
   'qf.step': '{i} / {n}',
   'qf.low': '轻微',
   'qf.high': '最痛',

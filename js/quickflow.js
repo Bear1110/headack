@@ -6,7 +6,7 @@
 // - 'end'：按「結束了」時，若有用藥但沒填效果 → 只問「藥有效嗎？」
 // 最後一題答完直接關閉，用提示訊息告知已記錄（不另外放一頁「完成」，少按一次）。
 
-import { OPTIONS } from './schema.js';
+import { OPTIONS, guessTiming } from './schema.js';
 import { createHeadMap } from './widgets.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -167,8 +167,8 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       const code = el.dataset.med;
       const meds = (r.meds ?? []).some((m) => m.code === code)
         ? r.meds.filter((m) => m.code !== code)
-        // 用量先記 1，時機依疼痛程度推斷，服藥時間記現在；事後可在完整表單修改
-        : [...(r.meds ?? []), { code, amount: 1, timing: (r.intensity ?? 0) >= 7 ? 'severe' : 'early', name: '', at: now() }];
+        // 用量先記 1、服藥時間記現在；事後可在完整表單修改
+        : [...(r.meds ?? []), { code, amount: 1, timing: guessTiming(r.intensity), name: '', at: now() }];
       update({ meds });
       return render();
     }

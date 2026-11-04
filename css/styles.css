@@ -218,6 +218,8 @@ body[data-view="settings"] #view-settings { display: flex; }
 .ongoing .label { margin: .75rem 0 .4rem; font-size: .9rem; color: var(--muted); }
 /* 開始很久還沒結束：邊框改警示色，加一行提醒 */
 .ongoing.stale { border-color: var(--warning-text); }
+.ongoing-meds { display: flex; align-items: flex-start; gap: .4rem; margin: 0 0 .5rem; color: var(--text); }
+.ongoing-meds .icon { width: 18px; height: 18px; flex: none; margin-top: .1em; color: var(--primary); }
 .ongoing-note { display: flex; align-items: flex-start; gap: .4rem; margin-top: .6rem; padding: .5rem .65rem; border-radius: 10px; line-height: 1.4; }
 .ongoing-note .icon { width: 18px; height: 18px; flex: none; margin-top: .1em; }
 .intensity-pick { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }

@@ -76,6 +76,9 @@ export const MED_BY_CODE = Object.fromEntries(MEDS.map((m) => [m.code, m]));
 // 服藥時機
 export const MED_TIMINGS = ['prodrome', 'early', 'severe'];
 
+// 發作當下快速記錄用藥時，依目前疼痛程度推斷時機；事後可在完整表單修改
+export const guessTiming = (intensity) => ((intensity ?? 0) >= 7 ? 'severe' : 'early');
+
 // 用量選擇的步進
 export const DOSE_STEP = 0.5;
 

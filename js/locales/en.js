@@ -51,6 +51,8 @@ export default {
   'log.saved': 'Saved',
   'log.howBad': 'How bad is it right now?',
   'log.peak': 'Worst it has been this time?',
+  'log.tookMed': 'Took something?',
+  'log.medTaken': 'Saved {m} at {t}',
   'qf.step': '{i} of {n}',
   'qf.low': 'Mild',
   'qf.high': 'Worst',

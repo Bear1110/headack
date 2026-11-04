@@ -51,6 +51,8 @@ export default {
   'log.saved': '記録しました',
   'log.howBad': '今の痛みはどのくらいですか？',
   'log.peak': '今回いちばん痛かったのは何点？',
+  'log.tookMed': '薬を飲みましたか？',
+  'log.medTaken': '{m}（{t}）を記録しました',
   'qf.step': '{i} / {n}',
   'qf.low': '軽い',
   'qf.high': '最も強い',

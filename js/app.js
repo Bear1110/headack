@@ -1,7 +1,7 @@
 import * as auth from './auth.js';
 import * as store from './store.js';
 import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
-import { OPTIONS, MED_BY_CODE, newId } from './schema.js';
+import { OPTIONS, MED_BY_CODE, newId, guessTiming } from './schema.js';
 import { createMedEditor, createHeadMap, medLabel, doseLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS, dateLabel, clockLabel } from './i18n.js';
 import { localDate, daysCovered, monthStats, medTimeOnStart } from './stats.js';
@@ -250,6 +250,17 @@ function endRecord(id) {
   // 有吃藥但還沒填效果：結束當下最記得，問一題就好；否則提供「復原」（避免誤觸）
   if (r.meds?.length && !r.med_effect) quickFlow.open(id, 'end');
   else toast(t('undo.ended'), 6000, { label: t('undo.undo'), run: () => save({ ...r }, false, { quiet: true }) });
+}
+
+// 進行中卡片上的「吃了 X」：一鍵記下用藥（用量 1、時間是現在），同一種藥再按一次就是再吃一次
+function takeMed(id, code) {
+  const r = store.getRecords().find((x) => x.id === id);
+  if (!r) return;
+  buzz(20);
+  const med = { code, amount: 1, timing: guessTiming(r.intensity), name: '', at: nowLocal() };
+  save({ ...r, meds: [...(r.meds ?? []), med] }, false, { quiet: true });
+  toast(t('log.medTaken', { m: medLabel(t, med), t: clockLabel(new Date(med.at)) }), 6000,
+    { label: t('undo.undo'), run: () => save({ ...r }, false, { quiet: true }) });
 }
 
 // ---------- 表單 ----------
@@ -544,6 +555,7 @@ function renderSync() {
 function renderOngoing() {
   const ongoing = store.getRecords().filter(isOngoing).sort((a, b) => b.start.localeCompare(a.start));
   const levels = Array.from({ length: 10 }, (_, i) => i + 1);
+  const quickMeds = ongoing.length ? frequentMeds().slice(0, 3) : [];
   $('#ongoing').innerHTML = ongoing.map((r) => {
     // 開始很久了還沒按結束：多半是睡著或忘了，問一句並提供補填結束時間
     const hours = Math.floor((Date.now() - new Date(r.start)) / 3600000);
@@ -555,6 +567,11 @@ function renderOngoing() {
       <p class="label">${escapeHtml(t('log.peak'))}</p>
       <div class="intensity-pick" role="group" aria-label="${escapeHtml(t('form.intensity'))}">
         ${levels.map((n) => `<button type="button" class="i${n}" data-action="intensity" data-value="${n}" aria-pressed="${r.intensity === n}">${n}</button>`).join('')}
+      </div>
+      <p class="label">${escapeHtml(t('log.tookMed'))}</p>
+      ${r.meds?.length ? `<p class="ongoing-meds small">${icon('pill')}<span>${escapeHtml(formatList(r.meds.map(medText)))}</span></p>` : ''}
+      <div class="chips">
+        ${quickMeds.map((c) => `<button type="button" class="chip-btn" data-action="med" data-value="${c}">＋ ${escapeHtml(t(`med.${c}`))}</button>`).join('')}
       </div>
       <div class="actions">
         <button class="btn" data-action="end">${t('log.end')}</button>
@@ -577,6 +594,11 @@ function isOngoing(r) {
 function isLive(r) {
   const age = Date.now() - new Date(r.start);
   return !r.end && age >= 0 && age < STALE_HOURS * 3600 * 1000;
+}
+
+// 一次用藥的顯示文字：藥名、用量、服藥時間
+function medText(m) {
+  return [medLabel(t, m), doseLabel(t, m), m.at ? clockLabel(new Date(m.at)) : ''].filter(Boolean).join(' ');
 }
 
 // 列表與匯入預覽共用的一行摘要
@@ -652,7 +674,7 @@ function recordItemHtml(r, { showType = false } = {}) {
   const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;
   const tags = [
     isOngoing(r) ? tag('ongoing', escapeHtml(t('list.ongoing'))) : '',
-    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml([medLabel(t, m), doseLabel(t, m), m.at ? clockLabel(new Date(m.at)) : ''].filter(Boolean).join(' '))}`)),
+    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml(medText(m))}`)),
     r.aura?.length ? tag('aura', `${icon('aura')}${escapeHtml(t('list.auraBadge'))}`) : '',
     showType && r.type && r.type !== 'unknown' ? tag('type', escapeHtml(t(`opt.type.${r.type}`))) : '',
     Number.isFinite(r.pressure_change_24h) && r.pressure_change_24h <= PRESSURE_DROP
@@ -1056,6 +1078,7 @@ function bindEvents() {
     const id = btn.closest('[data-id]').dataset.id;
     if (btn.dataset.action === 'end') endRecord(id);
     else if (btn.dataset.action === 'intensity') setIntensity(id, Number(btn.dataset.value));
+    else if (btn.dataset.action === 'med') takeMed(id, btn.dataset.value);
     else openForm(store.getRecords().find((r) => r.id === id), {}, { focus: btn.dataset.action === 'end-at' ? 'end' : '' });
   });
 
