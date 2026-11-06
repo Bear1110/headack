@@ -7,14 +7,14 @@
 // - 開始時間剛好 00:00 的紀錄視為「時間不明」（多半是只有日期的匯入資料），不納入時段分析。
 
 import { MED_BY_CODE, MOH_THRESHOLDS } from './schema.js';
-import { daysCovered, localDate, addDays } from './stats.js';
+import { daysCovered, localDate, addDays, dayDiff } from './stats.js';
 
 export const DAYS_PER_MONTH = 30.44;
 const EFFECTIVE = new Set(['good', 'complete']);
 
 const dayOf = (iso) => iso.slice(0, 10);
 const hasTime = (iso) => iso.length >= 16 && iso.slice(11, 16) !== '00:00';
-const daysBetween = (from, to) => Math.round((new Date(`${to}T00:00`) - new Date(`${from}T00:00`)) / 86400000) + 1;
+const daysBetween = (from, to) => dayDiff(from, to) + 1; // 含頭尾
 
 function median(sorted) {
   if (!sorted.length) return null;

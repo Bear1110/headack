@@ -31,11 +31,19 @@ export function addDays(day, n) {
   return localDate(d);
 }
 
-// 服藥時間只記時:分，日期以發作開始那天為準；早於開始時間的視為跨過午夜（隔天）
-export function medTimeOnStart(start, hhmm) {
-  if (!hhmm || !start) return '';
-  const day = start.slice(0, 10);
-  return `${hhmm >= start.slice(11, 16) ? day : addDays(day, 1)}T${hhmm}`;
+// 兩個日期（YYYY-MM-DD）相差幾天：以當地午夜相減再四捨五入，遇到夏令時間也不會差一天
+export function dayDiff(from, to) {
+  return Math.round((new Date(`${to}T00:00`) - new Date(`${from}T00:00`)) / 86400000);
+}
+
+// 服藥那天相對於發作開始那天：0 = 當天、1 = 隔天…（頭痛可能持續好幾天，藥不一定當天吃）
+export function medDayOffset(start, at) {
+  return start && at ? dayDiff(start.slice(0, 10), at.slice(0, 10)) : 0;
+}
+
+// 第一次選服藥時間時預設哪一天：早於開始時間的多半是跨過午夜，算隔天
+export function defaultMedDay(start, hhmm) {
+  return start && hhmm < start.slice(11, 16) ? 1 : 0;
 }
 
 // month: 'YYYY-MM'

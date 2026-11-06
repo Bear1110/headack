@@ -2,9 +2,9 @@ import * as auth from './auth.js';
 import * as store from './store.js';
 import { openSpreadsheet, fetchEmail, ApiError } from './sheets.js';
 import { OPTIONS, MED_BY_CODE, newId, newDose } from './schema.js';
-import { createMedEditor, createIntensityPicker, intensityButtons, createHeadMap, medLabel, doseLabel } from './widgets.js';
+import { createMedEditor, createIntensityPicker, intensityButtons, createHeadMap, medLabel, doseLabel, medDayLabel } from './widgets.js';
 import { t, getLang, setLang, initI18n, formatList, LANGS, dateLabel, clockLabel } from './i18n.js';
-import { localDate, daysCovered, monthStats, medTimeOnStart } from './stats.js';
+import { localDate, daysCovered, monthStats, dayDiff, medDayOffset } from './stats.js';
 import { createStatsView } from './statsview.js';
 import { createQuickFlow } from './quickflow.js';
 import { applyIcons, icon } from './icons.js';
@@ -343,7 +343,7 @@ function submitForm(e) {
     type: form.querySelector('input[name="type"]:checked')?.value ?? '',
     pain_quality: checked('pain_quality'),
     locations: headMap.get(),
-    meds: medEditor.get().map((m) => ({ ...m, at: medTimeOnStart(f.start.value, m.at?.slice(-5)) })),
+    meds: medEditor.get(),
     med_effect: form.querySelector('input[name="med_effect"]:checked')?.value ?? '',
     triggers: checked('triggers'),
     aura: checked('aura'),
@@ -571,7 +571,7 @@ function renderOngoing() {
         ${intensityButtons(r.intensity)}
       </div>
       <p class="label">${escapeHtml(t('log.tookMed'))}</p>
-      ${r.meds?.length ? `<p class="ongoing-meds small">${icon('pill')}<span>${escapeHtml(formatList(r.meds.map(medText)))}</span></p>` : ''}
+      ${r.meds?.length ? `<p class="ongoing-meds small">${icon('pill')}<span>${escapeHtml(formatList(r.meds.map((m) => medText(m, r.start))))}</span></p>` : ''}
       <div class="chips">
         ${quickMeds.map((c) => `<button type="button" class="chip-btn" data-action="med" data-value="${c}">＋ ${escapeHtml(t(`med.${c}`))}</button>`).join('')}
       </div>
@@ -598,9 +598,10 @@ function isLive(r) {
   return !r.end && age >= 0 && age < STALE_HOURS * 3600 * 1000;
 }
 
-// 一次用藥的顯示文字：藥名、用量、服藥時間
-function medText(m) {
-  return [medLabel(t, m), doseLabel(t, m), m.at ? clockLabel(new Date(m.at)) : ''].filter(Boolean).join(' ');
+// 一次用藥的顯示文字：藥名、用量、服藥時間（不是發作當天吃的，前面加「隔天」等）
+function medText(m, start) {
+  const n = medDayOffset(start, m.at);
+  return [medLabel(t, m), doseLabel(t, m), n ? medDayLabel(t, n, start.slice(0, 10)) : '', m.at ? clockLabel(new Date(m.at)) : ''].filter(Boolean).join(' ');
 }
 
 // 列表與匯入預覽共用的一行摘要
@@ -676,7 +677,7 @@ function recordItemHtml(r, { showType = false } = {}) {
   const tag = (cls, content) => `<span class="tag ${cls}">${content}</span>`;
   const tags = [
     isOngoing(r) ? tag('ongoing', escapeHtml(t('list.ongoing'))) : '',
-    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml(medText(m))}`)),
+    ...(r.meds ?? []).map((m) => tag('med', `${icon('pill')}${escapeHtml(medText(m, r.start))}`)),
     r.aura?.length ? tag('aura', `${icon('aura')}${escapeHtml(t('list.auraBadge'))}`) : '',
     showType && r.type && r.type !== 'unknown' ? tag('type', escapeHtml(t(`opt.type.${r.type}`))) : '',
     Number.isFinite(r.pressure_change_24h) && r.pressure_change_24h <= PRESSURE_DROP
@@ -877,7 +878,7 @@ function renderHomeSummary() {
     const d = (r.end || r.start).slice(0, 10);
     return d > max ? d : max;
   }, '');
-  const since = Math.round((new Date(`${today}T00:00`) - new Date(`${lastDay}T00:00`)) / 86400000);
+  const since = dayDiff(lastDay, today);
   const m = monthStats(records, thisMonth());
   const parts = [];
   if (!records.some(isOngoing)) parts.push(since <= 0 ? t('home.today') : t('home.since', { n: since }));
@@ -1068,6 +1069,7 @@ function bindEvents() {
       intensity: intensityPicker.get(),
       at: isLive({ start: f.start.value, end: f.end.value }) ? nowLocal() : '',
     }),
+    getStart: () => f.start.value,
   });
   headMap = createHeadMap($('#head-map'), { t });
   intensityPicker = createIntensityPicker($('#intensity-options'));

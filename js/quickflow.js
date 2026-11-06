@@ -87,7 +87,7 @@ export function createQuickFlow(dialog, { t, getRecord, saveRecord, frequentMeds
       <button type="button" class="qf-chip qf-med" data-med="${c}" aria-pressed="${n > 0}">${esc(t(`med.${c}`))}${n > 1 ? ` ×${n}` : ''}</button>`;
     }).join('');
     const taken = meds.map((m, i) => `
-      <li><span>${esc(medText(m))}</span><button type="button" class="qf-remove" data-remove-med="${i}" aria-label="${esc(t('form.remove'))}">✕</button></li>`).join('');
+      <li><span>${esc(medText(m, r.start))}</span><button type="button" class="qf-remove" data-remove-med="${i}" aria-label="${esc(t('form.remove'))}">✕</button></li>`).join('');
     return `
       <h2>${esc(t('qf.meds'))}</h2>
       <p class="qf-hint">${esc(t('qf.medsHint'))}</p>

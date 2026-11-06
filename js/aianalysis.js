@@ -31,7 +31,7 @@ function entryLine(r, includeNotes) {
     m.code === 'other_med' && m.name ? m.name.replace(/[,;=|]/g, ' ') : m.code,
     Number.isFinite(m.amount) ? `x${m.amount}` : '',
     m.timing,
-    m.at ? `@${m.at.slice(11, 16)}` : '',
+    m.at ? `@${m.at.slice(0, 10) === r.start.slice(0, 10) ? m.at.slice(11) : m.at.slice(5).replace('T', ' ')}` : '', // 同結束時間：跨日才帶日期
   ].filter(Boolean).join(' ')).join(','));
   add('effect', r.med_effect);
   add('trig', r.triggers?.join(','));

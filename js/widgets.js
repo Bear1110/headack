@@ -2,6 +2,8 @@
 // 兩者都是「狀態在 JS、畫面每次整段重繪」的簡單元件，對外提供 set() / get()。
 
 import { MEDS, MED_BY_CODE, MED_TIMINGS, DOSE_STEP } from './schema.js';
+import { addDays, medDayOffset, defaultMedDay } from './stats.js';
+import { dateLabel } from './i18n.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -17,11 +19,29 @@ export function doseLabel(t, m) {
 
 // ---------- 用藥 ----------
 
+// 服藥日相對於發作開始那天（startDay: YYYY-MM-DD）的標示
+export function medDayLabel(t, n, startDay) {
+  if (n === 0) return t('form.day0');
+  if (n === 1) return t('form.day1');
+  if (n > 1) return t('form.dayN', { n: n + 1 });
+  return dateLabel(new Date(`${addDays(startDay, n)}T00:00`)); // 早於開始那天（少見）：直接顯示日期
+}
+
 // getFrequent(): 依使用者過去紀錄排序的常用藥代碼（無紀錄時用語系預設）
 // makeDose(code): 新增一筆藥的預設值（服藥時間、時機由呼叫端依表單狀態決定，見 schema.newDose）
-// 服藥時間在編輯器裡只管時:分，日期由存檔時依開始時間決定（見 app.js submitForm）
-export function createMedEditor(root, { t, getFrequent, makeDose }) {
+// getStart(): 表單上的開始時間。
+// 服藥時間在編輯器裡記成「第幾天（相對開始那天）+ 時:分」，get() 時才依開始時間換成完整日期，
+// 所以使用者選了「隔天」就一直是隔天，事後改開始時間，服藥日期也跟著移動
+export function createMedEditor(root, { t, getFrequent, makeDose, getStart }) {
   let meds = [];
+  const startDay = () => getStart().slice(0, 10);
+  const toRow = (m) => ({ ...m, day: medDayOffset(getStart(), m.at), time: m.at ? m.at.slice(11, 16) : '' });
+
+  // 「哪一天」選單：當天～第 3 天（偏頭痛最長約 72 小時），已存的日期在範圍外也列進去
+  function dayOptions(m) {
+    return [...new Set([0, 1, 2, m.day])].sort((a, b) => a - b)
+      .map((d) => `<option value="${d}" ${d === m.day ? 'selected' : ''}>${esc(medDayLabel(t, d, startDay()))}</option>`).join('');
+  }
 
   const CATEGORY_ORDER = ['simple', 'combination', 'triptan', 'ergot', 'opioid'];
 
@@ -57,10 +77,11 @@ export function createMedEditor(root, { t, getFrequent, makeDose }) {
                 <output>${esc(doseLabel(t, m) || '—')}</output>
                 <button type="button" data-act="more" aria-label="${esc(t('form.more'))}">＋</button>
               </div>
-              <label class="med-time" title="${esc(t('form.medTime'))}">
+              <div class="med-time">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                <input type="time" class="med-at" value="${esc(m.at?.slice(-5))}" aria-label="${esc(t('form.medTime'))}">
-              </label>
+                <select class="med-day" aria-label="${esc(t('form.medDay'))}" ${m.time ? '' : 'hidden'}>${dayOptions(m)}</select>
+                <input type="time" class="med-at" value="${esc(m.time)}" aria-label="${esc(t('form.medTime'))}">
+              </div>
               <div class="seg" role="radiogroup" aria-label="${esc(t('form.timing'))}">
                 ${MED_TIMINGS.map((tm) => `<button type="button" role="radio" data-act="timing" data-v="${tm}" aria-checked="${m.timing === tm}">${esc(t(`timing.${tm}`))}</button>`).join('')}
               </div>
@@ -71,14 +92,14 @@ export function createMedEditor(root, { t, getFrequent, makeDose }) {
 
   function add(code) {
     if (!MED_BY_CODE[code]) return;
-    meds.push(makeDose(code));
+    meds.push(toRow(makeDose(code)));
     render();
     if (code === 'other_med') root.querySelector('.med-item:last-child .med-name')?.focus();
   }
 
   root.addEventListener('click', (e) => {
-    // 整個時間 chip 都能點開時間選擇器（桌面版 Chrome 預設只有小圖示能點）
-    const timeInput = e.target.closest('.med-time')?.querySelector('.med-at');
+    // 時間 chip 上除了「哪一天」選單，點哪裡都打開時間選擇器（桌面版 Chrome 預設只有小圖示能點）
+    const timeInput = !e.target.closest('.med-day') && e.target.closest('.med-time')?.querySelector('.med-at');
     if (timeInput) {
       try { timeInput.showPicker(); } catch { /* 不支援時照原生行為 */ }
       return;
@@ -100,8 +121,18 @@ export function createMedEditor(root, { t, getFrequent, makeDose }) {
 
   root.addEventListener('change', (e) => {
     if (e.target.matches('.med-add') && e.target.value) add(e.target.value);
-    // 不重繪：時間選擇器在手機上可能還開著
-    if (e.target.matches('.med-at')) meds[Number(e.target.closest('.med-item').dataset.i)].at = e.target.value;
+    // 時間與日期都不整段重繪：手機上的選擇器可能還開著，只就地更新「哪一天」選單
+    const item = e.target.closest('.med-item');
+    if (!item) return;
+    const m = meds[Number(item.dataset.i)];
+    const day = item.querySelector('.med-day');
+    if (e.target.matches('.med-at')) {
+      if (!m.time && e.target.value) m.day = defaultMedDay(getStart(), e.target.value); // 第一次選才推哪一天
+      m.time = e.target.value;
+      day.hidden = !m.time;
+      day.innerHTML = dayOptions(m);
+    }
+    if (e.target.matches('.med-day')) m.day = Number(e.target.value);
   });
 
   // 自訂藥名：直接更新狀態，不重繪（避免輸入中失去焦點）
@@ -111,8 +142,14 @@ export function createMedEditor(root, { t, getFrequent, makeDose }) {
   });
 
   return {
-    set(list) { meds = (list ?? []).map((m) => ({ ...m })); render(); },
-    get() { return meds.filter((m) => m.code !== 'other_med' || m.name.trim()).map((m) => ({ ...m, name: m.name?.trim() ?? '' })); },
+    set(list) { meds = (list ?? []).map(toRow); render(); },
+    get() {
+      return meds.filter((m) => m.code !== 'other_med' || m.name.trim()).map(({ day, time, ...m }) => ({
+        ...m,
+        name: m.name?.trim() ?? '',
+        at: time && startDay() ? `${addDays(startDay(), day)}T${time}` : '',
+      }));
+    },
     render,
   };
 }
