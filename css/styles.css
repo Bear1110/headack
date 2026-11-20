@@ -99,6 +99,13 @@ h2 { font-size: 1rem; margin: 0 0 .5rem; }
 @keyframes pulse { 50% { opacity: .35; } }
 .sync-count { font-weight: 700; font-variant-numeric: tabular-nums; }
 .sync-text { display: none; }
+/* 權杖過期的「重新連線」：跟同步狀態一樣是雲朵圖示（可點），不是文字按鈕 */
+#btn-signin.reconnect {
+  display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .35rem;
+  border: 0; background: none; color: var(--warning-text); font-weight: 400;
+}
+#btn-signin.reconnect[hidden] { display: none; }
+#btn-signin.reconnect .icon { width: 22px; height: 22px; }
 
 .icon-btn-top {
   appearance: none; flex: none; display: inline-grid; place-items: center; cursor: pointer;

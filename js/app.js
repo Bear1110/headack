@@ -111,8 +111,8 @@ async function trySync() {
   render();
 }
 
-// 必須在點擊事件中同步呼叫（見 auth.requestToken）
-function signIn() {
+// 必須在點擊事件中同步呼叫（見 auth.requestToken）。quiet：自動重連失敗時不跳錯誤提示
+function signIn({ quiet = false } = {}) {
   auth.requestToken({ firstTime: !auth.getEmail() })
     .then(async (token) => {
       try {
@@ -131,9 +131,42 @@ function signIn() {
       await trySync();
     })
     .catch((e) => {
-      if (e.message === 'superseded') return;
+      if (e.message === 'superseded' || quiet) return;
       toast(e.message === 'popup_failed_to_open' ? t('error.popup') : t('error.auth'));
     });
+}
+
+// 權杖過期時，使用者下一次點畫面任何地方就順便重新連線（等同替他按「重新連線」）。
+// 不能用程式呼叫 button.click()：沒有真的使用者手勢，Google 彈窗會被瀏覽器擋掉。
+// 每次過期只自動試一次；被關掉或失敗就留給右上角的圖示手動按，避免每點一下都跳彈窗。
+let autoReconnectArmed = false;
+let autoReconnectTried = false;
+let expiryTimer = 0;
+
+function needsReconnect() {
+  return authReady && !store.isDemo() && !!auth.getEmail() && !auth.hasValidToken();
+}
+
+function onAutoReconnectClick(e) {
+  disarmAutoReconnect();
+  if (!needsReconnect() || !navigator.onLine) return;
+  // 這些按鈕自己會開登入彈窗：一次點擊只能開一個彈窗（開了就用掉使用者手勢），
+  // 這裡先開的話，按鈕自己的彈窗會被擋（例如「清除資料」會失敗）
+  if (e.target.closest?.('#btn-signin, #btn-backup, #btn-clear-confirm')) return;
+  autoReconnectTried = true;
+  signIn({ quiet: true }); // 原本的點擊照常進行，不攔
+}
+
+function armAutoReconnect() {
+  if (autoReconnectArmed || autoReconnectTried) return;
+  autoReconnectArmed = true;
+  document.addEventListener('click', onAutoReconnectClick, true);
+}
+
+function disarmAutoReconnect() {
+  if (!autoReconnectArmed) return;
+  autoReconnectArmed = false;
+  document.removeEventListener('click', onAutoReconnectClick, true);
 }
 
 function signOut() {
@@ -528,7 +561,10 @@ function renderSync() {
   // 雲朵 icon + 未同步筆數；完整文字放在 title / aria-label（桌機另外顯示文字）
   let kind = '';
   let text = '';
-  if (syncState === 'syncing') [kind, text] = ['cloudSync', t('sync.syncing')];
+  // 登入過、權杖過期：狀態改由「重新連線」圖示按鈕表示（雲朵＋斜線），不另外顯示狀態
+  const reconnect = !!email && !hasToken;
+  if (reconnect) [kind, text] = ['', ''];
+  else if (syncState === 'syncing') [kind, text] = ['cloudSync', t('sync.syncing')];
   else if (syncState === 'offline' || syncState === 'error') [kind, text] = ['cloudOff', t(syncState === 'offline' ? 'sync.offline' : 'sync.failed')];
   else if (pending) [kind, text] = [hasToken ? 'cloudUp' : 'cloudOff', t('sync.pending', { n: pending })];
   else if (hasToken) [kind, text] = ['cloudCheck', t('sync.synced')];
@@ -540,11 +576,29 @@ function renderSync() {
   const signinBtn = $('#btn-signin');
   signinBtn.hidden = hasToken;
   signinBtn.disabled = !authReady;
-  // 窄螢幕顯示短版文字（由 CSS 切換）
-  const full = t(email ? 'auth.reconnect' : 'auth.signIn');
-  const short = email ? full : t('auth.signInShort');
-  signinBtn.innerHTML = `<span class="label-full">${escapeHtml(full)}</span><span class="label-short">${escapeHtml(short)}</span>`;
-  signinBtn.title = full;
+  signinBtn.classList.toggle('reconnect', reconnect);
+  if (reconnect) {
+    // 跟同步狀態同一套樣式：手機只有圖示（＋未同步筆數），桌機另外顯示文字
+    const label = t('auth.reconnect');
+    const full = pending ? `${label} · ${t('sync.pending', { n: pending })}` : label;
+    signinBtn.innerHTML = `${icon('cloudOff')}${pending ? `<span class="sync-count">${pending}</span>` : ''}<span class="sync-text">${escapeHtml(full)}</span>`;
+    signinBtn.title = full;
+    signinBtn.setAttribute('aria-label', full);
+  } else {
+    // 窄螢幕顯示短版文字（由 CSS 切換）
+    const full = t('auth.signIn');
+    signinBtn.innerHTML = `<span class="label-full">${escapeHtml(full)}</span><span class="label-short">${escapeHtml(t('auth.signInShort'))}</span>`;
+    signinBtn.title = full;
+    signinBtn.removeAttribute('aria-label');
+  }
+  if (needsReconnect()) armAutoReconnect();
+  else {
+    disarmAutoReconnect();
+    if (hasToken) autoReconnectTried = false; // 連上了：下次過期可以再自動試一次
+  }
+  // 網頁一直開著時，權杖到期那一刻沒有任何事件會重畫：排一次重畫，切成「重新連線」並開始等使用者點
+  clearTimeout(expiryTimer);
+  if (hasToken) expiryTimer = setTimeout(renderSync, auth.msUntilExpiry() + 1000);
   $('#btn-sync').hidden = !hasToken || !pending || syncState === 'syncing';
 
   let msg = '';

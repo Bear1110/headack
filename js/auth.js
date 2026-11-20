@@ -79,6 +79,11 @@ export function hasValidToken() {
   return !isDemo() && !!token && Date.now() < expiresAt - EXPIRY_MARGIN_MS;
 }
 
+// 再過多久 hasValidToken() 會變成 false（毫秒）；沒有權杖時為 0
+export function msUntilExpiry() {
+  return hasValidToken() ? expiresAt - EXPIRY_MARGIN_MS - Date.now() : 0;
+}
+
 export function getToken() {
   return hasValidToken() ? token : null;
 }
